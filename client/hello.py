@@ -85,7 +85,7 @@ class User(AbstractUser):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 """
-{
-  "email": "eyob@gmail.com",
-  "password": "mypass123456"
-}
+# {
+#   "email": "eyob@gmail.com",
+#   "password": "mypass123456"
+# }
