@@ -23,14 +23,29 @@ class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def login(self, request):
         serializer = LoginSerializer(data=request.data)
+
         if serializer.is_valid():
             tokens = serializer.validated_data
-            # user = UserSerializer(serializer.user).data
+            refresh_token = tokens['refresh']
+            access_token = tokens['access']
 
-            return Response({
+            response = Response({
                 "message": "Login successful",
-                # "user": user,
-                "access": tokens['access'],
-                "refresh": tokens['refresh']
+                "access": access_token,
             })
+
+
+            response['X-Refresh-Token'] = refresh_token
+
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                httponly=True,
+                secure=True,
+                samesite='Lax',
+                max_age=60 * 60 * 24 * 7,
+            )
+
+            return response
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
