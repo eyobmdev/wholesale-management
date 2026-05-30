@@ -9,4 +9,5 @@ dependencies = [
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
     "djangorestframework-stubs>=3.17.0",
+    "python-decouple>=3.8",
 ]
