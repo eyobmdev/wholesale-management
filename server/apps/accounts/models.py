@@ -23,11 +23,11 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     email = models.EmailField(blank=False,unique=True)
 
-    class Meta:
-        fields = ["first_name","last_name","email","password","password2"]
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS =["first_name","last_name"]
+
+    class Meta:
+        db_table = 'users'
 
     def __str__(self):
         if self.first_name and self.last_name:
