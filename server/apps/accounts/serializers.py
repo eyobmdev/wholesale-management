@@ -50,6 +50,7 @@ class LoginSerializer(serializers.Serializer):
     def validate_email(self, value):
         return value.lower()
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
