@@ -46,7 +46,6 @@ class LoginView(APIView):
             password=serializer.validated_data.get("password")
         )
 
-
         if not user:
             raise AuthenticationFailed("Invalid email or password.")
 
