@@ -6,7 +6,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Email is required')
-        # extra_fields.setdefault("username", email)
+        extra_fields.setdefault("username", email)
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -28,6 +28,8 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'users'
+
+    objects = UserManager()
 
     def __str__(self):
         if self.first_name and self.last_name:
