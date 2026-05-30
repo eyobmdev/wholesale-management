@@ -12,5 +12,4 @@ COOKIE_CONFIG = {
 
 def set_auth_cookies(response, refresh_token):
     response.set_cookie(**COOKIE_CONFIG, value=str(refresh_token))
-    response['X-Refresh-Token'] = str(refresh_token)
     return response
