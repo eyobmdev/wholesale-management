@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate,get_user_model
+from django.contrib.auth import authenticate,get_user_model, update_session_auth_hash
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,7 +11,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.conf import settings
-from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer
+from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer, ChangePasswordSerializer
 from .utils import send_password_reset_email
 import logging
 
@@ -179,4 +179,26 @@ class ResetPasswordView(APIView):
             'message': 'Password reset successfully. Please login.'
         })
 
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.save()
+
+        # Keep user logged in after password change
+        update_session_auth_hash(request, user)
+
+        return Response({
+            "success": True,
+            "message": "Password successfully changed.",
+            "status_code": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
 
