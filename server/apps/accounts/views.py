@@ -167,3 +167,18 @@ class ForgotPasswordView(APIView):
         })
 
 
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+        user.set_password(serializer.validated_data['password'])
+        user.save()
+
+        return Response({
+            'success': True,
+            'message': 'Password reset successfully. Please login.'
+        })
