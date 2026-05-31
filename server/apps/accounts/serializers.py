@@ -75,3 +75,34 @@ class ForgotPasswordSerializer(serializers.Serializer):
         return self.user
 
 
+class ResetPasswordSerializer(serializers.Serializer):
+    uid   = serializers.CharField()
+    token = serializers.CharField()
+    password  = serializers.CharField(min_length=8, write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        # decode uid
+        try:
+            uid  = force_str(urlsafe_base64_decode(attrs['uid']))
+            user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError):
+            raise serializers.ValidationError({"uid": "Invalid reset link."})
+
+        # verify token
+        token_generator = PasswordResetTokenGenerator()
+        if not token_generator.check_token(user, attrs['token']):
+            raise serializers.ValidationError({"token": "Reset link is invalid or has expired."})
+
+        # verify passwords match
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password2": "Passwords do not match."})
+
+        # validate password strength
+        try:
+            django_validate_password(attrs['password'], user)
+        except Exception as e:
+            raise serializers.ValidationError({"password": list(e.messages)})
+
+        attrs['user'] = user
+        return attrs
