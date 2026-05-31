@@ -10,13 +10,13 @@ from .utils import set_auth_cookies
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
 from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer
+from .utils import send_password_reset_email
+import logging
 
 
-
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 class RegisterView(APIView):
@@ -139,33 +139,25 @@ class ForgotPasswordView(APIView):
 
         user = serializer.get_user()
 
-        # always return success even if email doesn't exist
-        # prevents email enumeration attacks
         if user:
-            token_generator = PasswordResetTokenGenerator()
-            uid   = urlsafe_base64_encode(force_bytes(user.pk))
-            token = token_generator.make_token(user)
+            try:
+                token_generator = PasswordResetTokenGenerator()
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = token_generator.make_token(user)
 
-            reset_url = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
+                reset_url = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
-            html_message = render_to_string('accounts/reset_password_email.html', {
-                'first_name': user.first_name,
-                'reset_url':  reset_url,
-            })
+                send_password_reset_email(user, reset_url)
 
-            send_mail(
-                subject='Reset your password',
-                message=f'Reset your password: {reset_url}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                html_message=html_message,
-            )
+            except Exception as e:
+                logger.error("Email failed", exc_info=True)
+
 
         return Response({
             'success': True,
+            'status_code': 200,
             'message': 'If this email is registered you will receive a reset link shortly.'
         })
-
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
