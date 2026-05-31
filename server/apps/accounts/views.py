@@ -19,6 +19,9 @@ import logging
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
+
+
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -159,6 +162,7 @@ class ForgotPasswordView(APIView):
             'message': 'If this email is registered you will receive a reset link shortly.'
         })
 
+
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
 
@@ -174,3 +178,5 @@ class ResetPasswordView(APIView):
             'success': True,
             'message': 'Password reset successfully. Please login.'
         })
+
+
