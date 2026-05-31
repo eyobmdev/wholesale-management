@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from rest_framework import serializers
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 
 
 User = get_user_model()
@@ -106,3 +107,47 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        min_length=8,
+        error_messages={"min_length": "New password must be at least 8 characters long."}
+    )
+    confirm_password = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+
+        # Check old password
+        if not user.check_password(attrs['old_password']):
+            raise serializers.ValidationError({
+                "old_password": "Your old password was entered incorrectly."
+            })
+
+        # Check new password confirmation
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({
+                "confirm_password": "Passwords do not match!"
+            })
+
+        # Prevent using the same password
+        if attrs['old_password'] == attrs['new_password']:
+            raise serializers.ValidationError({
+                "new_password": "New password cannot be the same as the old password."
+            })
+
+        return attrs
+
+    def save(self):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
+
+
+
+
