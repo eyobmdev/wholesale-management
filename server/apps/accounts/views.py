@@ -7,6 +7,14 @@ from rest_framework.exceptions import NotAuthenticated, AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken,TokenError
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from .utils import set_auth_cookies
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer
+
 
 
 User = get_user_model()
@@ -120,4 +128,42 @@ class LogoutView(APIView):
         response.delete_cookie('access_token')
 
         return response
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.get_user()
+
+        # always return success even if email doesn't exist
+        # prevents email enumeration attacks
+        if user:
+            token_generator = PasswordResetTokenGenerator()
+            uid   = urlsafe_base64_encode(force_bytes(user.pk))
+            token = token_generator.make_token(user)
+
+            reset_url = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
+
+            html_message = render_to_string('accounts/reset_password_email.html', {
+                'first_name': user.first_name,
+                'reset_url':  reset_url,
+            })
+
+            send_mail(
+                subject='Reset your password',
+                message=f'Reset your password: {reset_url}',  # plain text fallback
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_message,
+            )
+
+        return Response({
+            'success': True,
+            'message': 'If this email is registered you will receive a reset link shortly.'
+        })
+
 
