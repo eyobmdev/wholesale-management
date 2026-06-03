@@ -23,7 +23,6 @@ def set_auth_cookies(response, refresh_token):
 def send_password_reset_email(user, reset_url):
     if not user.email:
         logger.error("User has no email address")
-        print("User has no email address")
         return False
 
     context = {
