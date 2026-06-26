@@ -42,6 +42,7 @@ class AppSetting(models.Model):
         → Owner can change to 30, 10, etc from settings page
         → Example: bought 10 bags, 20% threshold = alert when 2 bags left
 
+
     default_currency
         → The main currency used
         → Default: ETB
