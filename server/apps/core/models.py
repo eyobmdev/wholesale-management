@@ -12,48 +12,6 @@ class TimeStampedModel(models.Model):
 
 
 class AppSetting(models.Model):
-    """
-    Global settings for the app. Only ONE row ever exists.
-    The owner can change these from a settings page.
-
-    We use a SingletonModel pattern:
-        → only one row allowed
-        → always fetched with AppSetting.get_settings()
-
-    FIELDS:
-
-    business_name
-        → Your company/shop name
-        → Shown on invoices and reports
-        → Example: "Kebede Trading PLC"
-
-    business_phone
-        → Your contact number
-        → Shown on invoices
-
-    business_address
-        → Your location
-        → Shown on invoices
-
-    low_stock_alert_percentage
-        → When remaining bags drop below X% of purchased bags
-          the item is flagged as LOW STOCK on dashboard
-        → Default is 20 (meaning 20%)
-        → Owner can change to 30, 10, etc from settings page
-        → Example: bought 10 bags, 20% threshold = alert when 2 bags left
-
-
-    default_currency
-        → The main currency used
-        → Default: ETB
-        → Can be changed to USD or any currency in available_currencies
-
-    available_currencies
-        → List of currencies the owner has added
-        → Stored as JSON array: ["ETB", "USD"]
-        → Owner can add more from settings page
-        → Example: ["ETB", "USD", "EUR"]
-    """
     business_name = models.CharField(max_length=255,default='My Business')
     business_phone = models.CharField(max_length=20,blank=True,null=True)
     business_address = models.TextField(blank=True,null=True)
@@ -73,13 +31,6 @@ class AppSetting(models.Model):
 
     @classmethod
     def get_settings(cls):
-        """
-        Always returns the one and only settings row.
-        If it does not exist yet, creates it with defaults.
-        Called anywhere in the app like:
-            settings = AppSetting.get_settings()
-            threshold = settings.low_stock_alert_percentage
-        """
         obj, created = cls.objects.get_or_create(
             pk=1,
             defaults={
@@ -97,18 +48,6 @@ class AppSetting(models.Model):
 
 
 class PaymentMethod(models.TextChoices):
-    """
-    Reusable list of payment methods.
-    Used in income, expense, and payment models.
-    TextChoices means stored as text in database.
-
-    CASH     → physical money
-    TELEBIRR → Ethiopian mobile money
-    CBE      → Commercial Bank of Ethiopia transfer
-    BOA      → Bank of Abyssinia transfer
-    AWASH    → Awash Bank transfer
-    OTHER    → anything else (owner writes in notes)
-    """
     CASH = 'cash', 'Cash'
     TELEBIRR = 'telebirr', 'Telebirr'
     CBE = 'cbe', 'CBE'

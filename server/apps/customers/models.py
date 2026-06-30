@@ -1,6 +1,5 @@
 from django.db import models
-from server.apps.core.models import TimeStampedModel
-
+from ..core.models import TimeStampedModel
 
 class Customer(TimeStampedModel):
     name = models.CharField(
