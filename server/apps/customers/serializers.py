@@ -124,7 +124,6 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_balance_status(self, obj):
-        """Same logic as list serializer."""
         balance = obj.current_balance
         if balance > 0:
             return f"Owes you {balance} {obj.initial_credit_currency}"
