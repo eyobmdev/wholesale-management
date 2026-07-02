@@ -4,16 +4,12 @@ from .models import AppSetting
 
 class AppSettingSerializer(serializers.ModelSerializer):
     class Meta:
-        # model = which database model this serializer works with
         model = AppSetting
 
-        # fields = which model fields to include in API
-        # '__all__' means include every field from the model
         fields = '__all__'
 
     def validate_low_stock_alert_percentage(self, value):
         if value < 1 or value > 99:
-            # raise serializers.ValidationError sends error back to frontend
             raise serializers.ValidationError(
                 "Low stock alert percentage must be between 1 and 99."
             )
