@@ -60,19 +60,12 @@ class CustomerViewSet(viewsets.ModelViewSet):
         qs = super().get_queryset()
 
         if self.action == 'list':
-            # List needs sales and income for balance calculations
             qs = qs.prefetch_related('sales', 'income_records')
         elif self.action == 'retrieve':
-            # Detail page needs more data
             qs = qs.prefetch_related('sales', 'income_records')
 
         return qs
 
     def perform_destroy(self, instance):
-        """
-        Soft delete: archive the customer instead of deleting from database.
-        Sets is_active=False so the customer is hidden from lists but
-        data is preserved for history and balance calculations.
-        """
         instance.is_active = False
         instance.save(update_fields=['is_active', 'updated_at'])
