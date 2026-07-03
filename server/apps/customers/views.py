@@ -46,16 +46,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
     filterset_class = CustomerFilter
     search_fields = ['name', 'phone', 'location']
     ordering_fields = ['name', 'opening_date', 'initial_credit', 'created_at']
-    ordering = ['name']  # Default ordering
+    ordering = ['name']
 
     def get_serializer_class(self):
-        """
-        Return the appropriate serializer based on the action.
-
-        list   → CustomerListSerializer (includes balance fields)
-        retrieve → CustomerDetailSerializer (full detail)
-        create/update/partial_update → CustomerCreateUpdateSerializer (write only)
-        """
         if self.action == 'list':
             return CustomerListSerializer
         if self.action == 'retrieve':
@@ -64,10 +57,6 @@ class CustomerViewSet(viewsets.ModelViewSet):
         return CustomerCreateUpdateSerializer
 
     def get_queryset(self):
-        """
-        Optimize queries with select_related/prefetch_related
-        depending on the action.
-        """
         qs = super().get_queryset()
 
         if self.action == 'list':
