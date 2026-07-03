@@ -1,23 +1,35 @@
 """
-URL configuration for config project.
+Main URL configuration for the business app.
+All app URLs are included under /api/ prefix.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+API Endpoints:
+    /api/settings/             → App settings (singleton)
+    /api/customers/            → Customer CRUD
+    /api/factories/            → Factory CRUD
+    /api/purchases/            → Purchase CRUD (with nested items)
+    /api/purchase-items/       → Standalone purchase item CRUD
+    /api/stock/                → Stock batch list (read-only)
+    /api/stock/summary/        → Aggregated stock by item_code
+    /api/stock/available/      → Batches with remaining stock
+    /api/stock/low-stock/      → Low stock and sold out alerts
+    /api/sales/                → Sale CRUD (with nested items)
+    /api/sale-items/           → Standalone sale item CRUD
+    /api/income/               → Customer income records
+    /api/factory-payments/     → Factory payment records
+    /api/expenses/             → General expense records
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('apps.accounts.urls')),
+
+    path('api/', include('apps.core.urls')),
+    # path('api/', include('apps.customers.urls')),
+    # path('api/', include('apps.factories.urls')),
+    # path('api/', include('apps.purchases.urls')),
+    # path('api/', include('apps.inventory.urls')),
+    # path('api/', include('apps.sales.urls')),
+    # path('api/', include('apps.payments.urls')),
 ]
