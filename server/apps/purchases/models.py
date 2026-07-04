@@ -70,18 +70,20 @@ class Purchase(TimeStampedModel):
             f"on {self.date}"
         )
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.recalculate_totals()
+        super().save(*args, **kwargs)
+
     def recalculate_totals(self):
         from django.db.models import Sum
         result = self.items.aggregate(total=Sum('total_item_amount'))
+
         self.total_purchase_amount = result['total'] or 0
         self.unpaid_amount = self.total_purchase_amount - self.amount_paid_now
-        # Make sure unpaid never goes below 0
+
         if self.unpaid_amount < 0:
             self.unpaid_amount = 0
-        Purchase.objects.filter(pk=self.pk).update(
-            total_purchase_amount=self.total_purchase_amount,
-            unpaid_amount=self.unpaid_amount
-        )
 
     @property
     def is_fully_editable(self):
@@ -176,7 +178,7 @@ class PurchaseItem(TimeStampedModel):
         super().save(*args, **kwargs)
 
         self.purchase.recalculate_totals()
-
+        self.purchase.save()
         self._sync_stock_batch()
 
     def _sync_stock_batch(self):
