@@ -42,6 +42,7 @@ class PurchaseItemSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = [
+            'purchase',
             'total_pieces_purchased',
             'total_item_amount',
             'shipping_code',
