@@ -107,6 +107,7 @@ class FactoryDetailSerializer(serializers.ModelSerializer):
             'balance_status',
             'created_at',
             'updated_at',
+            # 'purchases'
         ]
 
     def get_balance_status(self, obj):
