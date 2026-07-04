@@ -5,6 +5,7 @@ auto-updated by SaleItem. No manual create/update/delete allowed.
 
 Includes a custom action for stock summary aggregated by item_code.
 """
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -53,6 +54,7 @@ class StockBatchViewSet(viewsets.ModelViewSet):
     queryset = StockBatch.objects.all()
     pagination_class = StandardPagination
     filterset_class = StockBatchFilter
+    filter_backends = [DjangoFilterBackend]
     search_fields = ['item_code', 'product_name', 'shipping_code']
     ordering_fields = [
         'item_code', 'product_name', 'shipping_code',
