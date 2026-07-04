@@ -1,3 +1,4 @@
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets
 
 from .models import Factory
@@ -40,6 +41,7 @@ class FactoryViewSet(viewsets.ModelViewSet):
     queryset = Factory.objects.all()
     pagination_class = StandardPagination
     filterset_class = FactoryFilter
+    filter_backends = [DjangoFilterBackend]
     search_fields = ['name', 'phone', 'location']
     ordering_fields = ['name', 'initial_balance', 'created_at']
     ordering = ['name']
