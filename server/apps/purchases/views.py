@@ -1,3 +1,4 @@
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -47,6 +48,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     queryset = Purchase.objects.all()
     pagination_class = StandardPagination
     filterset_class = PurchaseFilter
+    filter_backends = [DjangoFilterBackend]
     search_fields = ['shipping_code', 'notes']
     ordering_fields = [
         'date', 'total_purchase_amount', 'amount_paid_now',
@@ -122,6 +124,7 @@ class PurchaseItemViewSet(viewsets.ModelViewSet):
     queryset = PurchaseItem.objects.all()
     pagination_class = StandardPagination
     filterset_class = PurchaseItemFilter
+    filter_backends = [DjangoFilterBackend]
     search_fields = ['item_code', 'product_name']
     ordering_fields = ['item_code', 'total_item_amount', 'purchase_price', 'created_at']
     ordering = ['item_code']
