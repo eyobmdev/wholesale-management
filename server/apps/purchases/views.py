@@ -9,7 +9,7 @@ from .serializers import (
     PurchaseCreateSerializer,
     PurchaseUpdateSerializer,
     PurchaseItemSerializer,
-    PurchaseItemReadSerializer,
+    PurchaseItemReadSerializer, AddItemToPurchaseSerializer,
 )
 from .filters import PurchaseFilter, PurchaseItemFilter
 from ..core.pagination import StandardPagination
@@ -132,7 +132,9 @@ class PurchaseItemViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
             return PurchaseItemReadSerializer
-        # create, update, partial_update
+        elif self.action == 'create':
+            return AddItemToPurchaseSerializer
+        # update, partial_update
         return PurchaseItemSerializer
 
     def get_queryset(self):
