@@ -365,3 +365,32 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
                 purchase=purchase,
                 is_auto=True
             ).delete()
+
+
+class AddItemToPurchaseSerializer(serializers.ModelSerializer):
+    cost_per_piece = serializers.DecimalField(
+        max_digits=15, decimal_places=2, read_only=True
+    )
+    total_pieces_purchased = serializers.IntegerField(read_only=True)
+    total_item_amount = serializers.DecimalField(
+        max_digits=15, decimal_places=2, read_only=True
+    )
+
+    class Meta:
+        model = PurchaseItem
+        fields = [
+            'purchase', 'item_code', 'product_name', 'price_type',
+            'purchase_price', 'pcs_per_bag', 'total_bags_purchased',
+            'total_pieces_purchased', 'total_item_amount',
+            'cost_per_piece', 'currency'
+        ]
+        read_only_fields = ['total_pieces_purchased', 'total_item_amount']
+
+    def validate_purchase(self, purchase):
+        """Important validation"""
+        if not purchase.is_fully_editable:
+            raise serializers.ValidationError(
+                "Cannot add items to this purchase. Some items have already been sold."
+            )
+        return purchase
+
