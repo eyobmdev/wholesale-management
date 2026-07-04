@@ -165,6 +165,7 @@ class PurchaseItemViewSet(viewsets.ModelViewSet):
         purchase = instance.purchase
         instance.delete()
         purchase.recalculate_totals()
+        purchase.save()
 
         return Response(
             {"detail": "Purchase item deleted successfully."},
