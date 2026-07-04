@@ -1,3 +1,4 @@
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets
 
 from .models import Customer
@@ -44,6 +45,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     pagination_class = StandardPagination
     filterset_class = CustomerFilter
+    filter_backends = [DjangoFilterBackend]
     search_fields = ['name', 'phone', 'location']
     ordering_fields = ['name', 'opening_date', 'initial_credit', 'created_at']
     ordering = ['name']
