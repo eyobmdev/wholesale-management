@@ -78,7 +78,6 @@ class SaleFilter(django_filters.FilterSet):
 
 class SaleItemFilter(django_filters.FilterSet):
     """
-    Filter sale items by various fields.
     Example queries:
         /sale-items/?sale=5                  → items from specific sale
         /sale-items/?item_code=SOCK          → items with code containing SOCK
