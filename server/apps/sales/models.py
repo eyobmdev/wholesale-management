@@ -213,12 +213,12 @@ class SaleItem(TimeStampedModel):
             raise ValidationError("Bags sold must be greater than 0.")
 
     def save(self, *args, **kwargs):
-        self.full_clean()
-
-        # Snapshot batch data
         batch = self.stock_batch
         self.pcs_per_bag = batch.pcs_per_bag
         self.purchase_cost_per_piece = batch.cost_per_piece
+        self.full_clean()
+
+        # Snapshot batch data
 
         # Calculate pieces sold
         self.pieces_sold = int(self.bags_sold * self.pcs_per_bag)
