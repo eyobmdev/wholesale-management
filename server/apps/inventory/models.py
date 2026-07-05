@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal, ROUND_HALF_UP
 from ..core.models import TimeStampedModel, AppSetting
 
 
@@ -96,10 +97,16 @@ class StockBatch(TimeStampedModel):
     @property
     def cost_per_piece(self):
         if self.price_type == 'per_piece':
-            return self.purchase_price
-        if self.pcs_per_bag and self.pcs_per_bag > 0:
-            return self.purchase_price / self.pcs_per_bag
-        return 0
+            value = self.purchase_price
+        elif self.pcs_per_bag > 0:
+            value = self.purchase_price / Decimal(self.pcs_per_bag)
+        else:
+            value = Decimal("0.00")
+
+        return value.quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP
+        )
 
     @property
     def stock_value(self):
