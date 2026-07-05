@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
 from .models import Sale, SaleItem
-from ..inventory.models import StockBatch
 
 
 class SaleItemReadSerializer(serializers.ModelSerializer):
@@ -159,6 +158,7 @@ class SaleReadSerializer(serializers.ModelSerializer):
             'date',
             'currency',
             'payment_type',
+            'payment_method',
             'amount_paid_now',
             'total_sale_amount',
             'credit_amount',
@@ -204,72 +204,73 @@ class SaleCreateSerializer(serializers.ModelSerializer):
             'customer',
             'date',
             'currency',
-            'payment_type',
             'amount_paid_now',
+            'payment_method',
             'notes',
             'items',
             'invoice_number',
             'total_sale_amount',
             'credit_amount',
+            'payment_type',
         ]
         read_only_fields = [
             'invoice_number',
             'total_sale_amount',
             'credit_amount',
+            'payment_type',
         ]
 
     def validate_amount_paid_now(self, value):
-        """Cannot be negative."""
         if value < 0:
-            raise serializers.ValidationError(
-                "Amount paid cannot be negative."
-            )
+            raise serializers.ValidationError("Amount paid cannot be negative.")
         return value
 
     def validate_items(self, value):
-        """Must have at least one item."""
         if not value:
-            raise serializers.ValidationError(
-                "A sale must have at least one item."
-            )
+            raise serializers.ValidationError("A sale must have at least one item.")
         return value
 
     def validate(self, data):
-        payment_type = data.get('payment_type')
-        amount_paid = data.get('amount_paid_now', 0)
+        amount_paid_now = data.get('amount_paid_now', 0)
+        total_sale_amount = data.get('total_sale_amount')
+        payment_method = data.get('payment_method')
 
-        if payment_type == Sale.PaymentType.CREDIT and amount_paid > 0:
-            raise serializers.ValidationError(
-                "Credit sale cannot have an amount paid now. "
-                "Set amount paid to 0 or change payment type."
-            )
+        # Auto determine payment_type
+        if amount_paid_now == 0:
+            payment_type = Sale.PaymentType.CREDIT
+        elif amount_paid_now == total_sale_amount:
+            payment_type = Sale.PaymentType.CASH
+        else:
+            payment_type = Sale.PaymentType.PARTIAL
 
-        if payment_type == Sale.PaymentType.PARTIAL and amount_paid <= 0:
-            raise serializers.ValidationError(
-                "Partial payment must have an amount paid greater than 0."
-            )
+        data['payment_type'] = payment_type
+
+        # Validation
+        if payment_type in (Sale.PaymentType.CASH, Sale.PaymentType.PARTIAL):
+            if not payment_method:
+                raise serializers.ValidationError({
+                    "payment_method": "Payment method is required for cash and partial payments."
+                })
+        else:  # CREDIT
+            if payment_method:
+                data['payment_method'] = None
 
         return data
 
     @transaction.atomic
     def create(self, validated_data):
-        # Extract items
         items_data = validated_data.pop('items')
-        # Create sale header
+
         sale = Sale.objects.create(**validated_data)
 
-        # Create each item
         for item_data in items_data:
-            SaleItem.objects.create(
-                sale=sale,
-                **item_data
-            )
+            SaleItem.objects.create(sale=sale, **item_data)
+
         sale.refresh_from_db()
         return sale
 
 
 class SaleUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Sale
         fields = [
@@ -278,6 +279,7 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             'date',
             'currency',
             'payment_type',
+            'payment_method',
             'amount_paid_now',
             'notes',
             'invoice_number',
@@ -288,36 +290,54 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             'invoice_number',
             'total_sale_amount',
             'credit_amount',
+            'payment_type',
         ]
 
     def validate(self, data):
-        """Same payment type validation as create."""
-        payment_type = data.get(
-            'payment_type',
-            self.instance.payment_type if self.instance else None
-        )
-        amount_paid = data.get(
-            'amount_paid_now',
-            self.instance.amount_paid_now if self.instance else 0
-        )
+        instance = self.instance
+        amount_paid_now = data.get('amount_paid_now', instance.amount_paid_now)
+        payment_method = data.get('payment_method')
 
-        if payment_type == Sale.PaymentType.CREDIT and amount_paid > 0:
+        # Auto-determine the correct payment_type based on new amount
+        if amount_paid_now == 0:
+            new_payment_type = Sale.PaymentType.CREDIT
+        elif amount_paid_now >= instance.total_sale_amount:
+            new_payment_type = Sale.PaymentType.CASH
+        else:
+            new_payment_type = Sale.PaymentType.PARTIAL
+
+        data['payment_type'] = new_payment_type
+
+        if new_payment_type == Sale.PaymentType.CREDIT and amount_paid_now > 0:
             raise serializers.ValidationError(
-                "Credit sale cannot have amount paid."
+                "Credit sale cannot have amount paid now."
             )
-        if payment_type == Sale.PaymentType.PARTIAL and amount_paid <= 0:
+
+        if new_payment_type == Sale.PaymentType.PARTIAL and amount_paid_now <= 0:
             raise serializers.ValidationError(
                 "Partial payment must have amount paid greater than 0."
             )
+
+        # Payment method validation for non-credit
+        if new_payment_type in (Sale.PaymentType.CASH, Sale.PaymentType.PARTIAL):
+            if not payment_method and not instance.payment_method:
+                raise serializers.ValidationError({
+                    "payment_method": "Payment method is required for cash and partial payments."
+                })
+
         return data
 
     @transaction.atomic
     def update(self, instance, validated_data):
         """Update sale and sync the auto income record."""
+
         for field, value in validated_data.items():
             setattr(instance, field, value)
+
         instance.save()
-        # Sync auto income based on new amount_paid_now
-        instance._sync_auto_income()
         instance.refresh_from_db()
+
+        # Sync income with possibly new payment_method and amount
+        instance._sync_auto_income()
+
         return instance

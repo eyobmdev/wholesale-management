@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from ..core.models import TimeStampedModel
+from ..core.models import TimeStampedModel, PaymentMethod
 from ..customers.models import Customer
 
 
@@ -43,6 +43,13 @@ class Sale(TimeStampedModel):
         max_length=10,
         choices=PaymentType.choices,
         default=PaymentType.CASH
+    )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PaymentMethod.choices,
+        blank=True,
+        null=True,
+        help_text="Payment method used (CBE, Telebirr, etc.)"
     )
     amount_paid_now = models.DecimalField(
         max_digits=15,
@@ -115,7 +122,7 @@ class Sale(TimeStampedModel):
                     'customer': self.customer,
                     'date': self.date,
                     'paid_amount': self.amount_paid_now,
-                    'payment_method': 'cash',
+                    'payment_method': self.payment_method,
                     'is_auto': True,
                     'notes': f"Auto from sale #{self.invoice_number}",
                 }
