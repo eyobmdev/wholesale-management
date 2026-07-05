@@ -255,7 +255,6 @@ class SaleCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Extract items
         items_data = validated_data.pop('items')
-
         # Create sale header
         sale = Sale.objects.create(**validated_data)
 
