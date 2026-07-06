@@ -192,32 +192,17 @@ class SaleReadSerializer(serializers.ModelSerializer):
 
 
 class SaleCreateSerializer(serializers.ModelSerializer):
-    items = SaleItemWriteSerializer(
-        many=True,
-        write_only=True
-    )
+    items = SaleItemWriteSerializer(many=True, write_only=True)
 
     class Meta:
         model = Sale
         fields = [
-            'id',
-            'customer',
-            'date',
-            'currency',
-            'amount_paid_now',
-            'payment_method',
-            'notes',
-            'items',
-            'invoice_number',
-            'total_sale_amount',
-            'credit_amount',
-            'payment_type',
+            'id', 'customer', 'date', 'currency', 'amount_paid_now',
+            'payment_method', 'notes', 'items',
+            'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type',
         ]
         read_only_fields = [
-            'invoice_number',
-            'total_sale_amount',
-            'credit_amount',
-            'payment_type',
+            'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type',
         ]
 
     def validate_amount_paid_now(self, value):
@@ -232,26 +217,26 @@ class SaleCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         amount_paid_now = data.get('amount_paid_now', 0)
-        total_sale_amount = data.get('total_sale_amount')
+        total_sale_amount = data.get('total_sale_amount') or 0
         payment_method = data.get('payment_method')
 
         # Auto determine payment_type
         if amount_paid_now == 0:
             payment_type = Sale.PaymentType.CREDIT
-        elif amount_paid_now == total_sale_amount:
+        elif amount_paid_now >= total_sale_amount:
             payment_type = Sale.PaymentType.CASH
         else:
             payment_type = Sale.PaymentType.PARTIAL
 
         data['payment_type'] = payment_type
 
-        # Validation
-        if payment_type in (Sale.PaymentType.CASH, Sale.PaymentType.PARTIAL):
+        # Force payment_method when there is payment
+        if amount_paid_now > 0:
             if not payment_method:
                 raise serializers.ValidationError({
-                    "payment_method": "Payment method is required for cash and partial payments."
+                    "payment_method": "Payment method is required when amount_paid_now > 0."
                 })
-        else:  # CREDIT
+        else:
             if payment_method:
                 data['payment_method'] = None
 
@@ -263,34 +248,44 @@ class SaleCreateSerializer(serializers.ModelSerializer):
 
         sale = Sale.objects.create(**validated_data)
 
+        # Create items
         for item_data in items_data:
             SaleItem.objects.create(sale=sale, **item_data)
 
+        # Recalculate totals after items are added
+        sale.recalculate_totals()
+
+        # Create auto income if payment was made
+        if sale.amount_paid_now > 0:
+            self._create_auto_customer_income(sale)
+
         sale.refresh_from_db()
         return sale
+
+    def _create_auto_customer_income(self, sale):
+        from ..payments.models import CustomerIncome
+        CustomerIncome.objects.create(
+            sale=sale,
+            customer=sale.customer,
+            date=sale.date,
+            paid_amount=sale.amount_paid_now,
+            payment_method=sale.payment_method,
+            currency=sale.currency,
+            is_auto=True,
+            notes=f"Auto from sale #{sale.invoice_number}",
+        )
 
 
 class SaleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sale
         fields = [
-            'id',
-            'customer',
-            'date',
-            'currency',
-            'payment_type',
-            'payment_method',
-            'amount_paid_now',
-            'notes',
-            'invoice_number',
-            'total_sale_amount',
-            'credit_amount',
+            'id', 'customer', 'date', 'currency', 'payment_type',
+            'payment_method', 'amount_paid_now', 'notes',
+            'invoice_number', 'total_sale_amount', 'credit_amount',
         ]
         read_only_fields = [
-            'invoice_number',
-            'total_sale_amount',
-            'credit_amount',
-            'payment_type',
+            'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type',
         ]
 
     def validate(self, data):
@@ -298,7 +293,7 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
         amount_paid_now = data.get('amount_paid_now', instance.amount_paid_now)
         payment_method = data.get('payment_method')
 
-        # Auto-determine the correct payment_type based on new amount
+        # Auto determine new payment_type
         if amount_paid_now == 0:
             new_payment_type = Sale.PaymentType.CREDIT
         elif amount_paid_now >= instance.total_sale_amount:
@@ -308,36 +303,51 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
 
         data['payment_type'] = new_payment_type
 
-        if new_payment_type == Sale.PaymentType.CREDIT and amount_paid_now > 0:
-            raise serializers.ValidationError(
-                "Credit sale cannot have amount paid now."
-            )
-
-        if new_payment_type == Sale.PaymentType.PARTIAL and amount_paid_now <= 0:
-            raise serializers.ValidationError(
-                "Partial payment must have amount paid greater than 0."
-            )
-
-        # Payment method validation for non-credit
-        if new_payment_type in (Sale.PaymentType.CASH, Sale.PaymentType.PARTIAL):
-            if not payment_method and not instance.payment_method:
+        # Force payment_method
+        if amount_paid_now > 0:
+            if not payment_method and not getattr(instance, 'payment_method', None):
                 raise serializers.ValidationError({
-                    "payment_method": "Payment method is required for cash and partial payments."
+                    "payment_method": "Payment method is required when amount_paid_now > 0."
                 })
+        else:
+            if payment_method:
+                data['payment_method'] = None
 
         return data
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        """Update sale and sync the auto income record."""
+        old_paid = instance.amount_paid_now
 
         for field, value in validated_data.items():
             setattr(instance, field, value)
 
         instance.save()
+        instance.recalculate_totals()   # Important
+
+        new_paid = instance.amount_paid_now
+
+        # Sync only if payment amount changed
+        if old_paid != new_paid or 'payment_method' in validated_data:
+            self._sync_auto_income(instance)
+
         instance.refresh_from_db()
-
-        # Sync income with possibly new payment_method and amount
-        instance._sync_auto_income()
-
         return instance
+
+    def _sync_auto_income(self, sale):
+        from ..payments.models import CustomerIncome
+        if sale.amount_paid_now > 0 and sale.payment_method:
+            CustomerIncome.objects.update_or_create(
+                sale=sale,
+                is_auto=True,
+                defaults={
+                    'customer': sale.customer,
+                    'date': sale.date,
+                    'paid_amount': sale.amount_paid_now,
+                    'payment_method': sale.payment_method,
+                    'currency': sale.currency,
+                    'notes': f"Auto from sale #{sale.invoice_number}",
+                }
+            )
+        else:
+            CustomerIncome.objects.filter(sale=sale, is_auto=True).delete()
