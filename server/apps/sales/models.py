@@ -99,39 +99,20 @@ class Sale(TimeStampedModel):
             f"{self.total_sale_amount} {self.currency}"
         )
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.recalculate_totals()
+        super().save(*args, **kwargs)
+
     def recalculate_totals(self):
         from django.db.models import Sum
         result = self.items.aggregate(total=Sum('total_line_amount'))
+
         self.total_sale_amount = result['total'] or 0
         self.credit_amount = self.total_sale_amount - self.amount_paid_now
+
         if self.credit_amount < 0:
             self.credit_amount = 0
-        Sale.objects.filter(pk=self.pk).update(
-            total_sale_amount=self.total_sale_amount,
-            credit_amount=self.credit_amount
-        )
-        # Sync the auto income record
-        self._sync_auto_income()
-
-    def _sync_auto_income(self):
-        from ..payments.models import CustomerIncome
-        if self.amount_paid_now > 0:
-            CustomerIncome.objects.update_or_create(
-                sale=self,
-                defaults={
-                    'customer': self.customer,
-                    'date': self.date,
-                    'paid_amount': self.amount_paid_now,
-                    'payment_method': self.payment_method,
-                    'is_auto': True,
-                    'notes': f"Auto from sale #{self.invoice_number}",
-                }
-            )
-        else:
-            CustomerIncome.objects.filter(
-                sale=self,
-                is_auto=True
-            ).delete()
 
 
 class SaleItem(TimeStampedModel):
