@@ -255,13 +255,13 @@ class SaleCreateSerializer(serializers.ModelSerializer):
             SaleItem.objects.create(sale=sale, **item_data)
 
         # Recalculate totals after items are added
+        sale.refresh_from_db()
         sale.recalculate_totals()
 
         # Create auto income if payment was made
         if sale.amount_paid_now > 0:
             self._create_auto_customer_income(sale)
 
-        sale.refresh_from_db()
         return sale
 
     def _create_auto_customer_income(self, sale):

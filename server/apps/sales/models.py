@@ -106,6 +106,7 @@ class Sale(TimeStampedModel):
 
     def recalculate_totals(self):
         from django.db.models import Sum
+
         result = self.items.aggregate(total=Sum('total_line_amount'))
 
         self.total_sale_amount = result['total'] or 0
@@ -113,6 +114,12 @@ class Sale(TimeStampedModel):
 
         if self.credit_amount < 0:
             self.credit_amount = 0
+
+        if self.pk:
+            Sale.objects.filter(pk=self.pk).update(
+                total_sale_amount=self.total_sale_amount,
+                credit_amount=self.credit_amount
+            )
 
 
 class SaleItem(TimeStampedModel):
