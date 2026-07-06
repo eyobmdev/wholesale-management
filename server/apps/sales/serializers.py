@@ -216,6 +216,9 @@ class SaleCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        # Remove any mistakenly sent payment_type
+        data.pop('payment_type', None)
+
         amount_paid_now = data.get('amount_paid_now', 0)
         total_sale_amount = data.get('total_sale_amount') or 0
         payment_method = data.get('payment_method')
@@ -237,8 +240,7 @@ class SaleCreateSerializer(serializers.ModelSerializer):
                     "payment_method": "Payment method is required when amount_paid_now > 0."
                 })
         else:
-            if payment_method:
-                data['payment_method'] = None
+            data['payment_method'] = None
 
         return data
 
