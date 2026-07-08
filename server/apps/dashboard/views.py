@@ -57,7 +57,6 @@ from .serializers import (
 )
 
 
-# ════════════════════════════════════════════════════════════════
 # GLOBAL HELPERS
 
 def _date_range_from_request(request, default_days: int = 30):
