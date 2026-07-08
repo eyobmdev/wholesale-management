@@ -139,9 +139,7 @@ def _trunc_fn(period: str):
 class DashboardViewSet(viewsets.ViewSet):
     """READ-ONLY Dashboard API — no mutations allowed."""
 
-    # ────────────────────────────────────────────────────────────
     # MAIN DASHBOARD  GET /api/dashboard/
-    # ────────────────────────────────────────────────────────────
 
     def list(self, request):
         """
