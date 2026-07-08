@@ -811,7 +811,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # ────────────────────────────────────────────────────────────
     # STOCK OVERVIEW  GET /api/dashboard/stock-overview/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="stock-overview")
     def stock_overview(self, request):
