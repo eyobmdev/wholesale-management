@@ -809,7 +809,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(OverdueCustomersSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # STOCK OVERVIEW  GET /api/dashboard/stock-overview/
 
     @action(detail=False, methods=["get"], url_path="stock-overview")
