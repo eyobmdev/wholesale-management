@@ -571,7 +571,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # ────────────────────────────────────────────────────────────
     # TOP PRODUCTS  GET /api/dashboard/top-products/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="top-products")
     def top_products(self, request):
