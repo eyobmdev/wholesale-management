@@ -1266,9 +1266,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(RevenueVsExpensesSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # INVENTORY AGING  GET /api/dashboard/inventory-aging/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="inventory-aging")
     def inventory_aging(self, request):
