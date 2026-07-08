@@ -669,7 +669,6 @@ class DashboardViewSet(viewsets.ViewSet):
         result = {"period_label": period_label, "by": by, "products": products}
         return Response(TopProductsSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # TOP CUSTOMERS  GET /api/dashboard/top-customers/
 
     @action(detail=False, methods=["get"], url_path="top-customers")
