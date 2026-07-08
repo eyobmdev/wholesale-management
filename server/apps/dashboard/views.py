@@ -1153,9 +1153,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(CustomerBalancesSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # REVENUE VS EXPENSES  GET /api/dashboard/revenue-vs-expenses/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="revenue-vs-expenses")
     def revenue_vs_expenses(self, request):
