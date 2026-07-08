@@ -891,9 +891,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(StockOverviewSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # PAYMENT METHODS  GET /api/dashboard/payment-methods/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="payment-methods")
     def payment_methods(self, request):
@@ -940,9 +938,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(PaymentMethodDistributionSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # EXPENSES BREAKDOWN  GET /api/dashboard/expenses-breakdown/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="expenses-breakdown")
     def expenses_breakdown(self, request):
@@ -1012,9 +1008,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(ExpenseBreakdownSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # FACTORY BALANCES  GET /api/dashboard/factory-balances/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="factory-balances")
     def factory_balances(self, request):
