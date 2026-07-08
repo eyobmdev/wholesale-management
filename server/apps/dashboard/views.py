@@ -569,7 +569,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(ProfitTrendSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # TOP PRODUCTS  GET /api/dashboard/top-products/
 
     @action(detail=False, methods=["get"], url_path="top-products")
