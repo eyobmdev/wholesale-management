@@ -671,7 +671,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # ────────────────────────────────────────────────────────────
     # TOP CUSTOMERS  GET /api/dashboard/top-customers/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="top-customers")
     def top_customers(self, request):
