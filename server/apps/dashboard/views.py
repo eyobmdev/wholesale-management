@@ -1341,9 +1341,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(InventoryAgingSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # PRODUCT PERFORMANCE  GET /api/dashboard/product-performance/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="product-performance")
     def product_performance(self, request):
@@ -1487,9 +1485,7 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(ProductPerformanceListSerializer(result).data)
 
-    # ════════════════════════════════════════════════════════════════
     # PRIVATE COMPUTATION HELPERS
-    # ════════════════════════════════════════════════════════════════
 
     # ── Overdue buckets ──────────────────────────────────────────
 
