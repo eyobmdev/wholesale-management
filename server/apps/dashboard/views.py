@@ -1082,7 +1082,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # ────────────────────────────────────────────────────────────
     # CUSTOMER BALANCES  GET /api/dashboard/customer-balances/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="customer-balances")
     def customer_balances(self, request):
