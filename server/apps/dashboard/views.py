@@ -135,7 +135,6 @@ def _trunc_fn(period: str):
 
 
 # VIEWSET
-# ════════════════════════════════════════════════════════════════
 
 class DashboardViewSet(viewsets.ViewSet):
     """READ-ONLY Dashboard API — no mutations allowed."""
