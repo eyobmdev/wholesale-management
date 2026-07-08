@@ -791,7 +791,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # ────────────────────────────────────────────────────────────
     # OVERDUE CUSTOMERS  GET /api/dashboard/overdue-customers/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="overdue-customers")
     def overdue_customers(self, request):
