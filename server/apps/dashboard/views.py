@@ -134,7 +134,6 @@ def _trunc_fn(period: str):
     return {"daily": TruncDate, "weekly": TruncWeek, "monthly": TruncMonth}[period]
 
 
-# ════════════════════════════════════════════════════════════════
 # VIEWSET
 # ════════════════════════════════════════════════════════════════
 
