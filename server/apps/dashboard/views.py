@@ -789,7 +789,6 @@ class DashboardViewSet(viewsets.ViewSet):
         result = {"period_label": period_label, "by": by, "customers": customer_list}
         return Response(TopCustomersSerializer(result).data)
 
-    # ────────────────────────────────────────────────────────────
     # OVERDUE CUSTOMERS  GET /api/dashboard/overdue-customers/
 
     @action(detail=False, methods=["get"], url_path="overdue-customers")
