@@ -109,6 +109,8 @@ class LoginViewSet(viewsets.ViewSet):
 
         set_auth_cookies(response, refresh, max_age=cookie_age)
         return response
+
+
 class RefreshTokenViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 

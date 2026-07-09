@@ -1,17 +1,19 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-
 from .views import (
     RegisterViewSet,
     LoginViewSet,
+    RefreshTokenViewSet,
     LogoutViewSet,
     ForgotPasswordView,
     ResetPasswordView,
     ChangePasswordView,
 )
 
+
 router = DefaultRouter()
 router.register(r'register', RegisterViewSet, basename='register')
+router.register(r'refresh', RefreshTokenViewSet, basename='refresh')
 router.register(r'login', LoginViewSet, basename='login')
 router.register(r'logout', LogoutViewSet, basename='logout')
 
