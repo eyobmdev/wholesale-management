@@ -1,28 +1,27 @@
-from datetime import timedelta
-
 from django.contrib.auth import authenticate,get_user_model, update_session_auth_hash
 from rest_framework.views import APIView
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.exceptions import NotAuthenticated, AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken,TokenError
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
-from .utils import set_auth_cookies
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.conf import settings
-from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer, ChangePasswordSerializer
-from .utils import send_password_reset_email
+
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken,TokenError
+from datetime import timedelta,datetime
 import logging
 
 
+from .serializers import (
+    RegisterSerializer, UserSerializer, ForgotPasswordSerializer, ResetPasswordSerializer, \
+    ChangePasswordSerializer, LoginSerializer)
+from .utils import set_auth_cookies,send_password_reset_email
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
-
 
 class RegisterViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
@@ -35,16 +34,25 @@ class RegisterViewSet(viewsets.ViewSet):
         user = serializer.save()
         remember_me = serializer.validated_data.get("remember_me", False)
 
-        refresh = RefreshToken.for_user(user)
+        if remember_me:
+            lifetime = timedelta(days=30)
+            refresh = RefreshToken.for_user(user)
+            refresh.set_exp(lifetime=lifetime)
 
-        # Extend only if remember_me=True
-        cookie_age = timedelta(days=30) if remember_me else None
+            access = AccessToken.for_user(user)
+            access.set_exp(lifetime=lifetime)
+
+            cookie_age = lifetime
+        else:
+            refresh = RefreshToken.for_user(user)
+            access = refresh.access_token
+            cookie_age = None
 
         response = Response({
             "success": True,
             "message": "Account created successfully.",
             "user": UserSerializer(user).data,
-            "access": str(refresh.access_token),
+            "access": str(access),
         }, status=status.HTTP_201_CREATED)
 
         set_auth_cookies(response, refresh, max_age=cookie_age)
@@ -58,6 +66,7 @@ class LoginViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        remember_me = serializer.validated_data.get("remember_me", False)
 
         user = authenticate(
             request,
@@ -68,23 +77,38 @@ class LoginViewSet(viewsets.ViewSet):
         if not user:
             raise AuthenticationFailed("Invalid email or password.")
 
-        remember_me = serializer.validated_data.get("remember_me", False)
+        if remember_me:
+            # 30 days lifetime
+            lifetime = timedelta(days=30)
+            expires_at = datetime.utcnow() + lifetime
 
-        refresh = RefreshToken.for_user(user)
+            # Create Refresh Token with custom expiration
+            refresh = RefreshToken.for_user(user)
+            refresh.set_exp(lifetime=lifetime)
 
-        cookie_age = timedelta(days=30) if remember_me else None
+            # Create Access Token with custom expiration
+            access = AccessToken.for_user(user)
+            access.set_exp(lifetime=lifetime)
+
+            cookie_age = lifetime
+            print("30 DAYS APPLIED SUCCESSFULLY")
+        else:
+            refresh = RefreshToken.for_user(user)
+            access = refresh.access_token
+            cookie_age = None
+            print("Default 7 days")
+
+        print("Final Access EXP:", datetime.fromtimestamp(access['exp']))
 
         response = Response({
             "success": True,
             "message": "Login successful",
             "user": UserSerializer(user).data,
-            "access": str(refresh.access_token),
+            "access": str(access),
         })
 
         set_auth_cookies(response, refresh, max_age=cookie_age)
         return response
-
-
 class RefreshTokenViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
