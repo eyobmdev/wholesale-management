@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSettings, useUpdateSettings, useUpdatePassword } from '../../services/settingsService.js';
+import { useSettings, useUpdateSettings } from '../../services/settingsService.js';
+import { useUpdatePassword } from '../../services/authService.js';
 
 export default function Settings() {
   const { data: initialSettings, isLoading, isError } = useSettings();
@@ -29,6 +30,12 @@ export default function Settings() {
   });
   const [pwdError, setPwdError] = useState('');
   const [pwdSuccess, setPwdSuccess] = useState('');
+  
+  const [showPwd, setShowPwd] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
 
   // Initialize form data when query completes
   useEffect(() => {
@@ -160,6 +167,7 @@ export default function Settings() {
         <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>Manage your application preferences and business details.</p>
       </div>
 
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', alignItems: 'start' }}>
       {/* App Settings Card */}
       <div className="card-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
         {error && <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{error}</div>}
@@ -290,7 +298,7 @@ export default function Settings() {
       </div>
 
       {/* Change Password Card */}
-      <div className="card-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)', marginTop: '24px' }}>
+      <div className="card-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '24px' }}>Change Password</h3>
         
         {pwdError && <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{pwdError}</div>}
@@ -298,40 +306,61 @@ export default function Settings() {
 
         <form onSubmit={handlePasswordSubmit} className="settings-form-grid">
           
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
             <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>Current Password</label>
-            <input 
-              type="password" 
-              name="current_password" 
-              value={passwordData.current_password} 
-              onChange={handlePasswordChange} 
-              required
-              style={{ padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type={showPwd.current ? "text" : "password"} 
+                name="current_password" 
+                value={passwordData.current_password} 
+                onChange={handlePasswordChange} 
+                required
+                style={{ width: '100%', padding: '12px', paddingRight: '40px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
+              />
+              <i 
+                className={showPwd.current ? "ri-eye-line" : "ri-eye-off-line"} 
+                onClick={() => setShowPwd(prev => ({ ...prev, current: !prev.current }))}
+                style={{ position: 'absolute', right: '12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem' }}
+              ></i>
+            </div>
           </div>
 
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
             <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>New Password</label>
-            <input 
-              type="password" 
-              name="new_password" 
-              value={passwordData.new_password} 
-              onChange={handlePasswordChange} 
-              required
-              style={{ padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type={showPwd.new ? "text" : "password"} 
+                name="new_password" 
+                value={passwordData.new_password} 
+                onChange={handlePasswordChange} 
+                required
+                style={{ width: '100%', padding: '12px', paddingRight: '40px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
+              />
+              <i 
+                className={showPwd.new ? "ri-eye-line" : "ri-eye-off-line"} 
+                onClick={() => setShowPwd(prev => ({ ...prev, new: !prev.new }))}
+                style={{ position: 'absolute', right: '12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem' }}
+              ></i>
+            </div>
           </div>
 
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
             <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>Confirm New Password</label>
-            <input 
-              type="password" 
-              name="confirm_password" 
-              value={passwordData.confirm_password} 
-              onChange={handlePasswordChange} 
-              required
-              style={{ padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type={showPwd.confirm ? "text" : "password"} 
+                name="confirm_password" 
+                value={passwordData.confirm_password} 
+                onChange={handlePasswordChange} 
+                required
+                style={{ width: '100%', padding: '12px', paddingRight: '40px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
+              />
+              <i 
+                className={showPwd.confirm ? "ri-eye-line" : "ri-eye-off-line"} 
+                onClick={() => setShowPwd(prev => ({ ...prev, confirm: !prev.confirm }))}
+                style={{ position: 'absolute', right: '12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem' }}
+              ></i>
+            </div>
           </div>
 
           <button className="full-width" type="submit" disabled={isSavingPwd} style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: isSavingPwd ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)', opacity: isSavingPwd ? 0.7 : 1 }}>
@@ -339,7 +368,8 @@ export default function Settings() {
           </button>
         </form>
       </div>
-
+      
+      </div>
     </div>
   );
 }
