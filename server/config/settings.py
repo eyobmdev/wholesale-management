@@ -44,7 +44,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    # "corsheaders",
+    "corsheaders",
     "django_filters",
     # "drf_spectacular",
 ]
@@ -63,6 +63,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -178,3 +179,6 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 # your existing SMTP config should already be here
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# CORS_ALLOWED_ORIGINS = [*]
+CORS_ALLOW_ALL_ORIGINS = True
