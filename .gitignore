@@ -10,3 +10,5 @@ wheels/
 .venv
 /server/.venv
 /server/.env
+
+/client/node_modules/*
