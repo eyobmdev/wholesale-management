@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCustomers } from '../../services/customerService.js';
 import { DataTable, Badge, Button, Card } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 
 export default function Customers() {
+  const navigate = useNavigate();
   // Query state
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -58,7 +60,7 @@ export default function Customers() {
     {
       icon: 'ri-eye-line',
       label: 'View',
-      onClick: (row) => showToast.info('View', `Viewing ${row.name}`)
+      onClick: (row) => navigate(`/customers/${row.id}`)
     },
     {
       icon: 'ri-money-dollar-circle-line',
