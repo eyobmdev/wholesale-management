@@ -8,10 +8,13 @@ export default function Settings() {
     business_address: '',
     low_stock_alert_percentage: 20,
     default_currency: 'ETB',
-    available_currencies: 'ETB, USD'
+    available_currencies: ['ETB', 'USD']
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Currency input state for the tag input
+  const [currencyInput, setCurrencyInput] = useState('');
 
   // Password State
   const [passwordData, setPasswordData] = useState({
@@ -31,6 +34,28 @@ export default function Settings() {
     const { name, value } = e.target;
     setPasswordData(prev => ({ ...prev, [name]: value }));
   };
+  
+  // Handlers for currency tags
+  const handleCurrencyKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const newCurrency = currencyInput.trim().toUpperCase();
+      if (newCurrency && !formData.available_currencies.includes(newCurrency)) {
+        setFormData(prev => ({
+          ...prev,
+          available_currencies: [...prev.available_currencies, newCurrency]
+        }));
+      }
+      setCurrencyInput('');
+    }
+  };
+
+  const removeCurrency = (currencyToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      available_currencies: prev.available_currencies.filter(c => c !== currencyToRemove)
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,7 +68,7 @@ export default function Settings() {
       return;
     }
 
-    const currencies = formData.available_currencies.split(',').map(c => c.trim()).filter(Boolean);
+    const currencies = formData.available_currencies;
     
     if (currencies.length === 0) {
       setError('At least one currency is required.');
@@ -61,7 +86,7 @@ export default function Settings() {
     }
 
     // Pretend to save for now
-    console.log("Saving settings...", { ...formData, available_currencies: currencies });
+    console.log("Saving settings...", formData);
     setSuccess('Settings saved successfully!');
   };
 
@@ -145,19 +170,7 @@ export default function Settings() {
             />
             <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Alert when remaining stock drops below this % of purchased amount</small>
           </div>
-
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>Available Currencies (Comma Separated)</label>
-            <input 
-              type="text" 
-              name="available_currencies" 
-              value={formData.available_currencies} 
-              onChange={handleChange} 
-              placeholder="e.g. ETB, USD"
-              style={{ padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
-            />
-          </div>
-
+          
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>Default Currency</label>
             <select 
@@ -166,10 +179,65 @@ export default function Settings() {
               onChange={handleChange}
               style={{ padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--card-border)', background: 'var(--content-bg)', color: 'var(--text-color)', fontSize: '0.95rem' }}
             >
-              {formData.available_currencies.split(',').map(c => c.trim()).filter(Boolean).map(c => (
+              {formData.available_currencies.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group full-width" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>Available Currencies</label>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              padding: '10px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--card-border)',
+              background: 'var(--content-bg)',
+              alignItems: 'center'
+            }}>
+              {formData.available_currencies.map(currency => (
+                <span key={currency} style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'var(--header-bg)',
+                  padding: '4px 10px',
+                  borderRadius: '16px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  border: '1px solid var(--card-border)'
+                }}>
+                  {currency}
+                  <i 
+                    className="ri-close-line" 
+                    style={{ cursor: 'pointer', fontSize: '1rem', opacity: '0.7' }}
+                    onClick={() => removeCurrency(currency)}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+                  ></i>
+                </span>
+              ))}
+              <input 
+                type="text" 
+                value={currencyInput}
+                onChange={(e) => setCurrencyInput(e.target.value)}
+                onKeyDown={handleCurrencyKeyDown}
+                placeholder="Type and press Enter..."
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  outline: 'none',
+                  flex: '1',
+                  minWidth: '150px',
+                  color: 'var(--text-color)',
+                  fontSize: '0.95rem',
+                  padding: '2px 4px'
+                }}
+              />
+            </div>
+            <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Type a currency (e.g., USD) and press Enter or Comma.</small>
           </div>
 
           <button className="full-width" type="submit" style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)' }}>
