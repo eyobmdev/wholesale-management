@@ -9,7 +9,7 @@ sale/purchase. Manual records can be freely edited and deleted.
 GeneralExpense records are always manually created and can be fully managed.
 """
 from django_filters.rest_framework.backends import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets,filters
 from rest_framework.exceptions import ValidationError
 
 from .models import CustomerIncome, FactoryPayment, GeneralExpense
@@ -68,10 +68,14 @@ class CustomerIncomeViewSet(viewsets.ModelViewSet):
     queryset = CustomerIncome.objects.all()
     pagination_class = StandardPagination
     filterset_class = CustomerIncomeFilter
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     search_fields = ['customer__name', 'receipt_number', 'notes', 'reference']
     ordering_fields = ['date', 'paid_amount', 'created_at']
-    ordering = ['-date', '-created_at']
+    ordering = ['-created_at']
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -139,7 +143,11 @@ class FactoryPaymentViewSet(viewsets.ModelViewSet):
     queryset = FactoryPayment.objects.all()
     pagination_class = StandardPagination
     filterset_class = FactoryPaymentFilter
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     search_fields = ['factory__name', 'payment_number', 'notes', 'reference']
     ordering_fields = ['date', 'paid_amount', 'created_at']
     ordering = ['-date', '-created_at']
@@ -204,7 +212,11 @@ class GeneralExpenseViewSet(viewsets.ModelViewSet):
     queryset = GeneralExpense.objects.all()
     pagination_class = StandardPagination
     filterset_class = GeneralExpenseFilter
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     search_fields = ['description', 'notes', 'expense_number', 'reference']
     ordering_fields = ['date', 'amount', 'created_at']
     ordering = ['-date', '-created_at']
