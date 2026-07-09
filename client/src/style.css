@@ -27,6 +27,49 @@
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+
+  --search-bg: #f1f1f1;
+  --search-focus-bg: #ffffff;
+  --search-focus-border: #000000;
+  
+  --hover-bg: #f5f5f5;
+  --btn-hover-bg: #eaeaea;
+  --btn-hover-text: #000000;
+  
+  --stat-icon-bg: #f1f1f1;
+  --stat-icon-color: #000000;
+}
+
+body.dark-theme {
+  --bg-color: #111111;
+  --text-color: #f5f5f5;
+  --text-muted: #999999;
+  
+  --sidebar-bg: #000000;
+  --sidebar-text: #ffffff;
+  --sidebar-text-muted: #888888;
+  --sidebar-hover: #222222;
+  --sidebar-active: #ffffff;
+  --sidebar-active-bg: #222222;
+  
+  --header-bg: rgba(20, 20, 20, 0.85);
+  --header-border: #333333;
+  
+  --content-bg: #1a1a1a;
+  
+  --card-bg: #242424;
+  --card-border: #333333;
+
+  --search-bg: #2a2a2a;
+  --search-focus-bg: #111111;
+  --search-focus-border: #555555;
+  
+  --hover-bg: #2a2a2a;
+  --btn-hover-bg: #333333;
+  --btn-hover-text: #ffffff;
+  
+  --stat-icon-bg: #333333;
+  --stat-icon-color: #ffffff;
 }
 
 * {
@@ -168,7 +211,7 @@ body {
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: #f1f1f1;
+  background-color: var(--search-bg);
   padding: 8px 16px;
   border-radius: var(--radius-full);
   gap: 8px;
@@ -177,8 +220,8 @@ body {
 }
 
 .search-bar:focus-within {
-  background-color: #ffffff;
-  border-color: #000000;
+  background-color: var(--search-focus-bg);
+  border-color: var(--search-focus-border);
   box-shadow: var(--shadow-sm);
 }
 
@@ -193,6 +236,7 @@ body {
   font-size: 0.9rem;
   font-family: inherit;
   width: 200px;
+  color: var(--text-color);
 }
 
 .icon-btn {
@@ -211,8 +255,8 @@ body {
 }
 
 .icon-btn:hover {
-  background-color: #eaeaea;
-  color: #000;
+  background-color: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
 }
 
 .user-profile {
@@ -227,7 +271,7 @@ body {
 }
 
 .user-profile:hover {
-  background-color: #f5f5f5;
+  background-color: var(--hover-bg);
 }
 
 .avatar {
@@ -324,15 +368,15 @@ body {
 .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: #ccc;
+  border-color: var(--text-muted);
 }
 
 .stat-icon {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-md);
-  background-color: #f1f1f1;
-  color: #000;
+  background-color: var(--stat-icon-bg);
+  color: var(--stat-icon-color);
   display: flex;
   align-items: center;
   justify-content: center;
