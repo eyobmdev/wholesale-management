@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard/index.jsx';
 import Settings from './pages/Settings/index.jsx';
 import Customers from './pages/Customers/index.jsx';
 import CustomerDetails from './pages/Customers/CustomerDetails.jsx';
+import Factories from './pages/Factories/index.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetails />} />
+          <Route path="/factories" element={<Factories />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
             <div style={{padding: '32px', textAlign: 'center'}}>
