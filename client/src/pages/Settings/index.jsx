@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSettings, useUpdateSettings, useUpdatePassword } from '../../services/settingsService.js';
 
 export default function Settings() {
+  const { data: initialSettings, isLoading, isError } = useSettings();
+  const updateSettingsMutation = useUpdateSettings();
+  const updatePasswordMutation = useUpdatePassword();
+
   // App Settings State
   const [formData, setFormData] = useState({
-    business_name: 'My Business',
+    business_name: '',
     business_phone: '',
     business_address: '',
     low_stock_alert_percentage: 20,
@@ -24,6 +29,13 @@ export default function Settings() {
   });
   const [pwdError, setPwdError] = useState('');
   const [pwdSuccess, setPwdSuccess] = useState('');
+
+  // Initialize form data when query completes
+  useEffect(() => {
+    if (initialSettings) {
+      setFormData(initialSettings);
+    }
+  }, [initialSettings]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,9 +97,14 @@ export default function Settings() {
       return;
     }
 
-    // Pretend to save for now
-    console.log("Saving settings...", formData);
-    setSuccess('Settings saved successfully!');
+    updateSettingsMutation.mutate(formData, {
+      onSuccess: () => {
+        setSuccess('Settings saved successfully!');
+      },
+      onError: () => {
+        setError('Failed to save settings. Please try again.');
+      }
+    });
   };
 
   const handlePasswordSubmit = (e) => {
@@ -105,10 +122,36 @@ export default function Settings() {
       return;
     }
 
-    console.log("Changing password...", passwordData);
-    setPwdSuccess('Password changed successfully!');
-    setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+    updatePasswordMutation.mutate(passwordData, {
+      onSuccess: () => {
+        setPwdSuccess('Password changed successfully!');
+        setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+      },
+      onError: () => {
+        setPwdError('Failed to change password. Please try again.');
+      }
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="settings-page" style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <i className="ri-loader-4-line" style={{ display: 'inline-block', animation: 'spin 1s linear infinite', fontSize: '2rem', marginBottom: '16px' }}></i>
+        <p>Loading settings...</p>
+      </div>
+    );
+  }
+  
+  if (isError) {
+    return (
+      <div className="settings-page" style={{ padding: '32px', textAlign: 'center', color: '#ef4444' }}>
+        <p>Failed to load settings. Please try again.</p>
+      </div>
+    );
+  }
+
+  const isSaving = updateSettingsMutation.isPending;
+  const isSavingPwd = updatePasswordMutation.isPending;
 
   return (
     <div className="settings-page">
@@ -240,8 +283,8 @@ export default function Settings() {
             <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Type a currency (e.g., USD) and press Enter or Comma.</small>
           </div>
 
-          <button className="full-width" type="submit" style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)' }}>
-            Save Settings
+          <button className="full-width" type="submit" disabled={isSaving} style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: isSaving ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)', opacity: isSaving ? 0.7 : 1 }}>
+            {isSaving ? 'Saving...' : 'Save Settings'}
           </button>
         </form>
       </div>
@@ -291,8 +334,8 @@ export default function Settings() {
             />
           </div>
 
-          <button className="full-width" type="submit" style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)' }}>
-            Update Password
+          <button className="full-width" type="submit" disabled={isSavingPwd} style={{ marginTop: '16px', padding: '14px', background: 'var(--text-color)', color: 'var(--bg-color)', border: 'none', borderRadius: 'var(--radius-sm)', cursor: isSavingPwd ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem', transition: 'var(--transition)', opacity: isSavingPwd ? 0.7 : 1 }}>
+            {isSavingPwd ? 'Updating...' : 'Update Password'}
           </button>
         </form>
       </div>
