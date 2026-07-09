@@ -20,3 +20,11 @@ export const useCustomers = (params = {}) => {
     keepPreviousData: true,
   });
 };
+
+export const useCustomer = (id) => {
+  return useQuery({
+    queryKey: ['customer', id],
+    queryFn: () => customerService.getCustomer(id),
+    enabled: !!id,
+  });
+};
