@@ -1,9 +1,10 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
 
-from .models import AppSetting
-from .serializers import AppSettingSerializer
+from .models import AppSetting, PaymentMethod
+from .serializers import AppSettingSerializer, PaymentMethodOptionSerializer
 from .pagination import StandardPagination
 
 
@@ -36,3 +37,16 @@ class AppSettingViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed('DELETE', detail='Settings cannot be deleted.')
+
+
+class PaymentMethodOptionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        data = [
+            {"value": value, "label": label}
+            for value, label in PaymentMethod.choices
+        ]
+
+        serializer = PaymentMethodOptionSerializer(data, many=True)
+        return Response(serializer.data)

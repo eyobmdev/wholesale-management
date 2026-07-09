@@ -55,3 +55,8 @@ class AppSettingSerializer(serializers.ModelSerializer):
                 f"in the available currencies list."
             )
         return value
+
+
+class PaymentMethodOptionSerializer(serializers.Serializer):
+    value = serializers.CharField()
+    label = serializers.CharField()
