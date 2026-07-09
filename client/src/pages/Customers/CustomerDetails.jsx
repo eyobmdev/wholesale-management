@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomer } from '../../services/customerService.js';
-import { Card, Button, Badge } from '../../components/common/index.js';
+import { useCustomer, useDeleteCustomer } from '../../services/customerService.js';
+import { Card, Button, Badge, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import CustomerForm from './CustomerForm.jsx';
 import './Customers.css';
 
 export default function CustomerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: customer, isLoading, error } = useCustomer(id);
+  const deleteMutation = useDeleteCustomer();
+  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -43,6 +47,23 @@ export default function CustomerDetails() {
     return <Badge variant="default">Settled</Badge>;
   };
 
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete ${customer.name}?`)) {
+      const toastId = showToast.loading('Deleting...');
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          showToast.success('Deleted', 'Customer deleted successfully');
+          showToast.dismiss(toastId);
+          navigate('/customers', { replace: true });
+        },
+        onError: (err) => {
+          showToast.error('Delete Failed', err.message || 'Could not delete customer');
+          showToast.dismiss(toastId);
+        }
+      });
+    }
+  };
+
   return (
     <div className="middle-class details-page-wrapper">
       {/* Header Area */}
@@ -54,8 +75,8 @@ export default function CustomerDetails() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
               <h1 className="page-title">{customer.name}</h1>
-              <Badge variant={customer.is_active ? "success" : "warning"}>
-                {customer.is_active ? 'Active' : 'Archived'}
+              <Badge variant={(customer.is_active === true || customer.is_active === 'true') ? "success" : "warning"}>
+                {(customer.is_active === true || customer.is_active === 'true') ? 'Active' : 'Archived'}
               </Badge>
             </div>
             <p style={{ color: 'var(--text-muted)' }}>Customer ID: #{customer.id}</p>
@@ -66,14 +87,16 @@ export default function CustomerDetails() {
           <Button 
             variant="outline" 
             leftIcon="ri-edit-line"
-            onClick={() => showToast.info('Edit', 'Edit feature coming soon.')}
+            onClick={() => setIsEditModalOpen(true)}
           >
             Edit
           </Button>
           <Button 
             variant="danger" 
             leftIcon="ri-delete-bin-line"
-            onClick={() => showToast.info('Delete', 'Delete feature coming soon.')}
+            onClick={handleDelete}
+            disabled={deleteMutation.isLoading}
+            isLoading={deleteMutation.isLoading}
           >
             Delete
           </Button>
@@ -114,7 +137,7 @@ export default function CustomerDetails() {
               <div className="info-item">
                 <span className="info-label">Status</span>
                 <span className="info-value">
-                  {customer.is_active ? 'Active' : 'Archived'}
+                  {(customer.is_active === true || customer.is_active === 'true') ? 'Active' : 'Archived'}
                 </span>
               </div>
             </div>
@@ -178,6 +201,18 @@ export default function CustomerDetails() {
         </Card>
 
       </div>
+      
+      <Modal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        title="Edit Customer"
+      >
+        <CustomerForm 
+          initialData={customer}
+          onCancel={() => setIsEditModalOpen(false)}
+          onSuccess={() => setIsEditModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

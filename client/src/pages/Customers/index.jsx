@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomers } from '../../services/customerService.js';
-import { DataTable, Badge, Button, Card } from '../../components/common/index.js';
+import { DataTable, Badge, Button, Card, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import CustomerForm from './CustomerForm.jsx';
 
 export default function Customers() {
   const navigate = useNavigate();
@@ -10,7 +11,10 @@ export default function Customers() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [activeSort, setActiveSort] = useState('name');
-  
+
+  // Modal state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // Filters state
   const [filters, setFilters] = useState({
     is_active: 'true',
@@ -33,22 +37,23 @@ export default function Customers() {
     { key: 'name', title: 'Name', sortable: true },
     { key: 'phone', title: 'Phone' },
     { key: 'location', title: 'Location' },
-    { 
-      key: 'current_balance', 
+    {
+      key: 'current_balance',
       title: 'Balance Status',
       render: (_, row) => {
         const balance = parseFloat(row.current_balance || 0);
         const currency = row.initial_credit_currency || 'ETB';
-        
+
         if (balance > 0) return <Badge variant="danger">Owes {balance.toFixed(2)} {currency}</Badge>;
         if (balance < 0) return <Badge variant="success">You Owe {Math.abs(balance).toFixed(2)} {currency}</Badge>;
         return <Badge variant="default">Settled</Badge>;
       }
     },
-    { 
-      key: 'is_active', 
+    {
+      key: 'is_active',
       title: 'Status',
       render: (isActive) => (
+        console.log(isActive),
         <Badge variant={isActive ? "success" : "warning"}>
           {isActive ? 'Active' : 'Archived'}
         </Badge>
@@ -120,7 +125,7 @@ export default function Customers() {
   };
 
   const handleNewCustomer = () => {
-    showToast.info('New Customer', 'Opening new customer form...');
+    setIsCreateModalOpen(true);
   };
 
   // Pagination config
@@ -136,37 +141,48 @@ export default function Customers() {
         </div>
       </div>
 
-      <DataTable 
+      <DataTable
         columns={columns}
         data={data?.results || []}
         isLoading={isLoading}
         emptyMessage="No customers found matching your criteria."
-        
+
         searchPlaceholder="Search by name, phone..."
         searchValue={search}
         onSearch={handleSearch}
-        
+
         filters={filterConfig}
         onFilterChange={handleFilterChange}
-        
+
         sortOptions={sortConfig}
         activeSort={activeSort}
         onSortChange={handleSortChange}
-        
+
         toolbarActions={
           <Button variant="primary" leftIcon="ri-add-line" onClick={handleNewCustomer}>
             New Customer
           </Button>
         }
-        
+
         rowActions={rowActions}
-        
+
         pagination={{
           currentPage: page,
           totalPages: totalPages,
           onPageChange: (newPage) => setPage(newPage)
         }}
       />
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="New Customer"
+      >
+        <CustomerForm
+          onCancel={() => setIsCreateModalOpen(false)}
+          onSuccess={() => setIsCreateModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }
