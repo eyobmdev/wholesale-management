@@ -20,14 +20,6 @@ export const settingsService = {
     }
     // Real API call
     return await api.put('/settings', data);
-  },
-
-  async updatePassword(passwordData) {
-    if (USE_MOCK) {
-      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Password updated successfully' }), 800));
-    }
-    // Real API call
-    return await api.put('/settings/password', passwordData);
   }
 };
 
@@ -46,11 +38,5 @@ export const useUpdateSettings = () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['settings'] });
     },
-  });
-};
-
-export const useUpdatePassword = () => {
-  return useMutation({
-    mutationFn: (passwordData) => settingsService.updatePassword(passwordData),
   });
 };
