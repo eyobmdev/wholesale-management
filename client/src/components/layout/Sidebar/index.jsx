@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { authService } from '../../../services/authService.js';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -66,6 +67,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <li>
             <a 
               className="logout-btn"
+              onClick={() => authService.logout()}
               style={{ cursor: 'pointer', justifyContent: isCollapsed ? 'center' : 'flex-start', padding: isCollapsed ? '12px 0' : '12px 24px' }} 
               title={isCollapsed ? "Logout" : ""}
             >

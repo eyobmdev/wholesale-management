@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/index.jsx';
 import Header from '../Header/index.jsx';
 
-export default function MainLayout({ children }) {
+export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -17,7 +18,7 @@ export default function MainLayout({ children }) {
       <div className="main-wrapper">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="middle-class">
-          {children}
+          <Outlet />
         </main>
       </div>
     </>
