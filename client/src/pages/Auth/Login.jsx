@@ -18,13 +18,14 @@ export default function Login() {
     const toastId = showToast.loading('Signing in...');
     loginMutation.mutate(formData, {
       onSuccess: (data) => {
-        showToast.success('Success', 'Logged in successfully!');
+        showToast.success('Success', data.message || 'Logged in successfully!');
         showToast.dismiss(toastId);
-        authService.setToken(data.token);
+        authService.setToken(data.access);
         navigate('/dashboard', { replace: true });
       },
       onError: (err) => {
-        showToast.error('Login Failed', err.message || 'Invalid credentials');
+        const errorMsg = err?.message || 'Invalid credentials';
+        showToast.error('Login Failed', errorMsg);
         showToast.dismiss(toastId);
       }
     });
