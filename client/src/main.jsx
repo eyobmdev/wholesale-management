@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout/index.jsx';
+import Settings from './pages/Settings/index.jsx';
 import './style.css';
 
-const InitialContent = () => (
+const DashboardContent = () => (
   <>
     <div className="welcome-card">
       <div className="card-icon"><i className="ri-hand-coin-line"></i></div>
@@ -41,8 +43,18 @@ const InitialContent = () => (
 
 ReactDOM.createRoot(document.getElementById('app')).render(
   <React.StrictMode>
-    <MainLayout>
-      <InitialContent />
-    </MainLayout>
+    <BrowserRouter>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardContent />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<div style={{padding: '32px', textAlign: 'center'}}>
+            <h2>Page not implemented yet</h2>
+            <p style={{color: 'var(--text-muted)', marginTop: '16px'}}>Select Dashboard or Settings from the sidebar.</p>
+          </div>} />
+        </Routes>
+      </MainLayout>
+    </BrowserRouter>
   </React.StrictMode>
 );
