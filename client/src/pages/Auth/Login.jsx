@@ -82,7 +82,7 @@ export default function Login() {
               <label className="remember-me">
                 <input type="checkbox" /> Remember me
               </label>
-              <a href="#" className="forgot-link">Forgot password</a>
+              <Link to="/forgot-password" className="forgot-link">Forgot password</Link>
             </div>
             
             <button type="submit" className="premium-auth-btn" disabled={loginMutation.isPending}>

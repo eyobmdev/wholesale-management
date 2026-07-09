@@ -12,7 +12,15 @@ export const authService = {
   },
 
   async updatePassword(passwordData) {
-    return await api.put('/auth/password', passwordData); 
+    return await api.put('/auth/password/', passwordData); 
+  },
+
+  async forgotPassword(email) {
+    return await api.post('/auth/forgot-password/', { email });
+  },
+
+  async resetPassword(data) {
+    return await api.post('/auth/reset-password/', data);
   },
 
   setTokens(access, refresh) {
@@ -58,5 +66,17 @@ export const useRegister = () => {
 export const useUpdatePassword = () => {
   return useMutation({
     mutationFn: (passwordData) => authService.updatePassword(passwordData),
+  });
+};
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: (email) => authService.forgotPassword(email),
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: (data) => authService.resetPassword(data),
   });
 };
