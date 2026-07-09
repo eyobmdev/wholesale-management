@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -14,6 +14,9 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-left">
+        <button className="icon-btn menu-toggle" onClick={onMenuClick}>
+          <i className="ri-menu-line"></i>
+        </button>
         <h1 className="page-title">Dashboard</h1>
       </div>
       <div className="header-right">
