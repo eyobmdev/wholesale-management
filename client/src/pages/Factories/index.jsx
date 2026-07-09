@@ -69,7 +69,7 @@ export default function Factories() {
     {
       icon: 'ri-eye-line',
       label: 'View',
-      onClick: (row) => showToast.info('View', 'View Factory details feature coming soon')
+      onClick: (row) => navigate(`/factories/${row.id}`)
     },
     {
       icon: 'ri-money-dollar-circle-line',
