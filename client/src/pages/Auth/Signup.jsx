@@ -9,7 +9,8 @@ export default function Signup() {
     last_name: '', 
     email: '', 
     password: '', 
-    password2: '' 
+    password2: '',
+    remember_me: false
   });
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function Signup() {
       onSuccess: (data) => {
         showToast.success('Success', data.message || 'Account created successfully!');
         showToast.dismiss(toastId);
-        authService.setToken(data.access || data.accessf); // Handle the possible "accessf" typo from backend
+        authService.setTokens(data.access || data.accessf, data.refresh); 
         navigate('/dashboard', { replace: true });
       },
       onError: (err) => {
@@ -127,6 +128,16 @@ export default function Signup() {
                 placeholder="Confirm your password"
                 required 
               />
+            </div>
+            
+            <div className="auth-options" style={{ justifyContent: 'flex-start' }}>
+              <label className="remember-me">
+                <input 
+                  type="checkbox" 
+                  checked={formData.remember_me} 
+                  onChange={(e) => setFormData({...formData, remember_me: e.target.checked})}
+                /> Remember me
+              </label>
             </div>
             
             <button type="submit" className="premium-auth-btn" disabled={registerMutation.isPending}>

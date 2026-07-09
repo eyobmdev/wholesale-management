@@ -4,7 +4,7 @@ import { useLogin, authService } from '../../services/authService.js';
 import { showToast } from '../../utils/toast.js';
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', remember_me: false });
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const loginMutation = useLogin();
@@ -20,7 +20,7 @@ export default function Login() {
       onSuccess: (data) => {
         showToast.success('Success', data.message || 'Logged in successfully!');
         showToast.dismiss(toastId);
-        authService.setToken(data.access);
+        authService.setTokens(data.access, data.refresh);
         navigate('/dashboard', { replace: true });
       },
       onError: (err) => {
@@ -80,7 +80,11 @@ export default function Login() {
             
             <div className="auth-options">
               <label className="remember-me">
-                <input type="checkbox" /> Remember me
+                <input 
+                  type="checkbox" 
+                  checked={formData.remember_me} 
+                  onChange={(e) => setFormData({...formData, remember_me: e.target.checked})}
+                /> Remember me
               </label>
               <Link to="/forgot-password" className="forgot-link">Forgot password</Link>
             </div>

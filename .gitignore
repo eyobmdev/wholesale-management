@@ -12,3 +12,4 @@ wheels/
 /server/.env
 
 /client/node_modules/*
+/client/.vite

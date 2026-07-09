@@ -41,9 +41,18 @@ export const authService = {
     localStorage.removeItem('refresh_token');
   },
 
-  logout() {
-    this.removeTokens();
-    window.location.href = '/login';
+  async logout() {
+    try {
+      const refresh = this.getRefreshToken();
+      if (refresh) {
+        await api.post('/auth/logout/', { refresh });
+      }
+    } catch (error) {
+      console.warn("Logout API call failed, but clearing local session anyway.");
+    } finally {
+      this.removeTokens();
+      window.location.href = '/login';
+    }
   },
 
   isAuthenticated() {
