@@ -517,6 +517,10 @@ body {
     padding: 0 12px;
   }
   
+  .middle-class {
+    padding: 16px 12px;
+  }
+  
   .header-right {
     gap: 8px;
   }

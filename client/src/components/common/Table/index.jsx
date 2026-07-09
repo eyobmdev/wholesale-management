@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Input, Button } from '../index.js';
+import React, { useState, useEffect } from 'react';
+import { Input, Button, Select } from '../index.js';
 import './DataTable.css';
 
 export const DataTable = ({
@@ -10,8 +10,16 @@ export const DataTable = ({
   
   // Search / Toolbar
   onSearch,
+  searchValue = '',
   searchPlaceholder = "Search...",
   toolbarActions,
+  
+  // Advanced Toolbar
+  filters = [],
+  onFilterChange,
+  sortOptions = [],
+  activeSort = '',
+  onSortChange,
   
   // Pagination
   pagination,
@@ -25,13 +33,25 @@ export const DataTable = ({
   sortDirection = 'asc',
 }) => {
 
-  const [searchValue, setSearchValue] = useState('');
+  const [localSearch, setLocalSearch] = useState(searchValue);
+
+  // Sync external search value changes
+  useEffect(() => {
+    setLocalSearch(searchValue);
+  }, [searchValue]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onSearch && localSearch !== searchValue) {
+        onSearch(localSearch);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearch, searchValue]);
 
   const handleSearchChange = (e) => {
-    setSearchValue(e.target.value);
-    if (onSearch) {
-      onSearch(e.target.value);
-    }
+    setLocalSearch(e.target.value);
   };
 
   const handleSort = (key) => {
@@ -44,18 +64,43 @@ export const DataTable = ({
     <div className="data-table-container">
       
       {/* Toolbar Area */}
-      {(onSearch || toolbarActions) && (
+      {(onSearch || toolbarActions || filters.length > 0 || sortOptions.length > 0) && (
         <div className="data-table-toolbar">
-          <div className="data-table-search">
+          <div className="data-table-toolbar-left">
             {onSearch && (
-              <Input 
-                leftIcon="ri-search-line" 
-                placeholder={searchPlaceholder} 
-                value={searchValue}
-                onChange={handleSearchChange}
-              />
+              <div className="data-table-search">
+                <Input 
+                  leftIcon="ri-search-line" 
+                  placeholder={searchPlaceholder} 
+                  value={localSearch}
+                  onChange={handleSearchChange}
+                />
+              </div>
+            )}
+            
+            {filters.map((filter) => (
+              <div key={filter.key} className="data-table-filter">
+                <Select
+                  value={filter.value}
+                  onChange={(e) => onFilterChange && onFilterChange(filter.key, e.target.value)}
+                  options={filter.options}
+                  placeholder={filter.placeholder}
+                />
+              </div>
+            ))}
+
+            {sortOptions.length > 0 && (
+              <div className="data-table-sort">
+                <Select
+                  value={activeSort}
+                  onChange={(e) => onSortChange && onSortChange(e.target.value)}
+                  options={sortOptions}
+                  placeholder="Sort by..."
+                />
+              </div>
             )}
           </div>
+          
           <div className="data-table-actions">
             {toolbarActions}
           </div>

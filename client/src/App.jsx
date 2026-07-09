@@ -5,6 +5,7 @@ import MainLayout from './components/layout/MainLayout/index.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute/index.jsx';
 import Dashboard from './pages/Dashboard/index.jsx';
 import Settings from './pages/Settings/index.jsx';
+import Customers from './pages/Customers/index.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -24,6 +25,7 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/customers" element={<Customers />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
             <div style={{padding: '32px', textAlign: 'center'}}>
