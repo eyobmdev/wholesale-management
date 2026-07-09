@@ -29,13 +29,14 @@ export default function Signup() {
     const toastId = showToast.loading('Creating account...');
     registerMutation.mutate(formData, {
       onSuccess: (data) => {
-        showToast.success('Success', 'Account created successfully!');
+        showToast.success('Success', data.message || 'Account created successfully!');
         showToast.dismiss(toastId);
-        authService.setToken(data.token);
+        authService.setToken(data.access || data.accessf); // Handle the possible "accessf" typo from backend
         navigate('/dashboard', { replace: true });
       },
       onError: (err) => {
-        showToast.error('Signup Failed', err.message || 'Could not create account');
+        const errorMsg = err?.message || 'Could not create account';
+        showToast.error('Signup Failed', errorMsg);
         showToast.dismiss(toastId);
       }
     });
