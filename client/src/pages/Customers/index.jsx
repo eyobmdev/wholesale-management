@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomers } from '../../services/customerService.js';
-import { DataTable, Badge, Button, Card, Modal } from '../../components/common/index.js';
+import { DataTable, Badge, Button, Card, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import CustomerForm from './CustomerForm.jsx';
 
@@ -14,6 +14,7 @@ export default function Customers() {
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [paymentCustomer, setPaymentCustomer] = useState(null);
 
   // Filters state
   const [filters, setFilters] = useState({
@@ -70,7 +71,7 @@ export default function Customers() {
     {
       icon: 'ri-money-dollar-circle-line',
       label: 'Record Payment',
-      onClick: (row) => showToast.success('Payment', `Recording payment for ${row.name}`),
+      onClick: (row) => setPaymentCustomer(row),
       variant: 'primary'
     }
   ];
@@ -182,6 +183,21 @@ export default function Customers() {
           onCancel={() => setIsCreateModalOpen(false)}
           onSuccess={() => setIsCreateModalOpen(false)}
         />
+      </Modal>
+
+      <Modal
+        isOpen={!!paymentCustomer}
+        onClose={() => setPaymentCustomer(null)}
+        title={paymentCustomer ? `Record Payment for ${paymentCustomer.name}` : 'Record Payment'}
+      >
+        {paymentCustomer && (
+          <PaymentForm
+            entityIdKey="customer"
+            entityId={paymentCustomer.id}
+            onCancel={() => setPaymentCustomer(null)}
+            onSuccess={() => setPaymentCustomer(null)}
+          />
+        )}
       </Modal>
     </div>
   );

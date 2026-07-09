@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomer, useDeleteCustomer } from '../../services/customerService.js';
-import { Card, Button, Badge, Modal } from '../../components/common/index.js';
+import { Card, Button, Badge, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import CustomerForm from './CustomerForm.jsx';
 import './Customers.css';
@@ -13,6 +13,7 @@ export default function CustomerDetails() {
   const deleteMutation = useDeleteCustomer();
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -103,7 +104,7 @@ export default function CustomerDetails() {
           <Button 
             variant="primary" 
             leftIcon="ri-money-dollar-circle-line"
-            onClick={() => showToast.success('Payment', 'Record Payment UI coming soon.')}
+            onClick={() => setIsPaymentModalOpen(true)}
           >
             Record Payment
           </Button>
@@ -211,6 +212,19 @@ export default function CustomerDetails() {
           initialData={customer}
           onCancel={() => setIsEditModalOpen(false)}
           onSuccess={() => setIsEditModalOpen(false)}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        title={`Record Payment for ${customer.name}`}
+      >
+        <PaymentForm
+          entityIdKey="customer"
+          entityId={customer.id}
+          onCancel={() => setIsPaymentModalOpen(false)}
+          onSuccess={() => setIsPaymentModalOpen(false)}
         />
       </Modal>
     </div>
