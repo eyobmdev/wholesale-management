@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings, useUpdateSettings } from '../../services/settingsService.js';
 import { useUpdatePassword } from '../../services/authService.js';
+import { showToast } from '../../utils/toast.js';
 
 export default function Settings() {
   const { data: initialSettings, isLoading, isError } = useSettings();
@@ -78,64 +79,73 @@ export default function Settings() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
     // Frontend validation matching backend requirements
+    if (!formData.business_name) {
+      showToast.warning('Validation Error', 'Business name is required.');
+      return;
+    }
+
     if (formData.low_stock_alert_percentage < 1 || formData.low_stock_alert_percentage > 99) {
-      setError('Low stock alert percentage must be between 1 and 99.');
+      showToast.warning('Validation Error', 'Low stock alert percentage must be between 1 and 99.');
       return;
     }
 
     const currencies = formData.available_currencies;
     
     if (currencies.length === 0) {
-      setError('At least one currency is required.');
+      showToast.warning('Validation Error', 'At least one currency is required.');
       return;
     }
 
     if (!currencies.includes('ETB')) {
-      setError('ETB must always be in the currency list.');
+      showToast.error('Validation Error', 'ETB must always be in the currency list.');
       return;
     }
 
     if (!currencies.includes(formData.default_currency)) {
-      setError(`Default currency '${formData.default_currency}' must be in the available currencies list.`);
+      showToast.error('Validation Error', `Default currency '${formData.default_currency}' must be in the available currencies list.`);
       return;
     }
 
+    const toastId = showToast.loading('Saving settings...');
+
     updateSettingsMutation.mutate(formData, {
       onSuccess: () => {
-        setSuccess('Settings saved successfully!');
+        showToast.success('Settings saved successfully!');
+        showToast.dismiss(toastId);
       },
       onError: () => {
-        setError('Failed to save settings. Please try again.');
+        showToast.error('Failed to save settings', 'Please try again later.');
+        showToast.dismiss(toastId);
       }
     });
   };
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    setPwdError('');
-    setPwdSuccess('');
 
     if (passwordData.new_password !== passwordData.confirm_password) {
-      setPwdError('New passwords do not match.');
+      showToast.error('Validation Error', 'New passwords do not match.');
       return;
     }
 
     if (passwordData.new_password.length < 8) {
-      setPwdError('Password must be at least 8 characters long.');
+      showToast.warning('Validation Error', 'Password must be at least 8 characters long.');
       return;
     }
 
+    const toastId = showToast.loading('Updating password...');
+
     updatePasswordMutation.mutate(passwordData, {
       onSuccess: () => {
-        setPwdSuccess('Password changed successfully!');
+        showToast.success('Success', 'Password changed successfully!');
         setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+        showToast.dismiss(toastId);
       },
       onError: () => {
-        setPwdError('Failed to change password. Please try again.');
+        showToast.error('Error', 'Failed to change password. Please try again.');
+        showToast.dismiss(toastId);
       }
     });
   };
@@ -170,8 +180,6 @@ export default function Settings() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', alignItems: 'start' }}>
       {/* App Settings Card */}
       <div className="card-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-        {error && <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{error}</div>}
-        {success && <div style={{ padding: '16px', backgroundColor: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>{success}</div>}
 
         <form onSubmit={handleSubmit} className="settings-form-grid">
           
@@ -300,9 +308,6 @@ export default function Settings() {
       {/* Change Password Card */}
       <div className="card-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '24px' }}>Change Password</h3>
-        
-        {pwdError && <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{pwdError}</div>}
-        {pwdSuccess && <div style={{ padding: '16px', backgroundColor: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderRadius: 'var(--radius-md)', marginBottom: '24px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>{pwdSuccess}</div>}
 
         <form onSubmit={handlePasswordSubmit} className="settings-form-grid">
           

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 import MainLayout from './components/layout/MainLayout/index.jsx';
 import Dashboard from './pages/Dashboard/index.jsx';
 import Settings from './pages/Settings/index.jsx';
@@ -20,6 +21,7 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('app')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" expand={true} />
       <BrowserRouter>
         <MainLayout>
           <Routes>
