@@ -10,6 +10,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     { name: 'Inventory', icon: 'ri-archive-line', path: '/inventory' },
     { name: 'Sales', icon: 'ri-shopping-cart-2-line', path: '/sales' },
     { name: 'Purchases', icon: 'ri-truck-line', path: '/purchases' },
+    { name: 'Payments', icon: 'ri-bank-card-line', path: '/payments' },
     { name: 'Customers', icon: 'ri-team-line', path: '/customers' },
     { name: 'Factories', icon: 'ri-building-4-line', path: '/factories' },
   ];
