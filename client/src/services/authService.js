@@ -12,7 +12,7 @@ export const authService = {
   },
 
   async updatePassword(passwordData) {
-    return await api.put('/auth/password/', passwordData); 
+    return await api.put('/auth/change-password/', passwordData); 
   },
 
   async forgotPassword(email) {
