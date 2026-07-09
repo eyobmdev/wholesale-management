@@ -1,16 +1,24 @@
 from django.urls import path
-from .views import (RegisterView,
-                    LoginView,
-                    ForgotPasswordView,
-                    ResetPasswordView,
-                    ChangePasswordView,
-                    LogoutView)
+from rest_framework.routers import DefaultRouter
+
+from .views import (
+    RegisterViewSet,
+    LoginViewSet,
+    LogoutViewSet,
+    ForgotPasswordView,
+    ResetPasswordView,
+    ChangePasswordView,
+)
+
+router = DefaultRouter()
+router.register(r'register', RegisterViewSet, basename='register')
+router.register(r'login', LoginViewSet, basename='login')
+router.register(r'logout', LogoutViewSet, basename='logout')
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='auth_register'),
-    path('login/',LoginView.as_view(),name='auth_login'),
-    path('forgot-password/', ForgotPasswordView.as_view()),
-    path('reset-password/',  ResetPasswordView.as_view()),
-    path('change-password/', ChangePasswordView.as_view()),
-    path('logout/', LogoutView.as_view())
+    *router.urls,
+
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
 ]

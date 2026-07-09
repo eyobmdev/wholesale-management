@@ -9,19 +9,24 @@ from django.utils.http import urlsafe_base64_decode
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        write_only=True,
-        min_length=8,
-        style={'input_type': 'password'}
-    )
-    password2 = serializers.CharField(
-        write_only=True,
-        style={'input_type': 'password'}
-    )
+    password = serializers.CharField(write_only=True, min_length=8)
+    password2 = serializers.CharField(write_only=True)
+    remember_me = serializers.BooleanField(required=False, default=False)
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "email", "password", "password2"]
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+            "password2",
+            "remember_me",
+        ]
+        extra_kwargs = {
+            "first_name": {"required": False},
+            "last_name": {"required": False},
+        }
 
     def validate_email(self, value):
         if User.objects.filter(email=value.lower()).exists():
@@ -42,16 +47,18 @@ class RegisterSerializer(serializers.ModelSerializer):
             })
         return attrs
 
-
     def create(self, validated_data):
-        validated_data.pop("password2")
+        # Remove fields that shouldn't go to create_user()
+        validated_data.pop("password2", None)
+        validated_data.pop("remember_me", None)
+
         user = User.objects.create_user(**validated_data)
         return user
 
-
 class LoginSerializer(serializers.Serializer):
-    email    = serializers.EmailField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+    remember_me = serializers.BooleanField(required=False, default=False)
 
     def validate_email(self, value):
         return value.lower()
@@ -113,8 +120,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
         write_only=True,
         required=True,
-        min_length=8,
-        error_messages={"min_length": "New password must be at least 8 characters long."}
+        min_length=8
     )
     confirm_password = serializers.CharField(write_only=True, required=True)
 
@@ -138,6 +144,12 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 "new_password": "New password cannot be the same as the old password."
             })
+
+        # validate password strength
+        try:
+            django_validate_password(attrs['new_password'], user)
+        except Exception as e:
+            raise serializers.ValidationError({"password": list(e.messages)})
 
         return attrs
 

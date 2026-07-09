@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.contrib.auth import authenticate,get_user_model, update_session_auth_hash
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -21,35 +24,38 @@ User = get_user_model()
 
 
 
-
-class RegisterView(APIView):
+class RegisterViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    def post(self, request):
+    def create(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
+        remember_me = serializer.validated_data.get("remember_me", False)
+
         refresh = RefreshToken.for_user(user)
 
+        # Extend only if remember_me=True
+        cookie_age = timedelta(days=30) if remember_me else None
+
         response = Response({
-            'success': True,
-            'message': 'Account created successfully.',
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
+            "success": True,
+            "message": "Account created successfully.",
+            "user": UserSerializer(user).data,
+            "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
 
-        set_auth_cookies(response, refresh)
-
+        set_auth_cookies(response, refresh, max_age=cookie_age)
         return response
 
 
-class LoginView(APIView):
+class LoginViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    def post(self, request):
+    def create(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -62,25 +68,27 @@ class LoginView(APIView):
         if not user:
             raise AuthenticationFailed("Invalid email or password.")
 
+        remember_me = serializer.validated_data.get("remember_me", False)
+
         refresh = RefreshToken.for_user(user)
 
+        cookie_age = timedelta(days=30) if remember_me else None
+
         response = Response({
-            'success': True,
-            'message': 'Login successful',
-            'user': UserSerializer(user).data,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
+            "success": True,
+            "message": "Login successful",
+            "user": UserSerializer(user).data,
+            "access": str(refresh.access_token),
         })
 
-        set_auth_cookies(response, refresh)
-
+        set_auth_cookies(response, refresh, max_age=cookie_age)
         return response
 
 
-class RefreshTokenView(APIView):
+class RefreshTokenViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
-    def post(self, request):
+    def create(self, request):
         refresh_token = (
             request.COOKIES.get('refresh_token') or
             request.data.get('refresh')
@@ -90,29 +98,30 @@ class RefreshTokenView(APIView):
             raise NotAuthenticated("No refresh token provided.")
 
         try:
+            # Blacklist old token
             old_refresh = RefreshToken(refresh_token)
             old_refresh.blacklist()
 
+            # Create new refresh token for the user
             user = User.objects.get(id=old_refresh['user_id'])
             new_refresh = RefreshToken.for_user(user)
 
             response = Response({
                 'success': True,
-                'access':  str(new_refresh.access_token),
+                'access': str(new_refresh.access_token),
             })
 
             set_auth_cookies(response, new_refresh)
-
             return response
 
-        except (TokenError, User.DoesNotExist):
+        except (TokenError, User.DoesNotExist, KeyError):
             raise AuthenticationFailed("Session expired, please login again.")
 
 
-class LogoutView(APIView):
+class LogoutViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def create(self, request):
         refresh_token = (
             request.COOKIES.get('refresh_token') or
             request.data.get('refresh')
@@ -129,8 +138,9 @@ class LogoutView(APIView):
             'message': 'Logged out successfully'
         })
 
-        response.delete_cookie('refresh_token')
-        response.delete_cookie('access_token')
+        # Clear cookies
+        response.delete_cookie('refresh_token', path='/')
+        response.delete_cookie('access_token', path='/')
 
         return response
 

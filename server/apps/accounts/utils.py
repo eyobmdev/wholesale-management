@@ -7,16 +7,39 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-COOKIE_CONFIG = {
-    'key':      'refresh_token',
-    'httponly': True,
-    'secure':   not settings.DEBUG,
-    'samesite': 'Lax',
-    'max_age':  timedelta(days=config("REFRESH_TOKEN_EXPIRE_DAYS",cast=int)),
-}
 
-def set_auth_cookies(response, refresh_token):
-    response.set_cookie(**COOKIE_CONFIG, value=str(refresh_token))
+
+def set_auth_cookies(response, refresh_token, max_age=None):
+    if isinstance(max_age, timedelta):
+        max_age = int(max_age.total_seconds())
+
+    # Use global SIMPLE_JWT lifetime if no max_age is passed
+    if max_age is None:
+        refresh_lifetime = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7, cast=int)
+        max_age = timedelta(days=refresh_lifetime).total_seconds()
+
+    # Access Token Cookie
+    response.set_cookie(
+        key="access_token",
+        value=str(refresh_token.access_token),
+        max_age=int(max_age),
+        httponly=True,
+        secure=not settings.DEBUG,
+        samesite="Lax",
+        path="/",
+    )
+
+    # Refresh Token Cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=str(refresh_token),
+        max_age=int(max_age),
+        httponly=True,
+        secure=not settings.DEBUG,
+        samesite="Lax",
+        path="/",
+    )
+
     return response
 
 
