@@ -47,26 +47,31 @@ export default function PurchaseDetails() {
 
   return (
     <div className="page-container">
-      {/* Page Header */}
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="page-title">Purchase #{purchase.id}</h1>
-            <Badge 
-              status={
-                purchase.payment_status === 'paid' ? 'success' : 
-                purchase.payment_status === 'partial' ? 'warning' : 'danger'
-              }
-            >
-              {purchase.payment_status?.toUpperCase() || 'UNKNOWN'}
-            </Badge>
+      {/* Header Area */}
+      <div className="details-header">
+        <div className="details-header-left">
+          <button className="back-btn" onClick={() => navigate('/purchases')}>
+            <i className="ri-arrow-left-line"></i>
+          </button>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+              <h1 className="page-title">Purchase #{purchase.id}</h1>
+              <Badge 
+                status={
+                  purchase.payment_status === 'paid' ? 'success' : 
+                  purchase.payment_status === 'partial' ? 'warning' : 'danger'
+                }
+              >
+                {purchase.payment_status?.toUpperCase() || 'UNKNOWN'}
+              </Badge>
+            </div>
+            <p style={{ color: 'var(--text-muted)' }}>
+              {purchase.factory_name} • {formatDate(purchase.date)}
+            </p>
           </div>
-          <p className="page-subtitle" style={{ marginTop: '4px' }}>
-            {purchase.factory_name} • {formatDate(purchase.date)}
-          </p>
         </div>
         
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="details-header-actions">
           <Button variant="outline" leftIcon="ri-money-dollar-circle-line" onClick={() => {}}>
             Edit Payment
           </Button>
