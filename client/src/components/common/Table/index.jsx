@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Select } from '../index.js';
+import { Input, Button, Select, AsyncSelect } from '../index.js';
 import './DataTable.css';
 
 export const DataTable = ({
@@ -79,13 +79,22 @@ export const DataTable = ({
             )}
             
             {filters.map((filter) => (
-              <div key={filter.key} className="data-table-filter">
-                <Select
-                  value={filter.value}
-                  onChange={(e) => onFilterChange && onFilterChange(filter.key, e.target.value)}
-                  options={filter.options}
-                  placeholder={filter.placeholder}
-                />
+              <div key={filter.key} className="data-table-filter" style={{ minWidth: filter.type === 'async-select' ? '200px' : 'auto' }}>
+                {filter.type === 'async-select' ? (
+                  <AsyncSelect
+                    value={filter.value}
+                    onChange={(val) => onFilterChange && onFilterChange(filter.key, val)}
+                    loadOptions={filter.loadOptions}
+                    placeholder={filter.placeholder}
+                  />
+                ) : (
+                  <Select
+                    value={filter.value}
+                    onChange={(e) => onFilterChange && onFilterChange(filter.key, e.target.value)}
+                    options={filter.options}
+                    placeholder={filter.placeholder}
+                  />
+                )}
               </div>
             ))}
 
