@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FormField, Input, Checkbox, Select, Button } from '../../components/common/index.js';
 import { useCreateFactory, useUpdateFactory } from '../../services/factoryService.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export default function FactoryForm({ initialData, onSuccess, onCancel }) {
   const isEdit = !!initialData;
@@ -89,7 +90,7 @@ export default function FactoryForm({ initialData, onSuccess, onCancel }) {
             if (onSuccess) onSuccess();
           },
           onError: (err) => {
-            handleBackendErrors(err);
+            handleBackendErrors(err, setErrors, 'Update Failed');
           }
         }
       );
@@ -103,22 +104,9 @@ export default function FactoryForm({ initialData, onSuccess, onCancel }) {
           if (onSuccess) onSuccess();
         },
         onError: (err) => {
-          handleBackendErrors(err);
+          handleBackendErrors(err, setErrors, 'Creation Failed');
         }
       });
-    }
-  };
-
-  const handleBackendErrors = (err) => {
-    const data = err.response?.data;
-    if (data && typeof data === 'object') {
-      const newErrors = {};
-      Object.keys(data).forEach(key => {
-        newErrors[key] = Array.isArray(data[key]) ? data[key][0] : data[key];
-      });
-      setErrors(newErrors);
-    } else {
-      showToast.error('Error', err.message || 'An error occurred');
     }
   };
 
