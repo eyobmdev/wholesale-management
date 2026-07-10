@@ -16,35 +16,6 @@ from ..core.pagination import StandardPagination
 
 
 class PurchaseViewSet(viewsets.ModelViewSet):
-    """
-    CRUD ViewSet for purchases.
-
-    LIST   /purchases/          → PurchaseSerializer (header + nested items)
-    GET    /purchases/{id}/     → PurchaseSerializer (full detail)
-    POST   /purchases/          → PurchaseCreateSerializer (with nested items)
-    PUT    /purchases/{id}/     → PurchaseUpdateSerializer
-    PATCH  /purchases/{id}/     → PurchaseUpdateSerializer
-    DELETE /purchases/{id}/     → Only if no items sold (is_deletable=True)
-
-    FILTERING:
-        ?factory=2
-        ?factory_name=addis
-        ?date_from=2024-01-01&date_to=2024-06-30
-        ?shipping_code=SHP-A3F2
-        ?currency=USD
-        ?is_fully_editable=true
-        ?has_unpaid=true
-        ?min_total=5000
-
-    SEARCHING:
-        ?search=SHP-A3F2  (searches shipping_code and notes)
-
-    ORDERING:
-        ?ordering=-date           → newest first (default)
-        ?ordering=date            → oldest first
-        ?ordering=-total_purchase_amount
-        ?ordering=-unpaid_amount
-    """
     queryset = Purchase.objects.all()
     pagination_class = StandardPagination
     filterset_class = PurchaseFilter

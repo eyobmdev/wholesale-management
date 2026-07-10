@@ -317,25 +317,51 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'shipping_code',
             'total_purchase_amount',
-            'unpaid_amount',
+            'unpaid_amount'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        instance = getattr(self, 'instance', None)
+
+        # Restrict fields if purchase is NOT fully editable
+        if instance and not instance.is_fully_editable:
+            self.fields['factory'].read_only = True
+            self.fields['date'].read_only = True
+            self.fields['currency'].read_only = True
+
+    def validate(self, data):
+        instance = getattr(self, 'instance', None)
+
+        if instance and not instance.is_fully_editable:
+            # These fields should not be changeable
+            restricted_fields = ['factory', 'date', 'currency']
+
+            for field in restricted_fields:
+                if field in data:
+                    raise serializers.ValidationError({
+                        field: "You cannot change this field because some items from this purchase have already been sold."
+                    })
+
+        return data
 
     def validate_amount_paid_now(self, value):
         if value < 0:
-            raise serializers.ValidationError(
-                "Amount paid cannot be negative."
-            )
+            raise serializers.ValidationError("Amount paid cannot be negative.")
         return value
 
     @transaction.atomic
     def update(self, instance, validated_data):
         old_paid = instance.amount_paid_now
 
+        # Update only the allowed fields
         for field, value in validated_data.items():
             setattr(instance, field, value)
+
         instance.save()
 
-        # Sync the auto factory payment if amount_paid changed
+        # Sync auto factory payment if amount_paid_now changed
         new_paid = instance.amount_paid_now
         if old_paid != new_paid:
             self._sync_auto_factory_payment(instance)
@@ -347,7 +373,6 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
         from ..payments.models import FactoryPayment
 
         if purchase.amount_paid_now > 0:
-            # Update or create the auto payment
             FactoryPayment.objects.update_or_create(
                 purchase=purchase,
                 is_auto=True,
@@ -360,7 +385,6 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
                 }
             )
         else:
-            # amount_paid_now set to 0, remove the auto payment
             FactoryPayment.objects.filter(
                 purchase=purchase,
                 is_auto=True
