@@ -105,7 +105,7 @@ export default function Purchases() {
     {
       icon: 'ri-eye-line',
       label: 'View',
-      onClick: (row) => showToast.info('View', 'View Purchase feature coming soon')
+      onClick: (row) => navigate(`/purchases/${row.id}`)
     },
     {
       icon: 'ri-edit-line',

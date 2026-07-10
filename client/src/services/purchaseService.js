@@ -32,6 +32,14 @@ export const usePurchases = (params = {}) => {
   });
 };
 
+export const usePurchase = (id) => {
+  return useQuery({
+    queryKey: ['purchase', id],
+    queryFn: () => purchaseService.getPurchase(id),
+    enabled: !!id,
+  });
+};
+
 export const useUpdatePurchase = () => {
   const queryClient = useQueryClient();
   return useMutation({
