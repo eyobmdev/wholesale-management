@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePurchase } from '../../services/purchaseService.js';
-import { Card, Badge, Button, DataTable } from '../../components/common/index.js';
+import { Card, Badge, Button, DataTable, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 
 export default function PurchaseDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: purchase, isLoading, isError, error } = usePurchase(id);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   if (isLoading) {
     return (
@@ -77,7 +78,7 @@ export default function PurchaseDetails() {
     {
       icon: 'ri-eye-line',
       label: 'View',
-      onClick: (row) => showToast.info('View Item', 'View item details coming soon')
+      onClick: (row) => setSelectedItem(row)
     }
   ];
 
@@ -256,6 +257,133 @@ export default function PurchaseDetails() {
           </Card.Body>
         </Card>
       </div>
+
+      {/* Item Details Modal */}
+      <Modal 
+        isOpen={!!selectedItem} 
+        onClose={() => setSelectedItem(null)} 
+        title="Purchase Item Details"
+      >
+        {selectedItem && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            
+            <Card>
+              <Card.Header title="Basic Information" icon="ri-information-line" />
+              <Card.Body>
+                <div className="info-list">
+                  <div className="info-item">
+                    <span className="info-label">Product Name</span>
+                    <span className="info-value" style={{ fontWeight: 600 }}>{selectedItem.product_name}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Item Code</span>
+                    <span className="info-value" style={{ fontWeight: 600 }}>{selectedItem.item_code}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Factory</span>
+                    <span className="info-value">{selectedItem.factory_name || purchase.factory_name}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Shipping Code</span>
+                    <span className="info-value">{selectedItem.shipping_code || purchase.shipping_code || '-'}</span>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card>
+              <Card.Header title="Pricing" icon="ri-price-tag-3-line" />
+              <Card.Body>
+                <div className="info-list">
+                  <div className="info-item">
+                    <span className="info-label">Price Type</span>
+                    <span className="info-value">
+                      {selectedItem.price_type === 'per_piece' ? <Badge variant="info">Per Piece</Badge> : 
+                       selectedItem.price_type === 'per_bag' ? <Badge variant="primary">Per Bag</Badge> : 
+                       <Badge variant="default">{selectedItem.price_type}</Badge>}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Purchase Price</span>
+                    <span className="info-value" style={{ fontWeight: 600 }}>
+                      {formatCurrency(selectedItem.purchase_price, selectedItem.currency || purchase.currency)}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Cost Per Piece</span>
+                    <span className="info-value">
+                      {formatCurrency(selectedItem.cost_per_piece, selectedItem.currency || purchase.currency)}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Currency</span>
+                    <span className="info-value">{selectedItem.currency || purchase.currency}</span>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card>
+              <Card.Header title="Packaging" icon="ri-box-3-line" />
+              <Card.Body>
+                <div className="info-list">
+                  <div className="info-item">
+                    <span className="info-label">Pieces Per Bag</span>
+                    <span className="info-value">{selectedItem.pcs_per_bag}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Bags Purchased</span>
+                    <span className="info-value">{selectedItem.total_bags_purchased}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Pieces Purchased</span>
+                    <span className="info-value">{selectedItem.total_pieces_purchased}</span>
+                  </div>
+                  <div className="info-item" style={{ borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '16px' }}>
+                    <span className="info-label">Total Item Amount</span>
+                    <span className="info-value" style={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {formatCurrency(selectedItem.total_item_amount, selectedItem.currency || purchase.currency)}
+                    </span>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card>
+              <Card.Header title="Inventory" icon="ri-stack-line" />
+              <Card.Body>
+                <div className="info-list">
+                  <div className="info-item">
+                    <span className="info-label">Remaining Bags</span>
+                    <span className="info-value" style={{ fontWeight: 600, color: selectedItem.remaining_bags > 0 ? 'var(--success-color, #10b981)' : 'var(--danger-color, #ef4444)' }}>
+                      {selectedItem.remaining_bags}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Remaining Pieces</span>
+                    <span className="info-value" style={{ fontWeight: 600, color: selectedItem.remaining_pieces > 0 ? 'var(--success-color, #10b981)' : 'var(--danger-color, #ef4444)' }}>
+                      {selectedItem.remaining_pieces}
+                    </span>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+
+            <Card>
+              <Card.Header title="System" icon="ri-settings-4-line" />
+              <Card.Body>
+                <div className="info-list">
+                  <div className="info-item">
+                    <span className="info-label">Created At</span>
+                    <span className="info-value">{formatDateTime(selectedItem.created_at)}</span>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+            
+          </div>
+        )}
+      </Modal>
 
     </div>
   );
