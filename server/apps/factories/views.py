@@ -1,5 +1,9 @@
 from django_filters.rest_framework.backends import DjangoFilterBackend
+from django.db.models import Q
 from rest_framework import viewsets,filters
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
 
 from .models import Factory
 from .serializers import (
@@ -70,3 +74,28 @@ class FactoryViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save(update_fields=['is_active', 'updated_at'])
+
+
+class FactoryOptionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        queryset = Factory.objects.all().order_by('name')
+
+        # Optional Search
+        search = request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(code__icontains=search)
+            )
+
+        options = [
+            {
+                "value": factory.id,
+                "label": factory.name
+            }
+            for factory in queryset
+        ]
+
+        return Response(options)
