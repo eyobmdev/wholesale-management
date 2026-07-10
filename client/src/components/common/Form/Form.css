@@ -181,3 +181,7 @@ body.dark-theme .common-select {
   user-select: none;
   line-height: 1.4;
 }
+
+.async-select-inner-input::placeholder {
+  color: #9ca3af !important;
+}

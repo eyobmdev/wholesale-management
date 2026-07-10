@@ -86,6 +86,7 @@ export const AsyncSelect = ({
           <input
             autoFocus
             type="text"
+            className="async-select-inner-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Type to search..."
