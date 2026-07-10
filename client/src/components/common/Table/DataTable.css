@@ -225,3 +225,59 @@ body.dark-theme .data-table-pagination {
     gap: 16px;
   }
 }
+
+.filter-chips-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 24px 16px 24px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--primary-color-light, #eff6ff);
+  color: var(--primary-color, #2563eb);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.filter-chip button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 6px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.filter-chip button:hover {
+  opacity: 1;
+}
+
+.filter-chip button i {
+  font-size: 1rem;
+}
+
+.filter-chip-clear {
+  background: none;
+  border: none;
+  color: var(--danger-color, #ef4444);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.filter-chip-clear:hover {
+  text-decoration: underline;
+}

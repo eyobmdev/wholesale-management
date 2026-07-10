@@ -1,6 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Select, AsyncSelect } from '../index.js';
+import { Input, Button, Select, AsyncSelect, Modal } from '../index.js';
 import './DataTable.css';
+
+const TableFilter = ({ filter, onFilterChange }) => {
+  const { type, key, value, options, placeholder, loadOptions, keyFrom, keyTo, valueFrom, valueTo, placeholderFrom, placeholderTo } = filter;
+  
+  if (type === 'async-select') {
+    return (
+      <div className="data-table-filter" style={{ minWidth: '200px' }}>
+        <AsyncSelect
+          value={value}
+          onChange={(val) => onFilterChange(key, val)}
+          loadOptions={loadOptions}
+          placeholder={placeholder}
+        />
+      </div>
+    );
+  }
+
+  if (type === 'date-range' || type === 'number-range') {
+    const inputType = type === 'date-range' ? 'date' : 'number';
+    return (
+      <div className="data-table-filter" style={{ display: 'flex', gap: '8px', minWidth: '250px' }}>
+        <Input 
+          type={inputType}
+          value={valueFrom}
+          onChange={(e) => onFilterChange(keyFrom, e.target.value)}
+          placeholder={placeholderFrom || 'From'}
+        />
+        <Input 
+          type={inputType}
+          value={valueTo}
+          onChange={(e) => onFilterChange(keyTo, e.target.value)}
+          placeholder={placeholderTo || 'To'}
+        />
+      </div>
+    );
+  }
+
+  if (type === 'date' || type === 'number') {
+    return (
+      <div className="data-table-filter">
+        <Input 
+          type={type}
+          value={value}
+          onChange={(e) => onFilterChange(key, e.target.value)}
+          placeholder={placeholder}
+        />
+      </div>
+    );
+  }
+
+  // Default Select
+  return (
+    <div className="data-table-filter">
+      <Select
+        value={value}
+        onChange={(e) => onFilterChange(key, e.target.value)}
+        options={options}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+};
+
 
 export const DataTable = ({
   columns = [],
@@ -34,6 +97,7 @@ export const DataTable = ({
 }) => {
 
   const [localSearch, setLocalSearch] = useState(searchValue);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Sync external search value changes
   useEffect(() => {
@@ -60,6 +124,40 @@ export const DataTable = ({
     }
   };
 
+  // Filter Chips Logic
+  const activeFilters = filters.reduce((acc, filter) => {
+    if (filter.type === 'date-range' || filter.type === 'number-range') {
+      if (filter.valueFrom) {
+        acc.push({ key: filter.keyFrom, label: `${filter.placeholderFrom || 'From'}: ${filter.valueFrom}` });
+      }
+      if (filter.valueTo) {
+        acc.push({ key: filter.keyTo, label: `${filter.placeholderTo || 'To'}: ${filter.valueTo}` });
+      }
+    } else if (filter.value) {
+      // Find label if it's a standard select
+      let displayLabel = filter.value;
+      if (filter.options) {
+        const opt = filter.options.find(o => o.value === filter.value);
+        if (opt && opt.label !== 'All') displayLabel = opt.label;
+      }
+      acc.push({ key: filter.key, label: displayLabel });
+    }
+    return acc;
+  }, []);
+
+  const clearAllFilters = () => {
+    filters.forEach(filter => {
+      if (filter.type === 'date-range' || filter.type === 'number-range') {
+        if (filter.valueFrom) onFilterChange(filter.keyFrom, '');
+        if (filter.valueTo) onFilterChange(filter.keyTo, '');
+      } else {
+        if (filter.value) onFilterChange(filter.key, '');
+      }
+    });
+  };
+
+  const exceedsFilterThreshold = filters.length > 3;
+
   return (
     <div className="data-table-container">
       
@@ -78,25 +176,23 @@ export const DataTable = ({
               </div>
             )}
             
-            {filters.map((filter) => (
-              <div key={filter.key} className="data-table-filter" style={{ minWidth: filter.type === 'async-select' ? '200px' : 'auto' }}>
-                {filter.type === 'async-select' ? (
-                  <AsyncSelect
-                    value={filter.value}
-                    onChange={(val) => onFilterChange && onFilterChange(filter.key, val)}
-                    loadOptions={filter.loadOptions}
-                    placeholder={filter.placeholder}
-                  />
-                ) : (
-                  <Select
-                    value={filter.value}
-                    onChange={(e) => onFilterChange && onFilterChange(filter.key, e.target.value)}
-                    options={filter.options}
-                    placeholder={filter.placeholder}
-                  />
-                )}
-              </div>
+            {filters.length > 0 && !exceedsFilterThreshold && filters.map((filter, index) => (
+              <TableFilter 
+                key={filter.key || filter.keyFrom || index}
+                filter={filter}
+                onFilterChange={onFilterChange}
+              />
             ))}
+
+            {exceedsFilterThreshold && (
+              <Button 
+                variant="outline" 
+                leftIcon="ri-filter-3-line"
+                onClick={() => setIsFilterModalOpen(true)}
+              >
+                Filters {activeFilters.length > 0 ? `(${activeFilters.length})` : ''}
+              </Button>
+            )}
 
             {sortOptions.length > 0 && (
               <div className="data-table-sort">
@@ -219,6 +315,41 @@ export const DataTable = ({
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Filter Modal for excess filters */}
+      {exceedsFilterThreshold && (
+        <Modal 
+          isOpen={isFilterModalOpen} 
+          onClose={() => setIsFilterModalOpen(false)}
+          title="Advanced Filters"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {filters.map((filter, index) => (
+              <div key={filter.key || filter.keyFrom || index}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '8px', color: 'var(--text-color)' }}>
+                  {filter.placeholder || filter.placeholderFrom || 'Filter'}
+                </label>
+                <TableFilter 
+                  filter={filter}
+                  onFilterChange={onFilterChange}
+                />
+              </div>
+            ))}
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+              <Button variant="outline" onClick={() => {
+                clearAllFilters();
+                setIsFilterModalOpen(false);
+              }}>
+                Clear All
+              </Button>
+              <Button variant="primary" onClick={() => setIsFilterModalOpen(false)}>
+                Apply Filters
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

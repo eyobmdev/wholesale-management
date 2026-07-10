@@ -17,7 +17,12 @@ export default function Purchases() {
   const [filters, setFilters] = useState({
     factory: '',
     has_unpaid: '',
-    is_fully_editable: ''
+    is_fully_editable: '',
+    date_from: '',
+    date_to: '',
+    min_total: '',
+    max_total: '',
+    min_unpaid: ''
   });
 
   // Fetch data
@@ -27,7 +32,12 @@ export default function Purchases() {
     ordering: activeSort || undefined,
     ...(filters.factory ? { factory: filters.factory } : {}),
     ...(filters.has_unpaid !== '' ? { has_unpaid: filters.has_unpaid } : {}),
-    ...(filters.is_fully_editable !== '' ? { is_fully_editable: filters.is_fully_editable } : {})
+    ...(filters.is_fully_editable !== '' ? { is_fully_editable: filters.is_fully_editable } : {}),
+    ...(filters.date_from ? { date_from: filters.date_from } : {}),
+    ...(filters.date_to ? { date_to: filters.date_to } : {}),
+    ...(filters.min_total ? { min_total: filters.min_total } : {}),
+    ...(filters.max_total ? { max_total: filters.max_total } : {}),
+    ...(filters.min_unpaid ? { min_unpaid: filters.min_unpaid } : {})
   };
 
   const { data, isLoading } = usePurchases(queryParams);
@@ -115,7 +125,7 @@ export default function Purchases() {
     {
       key: 'factory',
       type: 'async-select',
-      placeholder: 'All Factories',
+      placeholder: 'Type to search...',
       value: filters.factory,
       loadOptions: async (query) => {
         // We use the raw service function to decouple from the React lifecycle here
@@ -148,6 +158,30 @@ export default function Purchases() {
         { label: 'Fully Editable', value: 'true' },
         { label: 'Restricted', value: 'false' }
       ]
+    },
+    {
+      type: 'date-range',
+      keyFrom: 'date_from',
+      keyTo: 'date_to',
+      valueFrom: filters.date_from,
+      valueTo: filters.date_to,
+      placeholderFrom: 'From Date',
+      placeholderTo: 'To Date'
+    },
+    {
+      type: 'number-range',
+      keyFrom: 'min_total',
+      keyTo: 'max_total',
+      valueFrom: filters.min_total,
+      valueTo: filters.max_total,
+      placeholderFrom: 'Min Total Amount',
+      placeholderTo: 'Max Total Amount'
+    },
+    {
+      type: 'number',
+      key: 'min_unpaid',
+      value: filters.min_unpaid,
+      placeholder: 'Min Unpaid Amount'
     }
   ];
 
