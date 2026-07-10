@@ -1,7 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePurchase } from '../../services/purchaseService.js';
-import { Card, Badge, Button } from '../../components/common/index.js';
+import { Card, Badge, Button, DataTable } from '../../components/common/index.js';
+import { showToast } from '../../utils/toast.js';
 
 export default function PurchaseDetails() {
   const { id } = useParams();
@@ -44,6 +45,41 @@ export default function PurchaseDetails() {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleString();
   };
+
+  const itemColumns = [
+    { key: 'product_name', title: 'Product Name', sortable: false },
+    { key: 'item_code', title: 'Item Code', sortable: false },
+    { key: 'total_bags_purchased', title: 'Bags Purchased', sortable: false },
+    { key: 'pcs_per_bag', title: 'Pieces per Bag', sortable: false },
+    { key: 'total_pieces_purchased', title: 'Total Pieces', sortable: false },
+    { 
+      key: 'purchase_price', 
+      title: 'Purchase Price', 
+      render: (val, row) => formatCurrency(val, row.currency || purchase.currency) 
+    },
+    { 
+      key: 'price_type', 
+      title: 'Price Type', 
+      render: (val) => {
+        if (val === 'per_piece') return <Badge variant="info">Per Piece</Badge>;
+        if (val === 'per_bag') return <Badge variant="primary">Per Bag</Badge>;
+        return <Badge variant="default">{val}</Badge>;
+      }
+    },
+    { 
+      key: 'total_item_amount', 
+      title: 'Total Amount', 
+      render: (val, row) => <span style={{ fontWeight: 600 }}>{formatCurrency(val, row.currency || purchase.currency)}</span>
+    }
+  ];
+
+  const itemActions = [
+    {
+      icon: 'ri-eye-line',
+      label: 'View',
+      onClick: (row) => showToast.info('View Item', 'View item details coming soon')
+    }
+  ];
 
   return (
     <div className="page-container">
@@ -204,6 +240,23 @@ export default function PurchaseDetails() {
         </div>
 
       </div>
+
+      {/* Purchase Items Section */}
+      <div style={{ marginTop: '24px' }}>
+        <Card>
+          <Card.Header title="Purchase Items" icon="ri-shopping-cart-2-line" />
+          <Card.Body noPadding>
+            <DataTable 
+              columns={itemColumns}
+              data={purchase.items || []}
+              rowActions={itemActions}
+              keyField="id"
+              emptyMessage="No items found for this purchase."
+            />
+          </Card.Body>
+        </Card>
+      </div>
+
     </div>
   );
 }
