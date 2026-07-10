@@ -82,13 +82,10 @@ class FactoryOptionViewSet(viewsets.ViewSet):
     def list(self, request):
         queryset = Factory.objects.all().order_by('name')
 
-        # Optional Search
+        # Search support 
         search = request.query_params.get('search')
         if search:
-            queryset = queryset.filter(
-                Q(name__icontains=search) |
-                Q(code__icontains=search)
-            )
+            queryset = queryset.filter(name__icontains=search)
 
         options = [
             {
