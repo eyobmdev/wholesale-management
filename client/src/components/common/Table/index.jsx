@@ -328,7 +328,7 @@ export const DataTable = ({
             {filters.map((filter, index) => (
               <div key={filter.key || filter.keyFrom || index}>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '8px', color: 'var(--text-color)' }}>
-                  {filter.placeholder || filter.placeholderFrom || 'Filter'}
+                  {filter.label || filter.placeholder || filter.placeholderFrom || 'Filter'}
                 </label>
                 <TableFilter 
                   filter={filter}

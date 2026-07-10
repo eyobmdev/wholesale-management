@@ -12,7 +12,7 @@ export default function Purchases() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [activeSort, setActiveSort] = useState('-date');
-  
+
   // Filters state
   const [filters, setFilters] = useState({
     factory: '',
@@ -47,23 +47,23 @@ export default function Purchases() {
     { key: 'factory_name', title: 'Factory', sortable: false },
     { key: 'date', title: 'Purchase Date', sortable: true, render: (val) => new Date(val).toLocaleDateString() },
     { key: 'shipping_code', title: 'Shipping Code', sortable: false },
-    { 
-      key: 'total_purchase_amount', 
-      title: 'Total Amount', 
+    {
+      key: 'total_purchase_amount',
+      title: 'Total Amount',
       sortable: true,
       render: (val) => `${parseFloat(val || 0).toFixed(2)}`
     },
-    { 
-      key: 'unpaid_amount', 
-      title: 'Unpaid Amount', 
+    {
+      key: 'unpaid_amount',
+      title: 'Unpaid Amount',
       sortable: true,
       render: (val) => {
         const amt = parseFloat(val || 0);
-        return amt > 0 ? <span style={{color: '#ef4444', fontWeight: 500}}>{amt.toFixed(2)}</span> : '0.00';
+        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{amt.toFixed(2)}</span> : '0.00';
       }
     },
-    { 
-      key: 'payment_status', 
+    {
+      key: 'payment_status',
       title: 'Payment Status',
       render: (val) => {
         const statusMap = {
@@ -125,7 +125,8 @@ export default function Purchases() {
     {
       key: 'factory',
       type: 'async-select',
-      placeholder: 'Type to search...',
+      label: 'Factory',
+      placeholder: 'All Factories',
       value: filters.factory,
       loadOptions: async (query) => {
         // We use the raw service function to decouple from the React lifecycle here
@@ -226,30 +227,30 @@ export default function Purchases() {
         </div>
       </div>
 
-      <DataTable 
+      <DataTable
         columns={columns}
         data={data?.results || []}
         isLoading={isLoading}
-        
+
         searchPlaceholder="Search purchases..."
         searchValue={search}
         onSearch={handleSearch}
-        
+
         filters={filterConfig}
         onFilterChange={handleFilterChange}
-        
+
         sortOptions={sortConfig}
         activeSort={activeSort}
         onSortChange={handleSortChange}
-        
+
         toolbarActions={
           <Button variant="primary" leftIcon="ri-add-line" onClick={handleNewPurchase}>
             Create Purchase
           </Button>
         }
-        
+
         rowActions={rowActions}
-        
+
         pagination={{
           currentPage: page,
           totalPages: totalPages,
