@@ -57,7 +57,7 @@ class Factory(TimeStampedModel):
     def current_balance(self):
         return (
                 self.initial_balance
-                + self.total_purchased_unpaid
+                + self.total_purchased_amount
                 - self.total_payments_made
         )
 
