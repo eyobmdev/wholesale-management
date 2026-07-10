@@ -6,18 +6,6 @@ from django.db import IntegrityError
 
 
 def custom_exception_handler(exc, context):
-    # Print for debugging (remove later)
-    if isinstance(exc, IntegrityError):
-        return Response(
-            {
-                "success": False,
-                "status_code": 409,
-                "message": "A user with this information already exists.",
-                "errors": None,
-            },
-            status=status.HTTP_409_CONFLICT,
-        )
-
     response = exception_handler(exc, context)
 
     if response is not None:
@@ -43,8 +31,12 @@ def custom_exception_handler(exc, context):
                     else:
                         errors[field] = str(field_errors)
 
-            first_field = next(iter(errors), None)
-            message = f"{first_field}: {errors[first_field]}" if first_field else "Validation failed"
+            # === IMPROVED MESSAGE LOGIC ===
+            if errors:
+                first_error = next(iter(errors.values()))  # Get first error message only
+                message = str(first_error)                 # Use clean message, no field name
+            else:
+                message = "Validation failed"
 
             response.data = {
                 "success": False,

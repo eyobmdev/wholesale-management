@@ -334,15 +334,27 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         instance = getattr(self, 'instance', None)
 
+        # 1. Partially Editable Protection
         if instance and not instance.is_fully_editable:
-            # These fields should not be changeable
             restricted_fields = ['factory', 'date', 'currency']
+            errors = {}
 
             for field in restricted_fields:
-                if field in data:
-                    raise serializers.ValidationError({
-                        field: "You cannot change this field because some items from this purchase have already been sold."
-                    })
+                if field in data and data[field] != getattr(instance, field):
+                    errors[
+                        field] = "You cannot change this field because some items from this purchase have already been sold."
+
+            if errors:
+                raise serializers.ValidationError(errors)
+
+        # 2. Prevent Over Payment
+        if 'amount_paid_now' in data and instance:
+            if data['amount_paid_now'] > instance.total_purchase_amount:
+                error_msg = f"Amount paid cannot exceed total purchase amount. Maximum allowed is {instance.total_purchase_amount} {instance.currency}."
+
+                raise serializers.ValidationError({
+                    'amount_paid_now': error_msg
+                })
 
         return data
 
@@ -355,7 +367,7 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         old_paid = instance.amount_paid_now
 
-        # Update only the allowed fields
+        # Update fields
         for field, value in validated_data.items():
             setattr(instance, field, value)
 
@@ -389,7 +401,6 @@ class PurchaseUpdateSerializer(serializers.ModelSerializer):
                 purchase=purchase,
                 is_auto=True
             ).delete()
-
 
 class AddItemToPurchaseSerializer(serializers.ModelSerializer):
     cost_per_piece = serializers.DecimalField(
