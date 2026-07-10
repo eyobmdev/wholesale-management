@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePurchases, useDeletePurchase, purchaseService } from '../../services/purchaseService.js';
-import { DataTable, Badge, Button } from '../../components/common/index.js';
+import { DataTable, Badge, Button, Modal } from '../../components/common/index.js';
+import PurchaseEditForm from './PurchaseEditForm.jsx';
 import { showToast } from '../../utils/toast.js';
 
 export default function Purchases() {
@@ -12,6 +13,10 @@ export default function Purchases() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [activeSort, setActiveSort] = useState('-date');
+  
+  // Modal states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPurchase, setEditingPurchase] = useState(null);
 
   // Filters state
   const [filters, setFilters] = useState({
@@ -106,11 +111,8 @@ export default function Purchases() {
       icon: 'ri-edit-line',
       label: 'Edit',
       onClick: (row) => {
-        if (!row.is_fully_editable) {
-          showToast.warning('Restricted', 'This purchase cannot be fully edited because it has active items or payments.');
-          return;
-        }
-        showToast.info('Edit', 'Edit Purchase feature coming soon');
+        setEditingPurchase(row);
+        setIsEditModalOpen(true);
       }
     },
     {
@@ -257,6 +259,20 @@ export default function Purchases() {
           onPageChange: (newPage) => setPage(newPage)
         }}
       />
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Purchase (Partial)"
+      >
+        {editingPurchase && (
+          <PurchaseEditForm
+            initialData={editingPurchase}
+            onCancel={() => setIsEditModalOpen(false)}
+            onSuccess={() => setIsEditModalOpen(false)}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

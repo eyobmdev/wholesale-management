@@ -10,6 +10,10 @@ export const purchaseService = {
     return await api.get(`/purchases/${id}/`);
   },
 
+  async updatePurchase(id, data) {
+    return await api.patch(`/purchases/${id}/`, data);
+  },
+
   async deletePurchase(id) {
     return await api.delete(`/purchases/${id}/`);
   },
@@ -25,6 +29,19 @@ export const usePurchases = (params = {}) => {
     queryKey: ['purchases', params],
     queryFn: () => purchaseService.getPurchases(params),
     keepPreviousData: true,
+  });
+};
+
+export const useUpdatePurchase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => purchaseService.updatePurchase(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase'] });
+      queryClient.invalidateQueries({ queryKey: ['factories'] });
+      queryClient.invalidateQueries({ queryKey: ['factory'] });
+    }
   });
 };
 
