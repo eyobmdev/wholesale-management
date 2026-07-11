@@ -2,6 +2,7 @@ from django.db import models
 from ..core.models import TimeStampedModel
 from ..factories.models import Factory
 from datetime import datetime
+from django.utils import timezone
 
 
 def generate_shipping_code():
@@ -16,6 +17,7 @@ class Purchase(TimeStampedModel):
         help_text="Which factory this purchase is from"
     )
     date = models.DateField(
+    default = timezone.now,
         help_text="Actual date of purchase"
     )
     shipping_code = models.CharField(
@@ -71,9 +73,13 @@ class Purchase(TimeStampedModel):
         )
 
     def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = timezone.now().date()
+
         if self.pk:
             self.recalculate_totals()
         super().save(*args, **kwargs)
+
 
     def recalculate_totals(self):
         from django.db.models import Sum

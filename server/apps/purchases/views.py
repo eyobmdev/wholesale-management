@@ -1,3 +1,5 @@
+import traceback
+
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets, status,filters
 from rest_framework.response import Response
@@ -124,6 +126,17 @@ class PurchaseItemViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             qs = qs.select_related('stock_batch')
         return qs
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print("=== SERIALIZER / SAVE ERROR ===")
+            print(traceback.format_exc())
+            raise  # let DRF handle it but at least you see the log
 
     def destroy(self, request, *args, **kwargs):
         """
