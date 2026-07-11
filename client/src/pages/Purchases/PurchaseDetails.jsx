@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePurchase, usePurchaseItems, useDeletePurchaseItem, useDeletePurchase } from '../../services/purchaseService.js';
-import { Card, Badge, Button, DataTable, Modal, ConfirmationDialog } from '../../components/common/index.js';
+import { Card, Badge, Button, DataTable, Modal, ConfirmationDialog, KeyValueGrid, StatCard } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import PurchaseItemForm from './PurchaseItemForm.jsx';
@@ -230,122 +230,86 @@ export default function PurchaseDetails() {
         </div>
       </div>
 
-      {/* Detail Cards Layout */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginTop: '24px', alignItems: 'flex-start' }}>
+      {/* Metrics & Status Section */}
+      <div style={{ marginTop: '24px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <i className="ri-dashboard-3-line" style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}></i>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Metrics & Status</h3>
+        </div>
         
-        {/* Left Column (Primary) */}
-        <div style={{ flex: '1 1 500px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Purchase Information Card */}
-          <Card>
-            <Card.Header title="Purchase Information" icon="ri-information-line" />
-            <Card.Body>
-              <div className="info-list">
-                <div className="info-item">
-                  <span className="info-label">Factory</span>
-                  <span className="info-value" style={{ fontWeight: 600 }}>{purchase.factory_name}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Purchase Date</span>
-                  <span className="info-value" style={{ fontWeight: 600 }}>{formatDate(purchase.date)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Shipping Code</span>
-                  <span className="info-value" style={{ fontWeight: 600 }}>{purchase.shipping_code || '-'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Currency</span>
-                  <span className="info-value" style={{ fontWeight: 600 }}>{purchase.currency || 'ETB'}</span>
-                </div>
-                <div className="info-item" style={{ borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '16px' }}>
-                  <span className="info-label">Created At</span>
-                  <span className="info-value">{formatDateTime(purchase.created_at)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Updated At</span>
-                  <span className="info-value">{formatDateTime(purchase.updated_at)}</span>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+          <StatCard 
+            label="Total Amount" 
+            value={formatCurrency(purchase.total_purchase_amount, purchase.currency)} 
+            icon="ri-bank-card-line"
+          />
+          <StatCard 
+            label="Amount Paid" 
+            value={formatCurrency(purchase.amount_paid_now, purchase.currency)} 
+            icon="ri-checkbox-circle-line"
+            valueColor="var(--success-color, #10b981)"
+            iconColor="var(--success-color, #10b981)"
+            iconBg="rgba(16, 185, 129, 0.15)"
+          />
+          <StatCard 
+            label="Unpaid Amount" 
+            value={formatCurrency(purchase.unpaid_amount, purchase.currency)} 
+            icon="ri-error-warning-line"
+            valueColor="var(--danger-color, #ef4444)"
+            iconColor="var(--danger-color, #ef4444)"
+            iconBg="rgba(239, 68, 68, 0.15)"
+          />
+          <StatCard 
+            label="Editability" 
+            value={purchase.is_fully_editable ? 'Fully Editable' : 'Partially Editable'} 
+            icon={purchase.is_fully_editable ? "ri-check-line" : "ri-error-warning-line"}
+            valueColor={purchase.is_fully_editable ? 'var(--success-color, #10b981)' : 'var(--warning-color, #f59e0b)'}
+            iconColor={purchase.is_fully_editable ? 'var(--success-color, #10b981)' : 'var(--warning-color, #f59e0b)'}
+            iconBg={purchase.is_fully_editable ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)'}
+          />
+        </div>
+      </div>
 
-          {/* Payment Summary Card */}
-          <Card>
-            <Card.Header title="Payment Summary" icon="ri-wallet-3-line" />
-            <Card.Body>
-              <div className="info-list">
-                <div className="info-item">
-                  <span className="info-label">Total Amount</span>
-                  <span className="info-value" style={{ fontWeight: 600, fontSize: '1.2rem' }}>
-                    {formatCurrency(purchase.total_purchase_amount, purchase.currency)}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Amount Paid</span>
-                  <span className="info-value" style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--success-color, #10b981)' }}>
-                    {formatCurrency(purchase.amount_paid_now, purchase.currency)}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Unpaid Amount</span>
-                  <span className="info-value" style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--danger-color, #ef4444)' }}>
-                    {formatCurrency(purchase.unpaid_amount, purchase.currency)}
-                  </span>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
+      {/* Purchase Information Card */}
+      <div style={{ marginBottom: '24px' }}>
+        <Card>
+          <Card.Header title="Purchase Information" icon="ri-information-line" />
+          <Card.Body>
+            
+            {/* Clean Dashboard Layout */}
+            <KeyValueGrid items={[
+              { label: 'Factory', value: purchase.factory_name },
+              { label: 'Purchase Date', value: formatDate(purchase.date) },
+              { label: 'Shipping Code', value: purchase.shipping_code || '-' },
+              { label: 'Currency', value: purchase.currency || 'ETB' },
+              { label: 'Created At', value: formatDateTime(purchase.created_at) },
+              { label: 'Updated At', value: formatDateTime(purchase.updated_at) },
+            ]} />
 
-          {/* Notes Card (Conditional) */}
-          {purchase.notes && (
-            <Card>
-              <Card.Header title="Notes" icon="ri-sticky-note-line" />
-              <Card.Body>
-                <p style={{ 
-                  fontSize: '0.95rem', 
-                  backgroundColor: 'var(--bg-secondary, #f9fafb)', 
-                  padding: '16px', 
-                  borderRadius: '8px',
-                  lineHeight: '1.5',
-                  margin: 0
+            {/* Nice Notes Section */}
+            {purchase.notes && (
+              <div style={{ marginTop: '24px' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <i className="ri-sticky-note-line"></i> Notes
+                </h4>
+                <div style={{ 
+                  backgroundColor: 'rgba(14, 165, 233, 0.1)', 
+                  border: '1px solid rgba(14, 165, 233, 0.2)', 
+                  borderLeft: '4px solid #0ea5e9',
+                  padding: '16px 20px', 
+                  borderRadius: '6px',
+                  color: 'var(--text-color)',
+                  fontSize: '0.95rem',
+                  lineHeight: '1.6',
+                  fontWeight: 500
                 }}>
                   {purchase.notes}
-                </p>
-              </Card.Body>
-            </Card>
-          )}
-
-        </div>
-
-        {/* Right Column (Secondary) */}
-        <div style={{ flex: '1 1 300px', minWidth: 0, maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Status Card */}
-          <Card>
-            <Card.Header title="Purchase Status" icon="ri-shield-check-line" />
-            <Card.Body>
-              <div className="info-list">
-                <div className="info-item">
-                  <span className="info-label">Editability</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: purchase.is_fully_editable ? 'var(--success-color, #10b981)' : 'var(--warning-color, #f59e0b)', fontWeight: 600 }}>
-                    <i className={purchase.is_fully_editable ? "ri-check-line" : "ri-error-warning-line"}></i>
-                    <span>{purchase.is_fully_editable ? 'Fully Editable' : 'Partially Editable'}</span>
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <span className="info-label">Deletion</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: purchase.is_deletable ? 'var(--success-color, #10b981)' : 'var(--danger-color, #ef4444)', fontWeight: 600 }}>
-                    <i className={purchase.is_deletable ? "ri-check-line" : "ri-close-line"}></i>
-                    <span>{purchase.is_deletable ? 'Deletable' : 'Cannot Delete'}</span>
-                  </div>
                 </div>
               </div>
-            </Card.Body>
-          </Card>
-          
-        </div>
+            )}
 
+          </Card.Body>
+        </Card>
       </div>
 
       {/* Purchase Items Section */}

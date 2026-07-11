@@ -1,8 +1,10 @@
 export { Button } from './Button/index.jsx';
 export { Card } from './Card/index.jsx';
+export { StatCard } from './Card/StatCard.jsx';
 export { Modal } from './Modal/index.jsx';
 export { ConfirmationDialog } from './Modal/ConfirmationDialog.jsx';
 export * from './Form/index.jsx';
 export * from './PaymentForm.jsx';
+export { KeyValueGrid } from './KeyValueGrid/index.jsx';
 export { Badge } from './Badge/index.jsx';
 export { DataTable } from './Table/index.jsx';
