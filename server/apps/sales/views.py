@@ -1,4 +1,5 @@
-from rest_framework import viewsets, status
+from django_filters.rest_framework.backends import DjangoFilterBackend
+from rest_framework import viewsets, status,filters
 from rest_framework.response import Response
 
 from .models import Sale, SaleItem
@@ -43,6 +44,11 @@ class SaleViewSet(viewsets.ModelViewSet):
     """
     queryset = Sale.objects.all()
     pagination_class = StandardPagination
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     filterset_class = SaleFilter
     search_fields = ['invoice_number', 'notes', 'customer__name']
     ordering_fields = [
@@ -140,6 +146,11 @@ class SaleItemViewSet(viewsets.ModelViewSet):
     queryset = SaleItem.objects.all()
     pagination_class = StandardPagination
     filterset_class = SaleItemFilter
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     search_fields = [
         'stock_batch__item_code',
         'stock_batch__product_name',

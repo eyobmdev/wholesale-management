@@ -1,5 +1,7 @@
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets,filters
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import Customer
 from .serializers import (
@@ -75,3 +77,26 @@ class CustomerViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save(update_fields=['is_active', 'updated_at'])
+
+
+class CustomerOptionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        queryset = Customer.objects.all().order_by('name')
+
+        # Search support
+        search = request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        options = [
+            {
+                "value": customer.id,
+                "label": customer.name
+            }
+            for customer in queryset
+        ]
+
+        return Response(options)
+
