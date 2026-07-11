@@ -14,6 +14,14 @@ export const purchaseService = {
     return await api.get('/purchase-items/', { params });
   },
 
+  async updatePurchaseItem(id, data) {
+    return await api.put(`/purchase-items/${id}/`, data);
+  },
+
+  async deletePurchaseItem(id) {
+    return await api.delete(`/purchase-items/${id}/`);
+  },
+
   async updatePurchase(id, data) {
     return await api.patch(`/purchases/${id}/`, data);
   },
@@ -75,6 +83,30 @@ export const useDeletePurchase = () => {
       // Invalidate factories since their balances may have changed
       queryClient.invalidateQueries({ queryKey: ['factories'] });
       queryClient.invalidateQueries({ queryKey: ['factory'] });
+    }
+  });
+};
+
+export const useUpdatePurchaseItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => purchaseService.updatePurchaseItem(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchaseItems'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase'] });
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+    }
+  });
+};
+
+export const useDeletePurchaseItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => purchaseService.deletePurchaseItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchaseItems'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase'] });
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
     }
   });
 };

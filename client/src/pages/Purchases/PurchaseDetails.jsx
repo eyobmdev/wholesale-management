@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePurchase, usePurchaseItems } from '../../services/purchaseService.js';
+import { usePurchase, usePurchaseItems, useDeletePurchaseItem } from '../../services/purchaseService.js';
 import { Card, Badge, Button, DataTable, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
+import PurchaseItemForm from './PurchaseItemForm.jsx';
 
 export default function PurchaseDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: purchase, isLoading, isError, error } = usePurchase(id);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const deleteItemMutation = useDeletePurchaseItem();
+
+  const [selectedItem, setSelectedItem] = useState(null); // For View action
+  const [editingItem, setEditingItem] = useState(null);   // For Edit action
 
   // Purchase Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -90,11 +95,38 @@ export default function PurchaseDetails() {
     }
   ];
 
+  const handleDeleteItem = (item) => {
+    if (window.confirm(`Are you sure you want to delete this purchase item? This action cannot be undone.`)) {
+      const toastId = showToast.loading('Deleting purchase item...');
+      deleteItemMutation.mutate(item.id, {
+        onSuccess: () => {
+          showToast.success('Deleted', 'Purchase item deleted successfully');
+          showToast.dismiss(toastId);
+        },
+        onError: (err) => {
+          showToast.dismiss(toastId);
+          handleBackendErrors(err, null, 'Failed to delete purchase item');
+        }
+      });
+    }
+  };
+
   const itemActions = [
     {
       icon: 'ri-eye-line',
       label: 'View',
       onClick: (row) => setSelectedItem(row)
+    },
+    {
+      icon: 'ri-edit-line',
+      label: 'Edit',
+      onClick: (row) => setEditingItem(row)
+    },
+    {
+      icon: 'ri-delete-bin-line',
+      label: 'Delete',
+      onClick: handleDeleteItem,
+      danger: true
     }
   ];
 
@@ -300,7 +332,7 @@ export default function PurchaseDetails() {
       <div style={{ marginTop: '24px' }}>
         <Card>
           <Card.Header title="Purchase Items" icon="ri-shopping-cart-2-line" />
-          <Card.Body noPadding>
+          <Card.Body style={{ padding: 0 }}>
             <DataTable 
               columns={itemColumns}
               data={itemsData?.results || []}
@@ -457,6 +489,21 @@ export default function PurchaseDetails() {
             </Card>
             
           </div>
+        )}
+      </Modal>
+
+      {/* Edit Item Modal */}
+      <Modal 
+        isOpen={!!editingItem} 
+        onClose={() => setEditingItem(null)} 
+        title="Edit Purchase Item"
+      >
+        {editingItem && (
+          <PurchaseItemForm 
+            item={editingItem} 
+            purchaseId={id} 
+            onClose={() => setEditingItem(null)} 
+          />
         )}
       </Modal>
 

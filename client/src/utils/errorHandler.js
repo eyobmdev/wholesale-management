@@ -14,14 +14,20 @@ export const handleBackendErrors = (err, setErrors, defaultTitle = 'Error') => {
     const errorsObject = data.errors || data; // Fallback to raw data if `errors` key doesn't exist
     const newErrors = {};
 
-    Object.keys(errorsObject).forEach(key => {
-      // Ignore top-level meta keys if fallback was used
-      if (['success', 'status_code', 'message'].includes(key) && !data.errors) return;
-      
-      newErrors[key] = Array.isArray(errorsObject[key]) 
-        ? errorsObject[key][0] 
-        : errorsObject[key];
-    });
+    if (data.errors === null && data.message) {
+      // If the backend specifically returns errors: null, map the top-level message to 'message'
+      newErrors.message = data.message;
+      newErrors.non_field_errors = data.message; // Keep for backward compatibility
+    } else {
+      Object.keys(errorsObject).forEach(key => {
+        // Ignore top-level meta keys if fallback was used
+        if (['success', 'status_code', 'message'].includes(key) && !data.errors) return;
+        
+        newErrors[key] = Array.isArray(errorsObject[key]) 
+          ? errorsObject[key][0] 
+          : errorsObject[key];
+      });
+    }
 
     if (setErrors) {
       setErrors(newErrors);
