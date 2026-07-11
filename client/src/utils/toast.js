@@ -5,43 +5,55 @@ export const showToast = {
   success: (message, description) => {
     toast.success(message, {
       description,
+      classNames: {
+        description: 'toast-description-inherit'
+      },
       style: {
-        background: 'var(--card-bg)',
-        color: '#22c55e', // modern green
-        border: '1px solid rgba(34, 197, 94, 0.2)',
+        background: '#dcfce7',
+        color: '#052e16',
+        border: '1px solid #bbf7d0',
       },
     });
   },
-  
+
   error: (message, description) => {
     toast.error(message, {
       description,
+      classNames: {
+        description: 'toast-description-inherit'
+      },
       style: {
-        background: 'var(--card-bg)',
-        color: '#ef4444', // modern red
-        border: '1px solid rgba(239, 68, 68, 0.2)',
+        background: '#fee2e2',
+        color: '#450a0a',
+        border: '1px solid #fecaca',
       },
     });
   },
-  
+
   warning: (message, description) => {
     toast.warning(message, {
       description,
+      classNames: {
+        description: 'toast-description-inherit'
+      },
       style: {
-        background: 'var(--card-bg)',
-        color: '#f59e0b', // modern amber/yellow
-        border: '1px solid rgba(245, 158, 11, 0.2)',
+        background: '#ffedd5',
+        color: '#431407',
+        border: '1px solid #fed7aa',
       },
     });
   },
-  
+
   info: (message, description) => {
     toast.info(message, {
       description,
+      classNames: {
+        description: 'toast-description-inherit'
+      },
       style: {
-        background: 'var(--card-bg)',
-        color: '#3b82f6', // modern blue
-        border: '1px solid rgba(59, 130, 246, 0.2)',
+        background: '#e0f2fe',
+        color: '#082f49',
+        border: '1px solid #bae6fd',
       },
     });
   },
@@ -57,7 +69,7 @@ export const showToast = {
     });
     return id; // Returns id so it can be dismissed or updated
   },
-  
+
   dismiss: (id) => {
     toast.dismiss(id);
   }
