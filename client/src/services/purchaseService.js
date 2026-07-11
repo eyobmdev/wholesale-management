@@ -10,6 +10,10 @@ export const purchaseService = {
     return await api.get(`/purchases/${id}/`);
   },
 
+  async getPurchaseItems(params = {}) {
+    return await api.get('/purchase-items/', { params });
+  },
+
   async updatePurchase(id, data) {
     return await api.patch(`/purchases/${id}/`, data);
   },
@@ -37,6 +41,15 @@ export const usePurchase = (id) => {
     queryKey: ['purchase', id],
     queryFn: () => purchaseService.getPurchase(id),
     enabled: !!id,
+  });
+};
+
+export const usePurchaseItems = (params = {}) => {
+  return useQuery({
+    queryKey: ['purchaseItems', params],
+    queryFn: () => purchaseService.getPurchaseItems(params),
+    keepPreviousData: true,
+    enabled: !!params.purchase,
   });
 };
 

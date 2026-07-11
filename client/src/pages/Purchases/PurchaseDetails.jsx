@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePurchase } from '../../services/purchaseService.js';
+import { usePurchase, usePurchaseItems } from '../../services/purchaseService.js';
 import { Card, Badge, Button, DataTable, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 
@@ -9,6 +9,22 @@ export default function PurchaseDetails() {
   const navigate = useNavigate();
   const { data: purchase, isLoading, isError, error } = usePurchase(id);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  // Purchase Items State
+  const [itemsPage, setItemsPage] = useState(1);
+  const [itemsSearch, setItemsSearch] = useState('');
+  const [itemsActiveSort, setItemsActiveSort] = useState('');
+  const [itemsFilters, setItemsFilters] = useState({ price_type: '' });
+
+  // Fetch Purchase Items
+  const itemsQueryParams = {
+    purchase: id,
+    page: itemsPage,
+    search: itemsSearch || undefined,
+    ordering: itemsActiveSort || undefined,
+    ...(itemsFilters.price_type ? { price_type: itemsFilters.price_type } : {})
+  };
+  const { data: itemsData, isLoading: itemsLoading } = usePurchaseItems(itemsQueryParams);
 
   if (isLoading) {
     return (
@@ -81,6 +97,44 @@ export default function PurchaseDetails() {
       onClick: (row) => setSelectedItem(row)
     }
   ];
+
+  // Items Toolbar Configuration
+  const itemsFilterConfig = [
+    {
+      key: 'price_type',
+      type: 'select',
+      label: 'Price Type',
+      placeholder: 'All Types',
+      value: itemsFilters.price_type,
+      options: [
+        { value: '', label: 'All Types' },
+        { value: 'per_piece', label: 'Per Piece' },
+        { value: 'per_bag', label: 'Per Bag' }
+      ]
+    }
+  ];
+
+  const itemsSortConfig = [
+    { value: '', label: 'Default' },
+    { value: 'item_code', label: 'Item Code (A-Z)' },
+    { value: '-item_code', label: 'Item Code (Z-A)' },
+    { value: 'total_item_amount', label: 'Total Amount (Low-High)' },
+    { value: '-total_item_amount', label: 'Total Amount (High-Low)' },
+    { value: 'purchase_price', label: 'Price (Low-High)' },
+    { value: '-purchase_price', label: 'Price (High-Low)' },
+    { value: 'created_at', label: 'Oldest First' },
+    { value: '-created_at', label: 'Newest First' }
+  ];
+
+  const handleItemsFilterChange = (key, value) => {
+    setItemsFilters(prev => ({ ...prev, [key]: value }));
+    setItemsPage(1);
+  };
+
+  const handleItemsSearch = (val) => {
+    setItemsSearch(val);
+    setItemsPage(1);
+  };
 
   return (
     <div className="page-container">
@@ -249,10 +303,31 @@ export default function PurchaseDetails() {
           <Card.Body noPadding>
             <DataTable 
               columns={itemColumns}
-              data={purchase.items || []}
+              data={itemsData?.results || []}
               rowActions={itemActions}
               keyField="id"
               emptyMessage="No items found for this purchase."
+              isLoading={itemsLoading}
+              
+              searchPlaceholder="Search items..."
+              searchValue={itemsSearch}
+              onSearch={handleItemsSearch}
+
+              filters={itemsFilterConfig}
+              onFilterChange={handleItemsFilterChange}
+
+              sortOptions={itemsSortConfig}
+              activeSort={itemsActiveSort}
+              onSortChange={(val) => {
+                setItemsActiveSort(val);
+                setItemsPage(1);
+              }}
+
+              pagination={{
+                currentPage: itemsPage,
+                totalPages: itemsData?.count ? Math.ceil(itemsData.count / 10) : 1,
+                onPageChange: (newPage) => setItemsPage(newPage)
+              }}
             />
           </Card.Body>
         </Card>
