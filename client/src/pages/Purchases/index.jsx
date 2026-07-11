@@ -214,7 +214,7 @@ export default function Purchases() {
   };
 
   const handleNewPurchase = () => {
-    showToast.info('New', 'Create Purchase feature coming soon');
+    navigate('/purchases/new');
   };
 
   // Pagination config

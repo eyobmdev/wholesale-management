@@ -6,6 +6,10 @@ export const factoryService = {
     return await api.get('/factories/', { params });
   },
 
+  async getFactoryOptions(search = '') {
+    return await api.get('/factory-options/', { params: { search } });
+  },
+
   async getFactory(id) {
     return await api.get(`/factories/${id}/`);
   },

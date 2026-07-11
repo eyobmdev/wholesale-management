@@ -11,6 +11,7 @@ import Factories from './pages/Factories/index.jsx';
 import FactoryDetails from './pages/Factories/FactoryDetails.jsx';
 import Purchases from './pages/Purchases/index.jsx';
 import PurchaseDetails from './pages/Purchases/PurchaseDetails.jsx';
+import PurchaseCreate from './pages/Purchases/PurchaseCreate.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/factories" element={<Factories />} />
           <Route path="/factories/:id" element={<FactoryDetails />} />
           <Route path="/purchases" element={<Purchases />} />
+          <Route path="/purchases/new" element={<PurchaseCreate />} />
           <Route path="/purchases/:id" element={<PurchaseDetails />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
