@@ -221,7 +221,7 @@ export default function PurchaseDetails() {
           <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
             Edit
           </Button>
-          <Button variant="outline" leftIcon="ri-delete-bin-line" className="text-danger" onClick={() => setIsDeleteModalOpen(true)}>
+          <Button variant="danger" leftIcon="ri-delete-bin-line" onClick={() => setIsDeleteModalOpen(true)}>
             Delete
           </Button>
           <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsAddItemModalOpen(true)}>
