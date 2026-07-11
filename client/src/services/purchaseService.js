@@ -22,6 +22,10 @@ export const purchaseService = {
     return await api.delete(`/purchase-items/${id}/`);
   },
 
+  async replacePurchase(id, data) {
+    return await api.put(`/purchases/${id}/`, data);
+  },
+
   async updatePurchase(id, data) {
     return await api.patch(`/purchases/${id}/`, data);
   },
@@ -65,6 +69,19 @@ export const useUpdatePurchase = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => purchaseService.updatePurchase(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase'] });
+      queryClient.invalidateQueries({ queryKey: ['factories'] });
+      queryClient.invalidateQueries({ queryKey: ['factory'] });
+    }
+  });
+};
+
+export const useReplacePurchase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => purchaseService.replacePurchase(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchases'] });
       queryClient.invalidateQueries({ queryKey: ['purchase'] });

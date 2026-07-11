@@ -5,6 +5,8 @@ import { Card, Badge, Button, DataTable, Modal } from '../../components/common/i
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import PurchaseItemForm from './PurchaseItemForm.jsx';
+import PurchaseEditForm from './PurchaseEditForm.jsx';
+import PurchaseFullEditForm from './PurchaseFullEditForm.jsx';
 
 export default function PurchaseDetails() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ export default function PurchaseDetails() {
 
   const [selectedItem, setSelectedItem] = useState(null); // For View action
   const [editingItem, setEditingItem] = useState(null);   // For Edit action
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Purchase Edit
 
   // Purchase Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -195,11 +198,8 @@ export default function PurchaseDetails() {
         </div>
         
         <div className="details-header-actions">
-          <Button variant="outline" leftIcon="ri-money-dollar-circle-line" onClick={() => {}}>
-            Edit Payment
-          </Button>
-          <Button variant="outline" leftIcon="ri-edit-line" onClick={() => {}}>
-            Edit Purchase
+          <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
+            Edit
           </Button>
           <Button variant="outline" leftIcon="ri-delete-bin-line" className="text-danger" onClick={() => {}}>
             Delete
@@ -503,6 +503,27 @@ export default function PurchaseDetails() {
             item={editingItem} 
             purchaseId={id} 
             onClose={() => setEditingItem(null)} 
+          />
+        )}
+      </Modal>
+
+      {/* Edit Purchase Modal */}
+      <Modal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        title={purchase.is_fully_editable ? "Edit Purchase" : "Edit Payment"}
+      >
+        {isEditModalOpen && purchase.is_fully_editable ? (
+          <PurchaseFullEditForm 
+            initialData={purchase} 
+            onSuccess={() => setIsEditModalOpen(false)} 
+            onCancel={() => setIsEditModalOpen(false)} 
+          />
+        ) : isEditModalOpen && (
+          <PurchaseEditForm 
+            initialData={purchase} 
+            onSuccess={() => setIsEditModalOpen(false)} 
+            onCancel={() => setIsEditModalOpen(false)} 
           />
         )}
       </Modal>
