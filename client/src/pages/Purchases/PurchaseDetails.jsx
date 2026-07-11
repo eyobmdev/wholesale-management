@@ -5,6 +5,7 @@ import { Card, Badge, Button, DataTable, Modal } from '../../components/common/i
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import PurchaseItemForm from './PurchaseItemForm.jsx';
+import PurchaseItemAddForm from './PurchaseItemAddForm.jsx';
 import PurchaseEditForm from './PurchaseEditForm.jsx';
 import PurchaseFullEditForm from './PurchaseFullEditForm.jsx';
 
@@ -17,6 +18,7 @@ export default function PurchaseDetails() {
   const [selectedItem, setSelectedItem] = useState(null); // For View action
   const [editingItem, setEditingItem] = useState(null);   // For Edit action
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Purchase Edit
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // For Add Item
 
   // Purchase Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -204,7 +206,7 @@ export default function PurchaseDetails() {
           <Button variant="outline" leftIcon="ri-delete-bin-line" className="text-danger" onClick={() => {}}>
             Delete
           </Button>
-          <Button variant="primary" leftIcon="ri-add-line" onClick={() => {}}>
+          <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsAddItemModalOpen(true)}>
             Add Item
           </Button>
         </div>
@@ -524,6 +526,20 @@ export default function PurchaseDetails() {
             initialData={purchase} 
             onSuccess={() => setIsEditModalOpen(false)} 
             onCancel={() => setIsEditModalOpen(false)} 
+          />
+        )}
+      </Modal>
+
+      {/* Add Item Modal */}
+      <Modal 
+        isOpen={isAddItemModalOpen} 
+        onClose={() => setIsAddItemModalOpen(false)} 
+        title="Add Purchase Item"
+      >
+        {isAddItemModalOpen && (
+          <PurchaseItemAddForm 
+            purchaseId={id} 
+            onClose={() => setIsAddItemModalOpen(false)} 
           />
         )}
       </Modal>

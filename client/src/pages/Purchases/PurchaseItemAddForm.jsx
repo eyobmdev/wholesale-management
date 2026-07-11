@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { FormField, Input, Select, Button } from '../../components/common/index.js';
-import { useUpdatePurchaseItem } from '../../services/purchaseService.js';
+import React, { useState } from 'react';
+import { Input, Select, Button, FormField } from '../../components/common/index.js';
+import { useCreatePurchaseItem } from '../../services/purchaseService.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 
-export default function PurchaseItemForm({ item, purchaseId, onClose }) {
-  const updateMutation = useUpdatePurchaseItem();
+export default function PurchaseItemAddForm({ purchaseId, onClose }) {
+  const createMutation = useCreatePurchaseItem();
   const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
-    purchase: purchaseId,
     item_code: '',
     product_name: '',
     price_type: 'per_piece',
@@ -19,30 +18,24 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
     currency: 'ETB'
   });
 
-  useEffect(() => {
-    if (item) {
-      setFormData({
-        purchase: purchaseId, // Always include current purchase ID
-        item_code: item.item_code || '',
-        product_name: item.product_name || '',
-        price_type: item.price_type || 'per_piece',
-        purchase_price: item.purchase_price || '',
-        pcs_per_bag: item.pcs_per_bag || '',
-        total_bags_purchased: item.total_bags_purchased || '',
-        currency: item.currency || 'ETB'
-      });
-    }
-  }, [item, purchaseId]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear field error on change
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleRadioChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      price_type: value
+    }));
+    if (errors.price_type) {
+      setErrors(prev => ({ ...prev, price_type: null }));
     }
   };
 
@@ -50,9 +43,8 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
     e.preventDefault();
     setErrors({});
     
-    const toastId = showToast.loading('Saving purchase item...');
+    const toastId = showToast.loading('Adding purchase item...');
     
-    // Ensure numeric fields are cast properly
     const payload = {
       ...formData,
       purchase: purchaseId,
@@ -61,15 +53,15 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
       total_bags_purchased: formData.total_bags_purchased ? parseInt(formData.total_bags_purchased, 10) : 0
     };
 
-    updateMutation.mutate({ id: item.id, data: payload }, {
+    createMutation.mutate(payload, {
       onSuccess: () => {
-        showToast.success('Saved', 'Purchase item updated successfully');
+        showToast.success('Added', 'Purchase item added successfully');
         showToast.dismiss(toastId);
         onClose();
       },
       onError: (err) => {
         showToast.dismiss(toastId);
-        handleBackendErrors(err, setErrors, 'Failed to update purchase item');
+        handleBackendErrors(err, setErrors, 'Failed to add purchase item');
       }
     });
   };
@@ -104,21 +96,34 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
         />
       </FormField>
 
+      <FormField label="Price Type" required error={errors.price_type}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '4px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input 
+              type="radio" 
+              name="price_type" 
+              value="per_piece" 
+              checked={formData.price_type === 'per_piece'} 
+              onChange={() => handleRadioChange('per_piece')} 
+              style={{ width: '16px', height: '16px', accentColor: 'var(--primary-color)' }}
+            />
+            <span>Per Piece</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input 
+              type="radio" 
+              name="price_type" 
+              value="per_bag" 
+              checked={formData.price_type === 'per_bag'} 
+              onChange={() => handleRadioChange('per_bag')} 
+              style={{ width: '16px', height: '16px', accentColor: 'var(--primary-color)' }}
+            />
+            <span>Per Bag</span>
+          </label>
+        </div>
+      </FormField>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-        <FormField label="Price Type" required error={errors.price_type}>
-          <Select
-            name="price_type"
-            value={formData.price_type}
-            onChange={handleChange}
-            error={errors.price_type}
-            options={[
-              { value: 'per_piece', label: 'Per Piece' },
-              { value: 'per_bag', label: 'Per Bag' }
-            ]}
-            required
-          />
-        </FormField>
-        
         <FormField label="Purchase Price" required error={errors.purchase_price}>
           <Input
             name="purchase_price"
@@ -128,6 +133,18 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
             onChange={handleChange}
             error={errors.purchase_price}
             required
+          />
+        </FormField>
+
+        <FormField label="Currency" required error={errors.currency}>
+          <Select 
+            name="currency"
+            value={formData.currency}
+            onChange={handleChange}
+            options={[
+              { label: 'ETB (Birr)', value: 'ETB' },
+              { label: 'USD (Dollar)', value: 'USD' }
+            ]}
           />
         </FormField>
       </div>
@@ -156,31 +173,21 @@ export default function PurchaseItemForm({ item, purchaseId, onClose }) {
         </FormField>
       </div>
 
-      <FormField label="Currency" required error={errors.currency}>
-        <Input
-          name="currency"
-          value={formData.currency}
-          onChange={handleChange}
-          error={errors.currency}
-          required
-        />
-      </FormField>
-
-      <div className="form-actions">
+      <div className="form-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
         <Button 
           type="button" 
           variant="outline" 
           onClick={onClose}
-          disabled={updateMutation.isLoading}
+          disabled={createMutation.isLoading}
         >
           Cancel
         </Button>
         <Button 
           type="submit" 
           variant="primary"
-          isLoading={updateMutation.isLoading}
+          isLoading={createMutation.isLoading}
         >
-          Save Changes
+          Add Item
         </Button>
       </div>
     </form>

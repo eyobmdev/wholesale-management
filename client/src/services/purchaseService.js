@@ -14,6 +14,10 @@ export const purchaseService = {
     return await api.get('/purchase-items/', { params });
   },
 
+  async createPurchaseItem(data) {
+    return await api.post('/purchase-items/', data);
+  },
+
   async updatePurchaseItem(id, data) {
     return await api.put(`/purchase-items/${id}/`, data);
   },
@@ -100,6 +104,18 @@ export const useDeletePurchase = () => {
       // Invalidate factories since their balances may have changed
       queryClient.invalidateQueries({ queryKey: ['factories'] });
       queryClient.invalidateQueries({ queryKey: ['factory'] });
+    }
+  });
+};
+
+export const useCreatePurchaseItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => purchaseService.createPurchaseItem(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['purchaseItems'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase'] });
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
     }
   });
 };
