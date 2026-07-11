@@ -29,12 +29,15 @@ def custom_exception_handler(exc, context):
                     else:
                         errors[field] = str(field_errors)
 
-            # === IMPROVED MESSAGE LOGIC ===
-            if errors:
-                first_error = next(iter(errors.values()))  # Get first error message only
-                message = str(first_error)                 # Use clean message, no field name
+                message = next(iter(errors.values())) if errors else "Validation failed"
+
+            elif isinstance(raw_errors, list):
+                message = str(raw_errors[0]) if raw_errors else "Validation failed"
+                errors = None
+
             else:
-                message = "Validation failed"
+                message = str(raw_errors)
+                errors = None
 
             response.data = {
                 "success": False,

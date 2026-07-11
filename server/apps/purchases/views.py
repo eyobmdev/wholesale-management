@@ -127,17 +127,6 @@ class PurchaseItemViewSet(viewsets.ModelViewSet):
             qs = qs.select_related('stock_batch')
         return qs
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            print("=== SERIALIZER / SAVE ERROR ===")
-            print(traceback.format_exc())
-            raise  # let DRF handle it but at least you see the log
-
     def destroy(self, request, *args, **kwargs):
         """
         Delete a purchase item only if no stock from it has been sold.
