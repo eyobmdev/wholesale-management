@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePurchase, usePurchaseItems, useDeletePurchaseItem } from '../../services/purchaseService.js';
-import { Card, Badge, Button, DataTable, Modal } from '../../components/common/index.js';
+import { usePurchase, usePurchaseItems, useDeletePurchaseItem, useDeletePurchase } from '../../services/purchaseService.js';
+import { Card, Badge, Button, DataTable, Modal, ConfirmationDialog } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import PurchaseItemForm from './PurchaseItemForm.jsx';
@@ -14,11 +14,13 @@ export default function PurchaseDetails() {
   const navigate = useNavigate();
   const { data: purchase, isLoading, isError, error } = usePurchase(id);
   const deleteItemMutation = useDeletePurchaseItem();
+  const deletePurchaseMutation = useDeletePurchase();
 
   const [selectedItem, setSelectedItem] = useState(null); // For View action
   const [editingItem, setEditingItem] = useState(null);   // For Edit action
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Purchase Edit
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // For Add Item
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // For Purchase Delete
 
   // Purchase Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -35,6 +37,22 @@ export default function PurchaseDetails() {
     ...(itemsFilters.price_type ? { price_type: itemsFilters.price_type } : {})
   };
   const { data: itemsData, isLoading: itemsLoading } = usePurchaseItems(itemsQueryParams);
+
+  const handleDeletePurchase = () => {
+    const toastId = showToast.loading('Deleting purchase...');
+    deletePurchaseMutation.mutate(id, {
+      onSuccess: () => {
+        showToast.success('Deleted', 'Purchase deleted successfully');
+        showToast.dismiss(toastId);
+        setIsDeleteModalOpen(false);
+        navigate('/purchases');
+      },
+      onError: (err) => {
+        showToast.dismiss(toastId);
+        handleBackendErrors(err, null, 'Failed to delete purchase');
+      }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -203,7 +221,7 @@ export default function PurchaseDetails() {
           <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
             Edit
           </Button>
-          <Button variant="outline" leftIcon="ri-delete-bin-line" className="text-danger" onClick={() => {}}>
+          <Button variant="outline" leftIcon="ri-delete-bin-line" className="text-danger" onClick={() => setIsDeleteModalOpen(true)}>
             Delete
           </Button>
           <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsAddItemModalOpen(true)}>
@@ -543,6 +561,18 @@ export default function PurchaseDetails() {
           />
         )}
       </Modal>
+
+      {/* Delete Purchase Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeletePurchase}
+        title="Delete Purchase"
+        message="Are you sure you want to delete this purchase? This action cannot be undone."
+        confirmLabel="Delete"
+        danger={true}
+        isConfirming={deletePurchaseMutation.isLoading}
+      />
 
     </div>
   );
