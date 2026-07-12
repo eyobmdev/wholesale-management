@@ -218,6 +218,9 @@ export default function PurchaseDetails() {
         </div>
         
         <div className="details-header-actions">
+          <Button variant="outline" leftIcon="ri-file-list-3-line" onClick={() => {}}>
+            View Invoice
+          </Button>
           <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
             Edit
           </Button>
