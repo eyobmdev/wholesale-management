@@ -133,10 +133,6 @@ export default function InvoicePreviewModal({ isOpen, onClose, purchaseId, shipp
         window.open(`https://telegram.me/share/url?url=${encodeURIComponent(shareUrl)}`, "_blank");
         setIsShareMenuOpen(false);
         break;
-      case 'email':
-        window.location.href = `mailto:?subject=${encodeURIComponent("Invoice")}&body=${encodeURIComponent(shareUrl)}`;
-        setIsShareMenuOpen(false);
-        break;
       case 'sms':
         window.location.href = `sms:?body=${encodeURIComponent(shareUrl)}`;
         setIsShareMenuOpen(false);
@@ -209,14 +205,6 @@ export default function InvoicePreviewModal({ isOpen, onClose, purchaseId, shipp
                     onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     <i className="ri-telegram-line" style={{ color: '#0088cc', fontSize: '1.2rem' }}></i> Telegram
-                  </button>
-                  <button 
-                    onClick={() => handleShareOption('email')}
-                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', border: 'none', background: 'transparent', width: '100%', textAlign: 'left', borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--text-color)' }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    <i className="ri-mail-line" style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}></i> Email
                   </button>
                   <button 
                     onClick={() => handleShareOption('sms')}
