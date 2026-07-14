@@ -161,7 +161,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
     is_deletable = serializers.BooleanField(read_only=True)
     is_fully_editable = serializers.BooleanField(read_only=True)
 
-    payment_status = serializers.SerializerMethodField()
+    payment_status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Purchase
@@ -189,15 +189,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
             'unpaid_amount',
         ]
 
-    def get_payment_status(self, obj):
-        if obj.total_purchase_amount == 0:
-            return "No items"
-        elif obj.amount_paid_now == 0:
-            return "Unpaid"
-        elif obj.amount_paid_now >= obj.total_purchase_amount:
-            return "Fully Paid"
-        else:
-            return "Partial"
 
 
 class PurchaseCreateSerializer(serializers.ModelSerializer):

@@ -1,9 +1,11 @@
-import traceback
+from django.urls import reverse
 
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import viewsets, status,filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action
+from django.http import HttpResponse
 
 from .models import Purchase, PurchaseItem
 from .serializers import (
@@ -15,7 +17,10 @@ from .serializers import (
 )
 
 from .filters import PurchaseFilter, PurchaseItemFilter
+from .services.invoice_cache import get_cached_invoice_pdf
+from .services.invoices import InvoiceGenerationError
 from ..core.pagination import StandardPagination
+from ..core.utils.public_documents import make_public_token
 
 
 class PurchaseViewSet(viewsets.ModelViewSet):
@@ -66,6 +71,35 @@ class PurchaseViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
 
+    @action(detail=True, methods=['get'])
+    def invoice(self, request, pk=None):
+        purchase = self.get_object()
+        disposition = "attachment" if request.query_params.get("download") else "inline"
+
+        try:
+            pdf_bytes = get_cached_invoice_pdf(purchase)
+        except InvoiceGenerationError as exc:
+            # logger.error("Invoice generation failed for purchase %s: %s", pk, exc)
+            return Response(
+                {"detail": "Could not generate invoice. Please try again later."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        filename = f"invoice_{purchase.shipping_code}.pdf"
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'{disposition}; filename="{filename}"'
+        response["Content-Length"] = len(pdf_bytes)
+        response["Cache-Control"] = "private, max-age=3600"
+        return response
+
+    @action(detail=True, methods=['get'], url_path='invoice/share-link')
+    def invoice_share_link(self, request, pk=None):
+        purchase = self.get_object()
+        token = make_public_token("purchase-invoice", purchase.pk)
+        share_url = request.build_absolute_uri(
+            reverse('public-document', kwargs={'token': token})
+        )
+        return Response({"share_url": share_url})
 
 class PurchaseItemViewSet(viewsets.ModelViewSet):
     """

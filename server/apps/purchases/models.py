@@ -99,6 +99,16 @@ class Purchase(TimeStampedModel):
     def is_deletable(self):
         return self.is_fully_editable
 
+    @property
+    def payment_status(self):
+        if self.total_purchase_amount == 0:
+            return "No Items"
+        elif self.amount_paid_now == 0:
+            return "Unpaid"
+        elif self.amount_paid_now >= self.total_purchase_amount:
+            return "Fully Paid"
+        return "Partial"
+
 
 class PurchaseItem(TimeStampedModel):
     class PriceType(models.TextChoices):
