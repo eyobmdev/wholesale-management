@@ -14,7 +14,6 @@ from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from xml.sax.saxutils import escape
 
-from django.conf import settings
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4
@@ -30,9 +29,7 @@ class InvoiceGenerationError(Exception):
     """Raised when a purchase invoice PDF cannot be generated."""
 
 
-# ----------------------------------------------------------------------
 # Palette
-# ----------------------------------------------------------------------
 PRIMARY = colors.HexColor("#1E3A5F")
 ACCENT = colors.HexColor("#2E86AB")
 LIGHT_BG = colors.HexColor("#F4F7FA")
