@@ -112,34 +112,39 @@ export default function InvoicePreviewModal({ isOpen, onClose, purchaseId, shipp
     }
   };
 
-  const handleShareOption = async (platform) => {
-    const url = await getShareUrl();
-    if (!url) return; // error state is handled in UI
+  const toggleShareMenu = () => {
+    if (!isShareMenuOpen) {
+      setIsShareMenuOpen(true);
+      getShareUrl(); // Pre-fetch so clicks can be synchronous
+    } else {
+      setIsShareMenuOpen(false);
+    }
+  };
+
+  const handleShareOption = (platform) => {
+    if (!shareUrl) return; // Must wait for URL to load
 
     switch (platform) {
       case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank");
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, "_blank");
         setIsShareMenuOpen(false);
         break;
       case 'telegram':
-        window.open(`https://telegram.me/share/url?url=${encodeURIComponent(url)}`, "_blank");
+        window.open(`https://telegram.me/share/url?url=${encodeURIComponent(shareUrl)}`, "_blank");
         setIsShareMenuOpen(false);
         break;
       case 'email':
-        window.location.href = `mailto:?subject=${encodeURIComponent("Invoice")}&body=${encodeURIComponent(url)}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent("Invoice")}&body=${encodeURIComponent(shareUrl)}`;
         setIsShareMenuOpen(false);
         break;
       case 'sms':
-        window.location.href = `sms:?body=${encodeURIComponent(url)}`;
+        window.location.href = `sms:?body=${encodeURIComponent(shareUrl)}`;
         setIsShareMenuOpen(false);
         break;
       case 'copy':
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast.success('Link Copied!', 'The invoice link has been copied to your clipboard.');
-        } catch (err) {
-          showToast.error('Copy Failed', 'Could not copy link to clipboard.');
-        }
+        navigator.clipboard.writeText(shareUrl)
+          .then(() => showToast.success('Link Copied!', 'The invoice link has been copied to your clipboard.'))
+          .catch(() => showToast.error('Copy Failed', 'Could not copy link to clipboard.'));
         setIsShareMenuOpen(false);
         break;
       default:
@@ -155,7 +160,7 @@ export default function InvoicePreviewModal({ isOpen, onClose, purchaseId, shipp
           <Button
             variant="outline"
             leftIcon="ri-share-forward-line"
-            onClick={() => setIsShareMenuOpen(!isShareMenuOpen)}
+            onClick={toggleShareMenu}
             disabled={isLoading || !blob}
           >
             Share
