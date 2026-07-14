@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSales, useDeleteSale } from '../../hooks/useSales.js';
 import { saleService } from '../../services/saleService.js';
-import { DataTable, Badge, Button, Card } from '../../components/common/index.js';
+import { DataTable, Badge, Button, Card, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import SaleEditForm from './SaleEditForm.jsx';
 
 export default function Sales() {
   const navigate = useNavigate();
   const deleteMutation = useDeleteSale();
+
+  // Modal states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSale, setEditingSale] = useState(null);
 
   // URL state
   const [searchParams, setSearchParams] = useSearchParams();
@@ -91,7 +96,10 @@ export default function Sales() {
     {
       icon: 'ri-edit-line',
       label: 'Edit',
-      onClick: (row) => console.log('Edit placeholder for', row.id)
+      onClick: (row) => {
+        setEditingSale(row);
+        setIsEditModalOpen(true);
+      }
     },
     {
       icon: 'ri-delete-bin-line',
@@ -250,6 +258,20 @@ export default function Sales() {
           }}
         />
       </Card>
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Sale (Partial)"
+      >
+        {editingSale && (
+          <SaleEditForm
+            initialData={editingSale}
+            onCancel={() => setIsEditModalOpen(false)}
+            onSuccess={() => setIsEditModalOpen(false)}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

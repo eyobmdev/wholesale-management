@@ -17,6 +17,18 @@ export const useSale = (id) => {
   });
 };
 
+export const useUpdateSale = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => saleService.updateSale(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['sale'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    }
+  });
+};
+
 export const useDeleteSale = () => {
   const queryClient = useQueryClient();
   return useMutation({
