@@ -290,29 +290,36 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type',
         ]
 
+    def validate_amount_paid_now(self, value):
+        if value is None:
+            return value
+
+        if value < 0:
+            raise serializers.ValidationError(
+                "Amount paid now cannot be negative."
+            )
+
+        instance = self.instance
+        if instance and value > instance.total_sale_amount:
+            raise serializers.ValidationError(
+                f"Amount paid now ({value:,}) cannot be greater than the total sale amount (₦{instance.total_sale_amount:,})."
+            )
+
+        return value
+
     def validate(self, data):
         instance = self.instance
         amount_paid_now = data.get('amount_paid_now', instance.amount_paid_now)
         payment_method = data.get('payment_method')
 
-        # Auto determine new payment_type
-        if amount_paid_now == 0:
-            new_payment_type = Sale.PaymentType.CREDIT
-        elif amount_paid_now >= instance.total_sale_amount:
-            new_payment_type = Sale.PaymentType.CASH
-        else:
-            new_payment_type = Sale.PaymentType.PARTIAL
-
-        data['payment_type'] = new_payment_type
-
         # Force payment_method
-        if amount_paid_now > 0:
+        if amount_paid_now and amount_paid_now > 0:
             if not payment_method and not getattr(instance, 'payment_method', None):
                 raise serializers.ValidationError({
                     "payment_method": "Payment method is required when amount_paid_now > 0."
                 })
         else:
-            if payment_method:
+            if payment_method is not None:
                 data['payment_method'] = None
 
         return data
@@ -325,7 +332,6 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, field, value)
 
         instance.save()
-        instance.recalculate_totals()   # Important
 
         new_paid = instance.amount_paid_now
 

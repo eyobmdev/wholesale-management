@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from ..core.models import TimeStampedModel, PaymentMethod
 from ..customers.models import Customer
@@ -100,9 +101,13 @@ class Sale(TimeStampedModel):
         )
 
     def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = timezone.now().date()
+
         if self.pk:
             self.recalculate_totals()
-        super().save(*args, **kwargs)
+
+        self.payment_type = self.computed_payment_type
 
     def recalculate_totals(self):
         from django.db.models import Sum
@@ -120,6 +125,17 @@ class Sale(TimeStampedModel):
                 total_sale_amount=self.total_sale_amount,
                 credit_amount=self.credit_amount
             )
+
+
+    @property
+    def computed_payment_type(self):
+        if self.amount_paid_now == self.total_sale_amount:
+            return self.PaymentType.CASH
+        elif self.amount_paid_now < self.total_sale_amount:
+            return self.PaymentType.PARTIAL
+        return self.PaymentType.CREDIT
+
+
     @property
     def payment_status(self):
         if self.total_sale_amount == 0:
