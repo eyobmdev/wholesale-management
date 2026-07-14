@@ -12,6 +12,7 @@ import FactoryDetails from './pages/Factories/FactoryDetails.jsx';
 import Purchases from './pages/Purchases/index.jsx';
 import PurchaseDetails from './pages/Purchases/PurchaseDetails.jsx';
 import PurchaseCreate from './pages/Purchases/PurchaseCreate.jsx';
+import Sales from './pages/Sales/index.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -38,6 +39,9 @@ export default function App() {
           <Route path="/purchases" element={<Purchases />} />
           <Route path="/purchases/new" element={<PurchaseCreate />} />
           <Route path="/purchases/:id" element={<PurchaseDetails />} />
+          <Route path="/sales" element={<Sales />} />
+          <Route path="/sales/new" element={<div style={{padding: '32px', textAlign: 'center'}}><h2>Create Sale (Coming Soon)</h2></div>} />
+          <Route path="/sales/:id" element={<div style={{padding: '32px', textAlign: 'center'}}><h2>Sale Details (Coming Soon)</h2></div>} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
             <div style={{padding: '32px', textAlign: 'center'}}>

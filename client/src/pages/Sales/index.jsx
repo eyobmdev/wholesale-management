@@ -1,0 +1,255 @@
+import React from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSales, useDeleteSale } from '../../hooks/useSales.js';
+import { saleService } from '../../services/saleService.js';
+import { DataTable, Badge, Button, Card } from '../../components/common/index.js';
+import { showToast } from '../../utils/toast.js';
+
+export default function Sales() {
+  const navigate = useNavigate();
+  const deleteMutation = useDeleteSale();
+
+  // URL state
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = parseInt(searchParams.get('page')) || 1;
+  const search = searchParams.get('search') || '';
+  const activeSort = searchParams.get('ordering') || '-date';
+
+  const filters = {
+    customer: searchParams.get('customer') || '',
+    payment_type: searchParams.get('payment_type') || '',
+    has_credit: searchParams.get('has_credit') || '',
+    date_from: searchParams.get('date_from') || '',
+    date_to: searchParams.get('date_to') || '',
+    min_total: searchParams.get('min_total') || '',
+    max_total: searchParams.get('max_total') || ''
+  };
+
+  // Fetch data
+  const queryParams = {
+    page,
+    search: search || undefined,
+    ordering: activeSort || undefined,
+    ...(filters.customer ? { customer: filters.customer } : {}),
+    ...(filters.payment_type ? { payment_type: filters.payment_type } : {}),
+    ...(filters.has_credit !== '' ? { has_credit: filters.has_credit } : {}),
+    ...(filters.date_from ? { date_from: filters.date_from } : {}),
+    ...(filters.date_to ? { date_to: filters.date_to } : {}),
+    ...(filters.min_total ? { min_total: filters.min_total } : {}),
+    ...(filters.max_total ? { max_total: filters.max_total } : {})
+  };
+
+  const { data, isLoading } = useSales(queryParams);
+
+  // DataTable Configuration
+  const columns = [
+    { key: 'invoice_number', title: 'Invoice Number', sortable: true },
+    { key: 'customer_name', title: 'Customer Name', sortable: true },
+    { key: 'date', title: 'Date', sortable: true, render: (val) => new Date(val).toLocaleDateString() },
+    {
+      key: 'total_sale_amount',
+      title: 'Total Amount',
+      sortable: true,
+      render: (val) => `${parseFloat(val || 0).toFixed(2)}`
+    },
+    {
+      key: 'credit_amount',
+      title: 'Credit Amount',
+      sortable: true,
+      render: (val) => {
+        const amt = parseFloat(val || 0);
+        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{amt.toFixed(2)}</span> : '0.00';
+      }
+    },
+    {
+      key: 'payment_status',
+      title: 'Payment Status',
+      sortable: true,
+      render: (val) => {
+        const statusMap = {
+          'Unpaid': 'danger',
+          'Partial': 'warning',
+          'Paid': 'success'
+        };
+        return <Badge variant={statusMap[val] || 'default'}>{val}</Badge>;
+      }
+    }
+  ];
+
+  const handleDelete = (row) => {
+    // Delete logic disabled as per instructions
+    console.log('Delete placeholder for', row.id);
+  };
+
+  const rowActions = [
+    {
+      icon: 'ri-eye-line',
+      label: 'View',
+      onClick: (row) => navigate(`/sales/${row.id}`)
+    },
+    {
+      icon: 'ri-edit-line',
+      label: 'Edit',
+      onClick: (row) => console.log('Edit placeholder for', row.id)
+    },
+    {
+      icon: 'ri-delete-bin-line',
+      label: 'Delete',
+      variant: 'danger',
+      onClick: handleDelete
+    }
+  ];
+
+  const filterConfig = [
+    {
+      key: 'customer',
+      type: 'async-select',
+      label: 'Customer',
+      placeholder: 'All Customers',
+      value: filters.customer,
+      loadOptions: async (query) => {
+        try {
+          const res = await saleService.getCustomerOptions(query);
+          return Array.isArray(res) ? res : (res.results || []);
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+    },
+    {
+      key: 'payment_type',
+      type: 'select',
+      label: 'Payment Type',
+      options: [
+        { value: '', label: 'All' },
+        { value: 'cash', label: 'Cash' },
+        { value: 'partial', label: 'Partial' },
+        { value: 'credit', label: 'Credit' }
+      ],
+      value: filters.payment_type
+    },
+    {
+      key: 'has_credit',
+      type: 'select',
+      label: 'Has Credit',
+      options: [
+        { value: '', label: 'All' },
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ],
+      value: filters.has_credit
+    },
+    {
+      key: 'date_from',
+      type: 'date',
+      label: 'From Date',
+      value: filters.date_from
+    },
+    {
+      key: 'date_to',
+      type: 'date',
+      label: 'To Date',
+      value: filters.date_to
+    },
+    {
+      key: 'min_total',
+      type: 'number',
+      label: 'Min Total',
+      placeholder: 'Min Total Amount',
+      value: filters.min_total
+    },
+    {
+      key: 'max_total',
+      type: 'number',
+      label: 'Max Total',
+      placeholder: 'Max Total Amount',
+      value: filters.max_total
+    }
+  ];
+
+  const updateURLParams = (updates) => {
+    const newParams = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleFilterChange = (key, val) => {
+    updateURLParams({ [key]: val, page: 1 });
+  };
+
+  const clearFilters = () => {
+    setSearchParams({}, { replace: true });
+  };
+
+  const sortConfig = [
+    { value: '-date', label: 'Sale Date (Newest)' },
+    { value: 'date', label: 'Sale Date (Oldest)' },
+    { value: '-total_sale_amount', label: 'Total Amount (High to Low)' },
+    { value: 'total_sale_amount', label: 'Total Amount (Low to High)' },
+    { value: '-credit_amount', label: 'Credit Amount (High to Low)' },
+    { value: 'credit_amount', label: 'Credit Amount (Low to High)' },
+    { value: '-created_at', label: 'Recently Created' },
+    { value: 'created_at', label: 'Oldest Created' }
+  ];
+
+  return (
+    <div className="page-container">
+      <div className="page-header" style={{ marginBottom: '24px' }}>
+        <h1 className="page-title">Sales</h1>
+        <p className="page-description">Manage customer sales, invoices, and payments.</p>
+      </div>
+
+      <Card>
+        <DataTable
+          columns={columns}
+          data={data?.results || []}
+          isLoading={isLoading}
+          keyField="id"
+
+          // Search props
+          searchPlaceholder="Search invoices or customers..."
+          searchValue={search}
+          onSearch={(v) => updateURLParams({ search: v, page: 1 })}
+          
+          // Filter props
+          filters={filterConfig}
+          onFilterChange={handleFilterChange}
+
+          // Sort props
+          sortOptions={sortConfig}
+          activeSort={activeSort}
+          onSortChange={(val) => updateURLParams({ ordering: val, page: 1 })}
+
+          // Toolbar Actions
+          toolbarActions={
+            <Button
+              variant="primary"
+              leftIcon="ri-add-line"
+              onClick={() => navigate('/sales/new')}
+            >
+              New Sale
+            </Button>
+          }
+
+          // Row Actions
+          rowActions={rowActions}
+
+          // Pagination
+          pagination={{
+            currentPage: page,
+            totalPages: data?.count ? Math.ceil(data.count / 10) : 1,
+            onPageChange: (newPage) => updateURLParams({ page: newPage })
+          }}
+        />
+      </Card>
+    </div>
+  );
+}
