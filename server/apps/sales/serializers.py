@@ -287,7 +287,7 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             'invoice_number', 'total_sale_amount', 'credit_amount',
         ]
         read_only_fields = [
-            'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type',
+            'invoice_number', 'total_sale_amount', 'credit_amount', 'payment_type'
         ]
 
     def validate_amount_paid_now(self, value):
@@ -295,16 +295,16 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
             return value
 
         if value < 0:
-            raise serializers.ValidationError(
-                "Amount paid now cannot be negative."
-            )
+            raise serializers.ValidationError("Amount paid now cannot be negative.")
+
+
 
         instance = self.instance
         if instance and value > instance.total_sale_amount:
             raise serializers.ValidationError(
-                f"Amount paid now ({value:,}) cannot be greater than the total sale amount (₦{instance.total_sale_amount:,})."
+                f"Amount paid now ({value:,}) cannot be greater than the total sale amount ({instance.total_sale_amount:,})."
             )
-
+        print(f"Validating amount: {value} | Total: {instance.total_sale_amount if instance else 'N/A'}")
         return value
 
     def validate(self, data):
@@ -312,7 +312,6 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
         amount_paid_now = data.get('amount_paid_now', instance.amount_paid_now)
         payment_method = data.get('payment_method')
 
-        # Force payment_method
         if amount_paid_now and amount_paid_now > 0:
             if not payment_method and not getattr(instance, 'payment_method', None):
                 raise serializers.ValidationError({
@@ -328,22 +327,24 @@ class SaleUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         old_paid = instance.amount_paid_now
 
+        # Apply updates
         for field, value in validated_data.items():
             setattr(instance, field, value)
 
-        instance.save()
+        instance.save()                    # This triggers model's payment_type logic
 
-        new_paid = instance.amount_paid_now
+        # Important: Recalculate after save
+        instance.recalculate_totals()
 
-        # Sync only if payment amount changed
-        if old_paid != new_paid or 'payment_method' in validated_data:
-            self._sync_auto_income(instance)
+        # Sync income if needed
+        self._sync_auto_income(instance)
 
-        instance.refresh_from_db()
+        instance.refresh_from_db()         # Get latest values
         return instance
 
     def _sync_auto_income(self, sale):
         from ..payments.models import CustomerIncome
+
         if sale.amount_paid_now > 0 and sale.payment_method:
             CustomerIncome.objects.update_or_create(
                 sale=sale,
