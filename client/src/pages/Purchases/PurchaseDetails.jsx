@@ -8,6 +8,7 @@ import PurchaseItemForm from './PurchaseItemForm.jsx';
 import PurchaseItemAddForm from './PurchaseItemAddForm.jsx';
 import PurchaseEditForm from './PurchaseEditForm.jsx';
 import PurchaseFullEditForm from './PurchaseFullEditForm.jsx';
+import InvoicePreviewModal from './InvoicePreviewModal.jsx';
 
 export default function PurchaseDetails() {
   const { id } = useParams();
@@ -21,6 +22,7 @@ export default function PurchaseDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Purchase Edit
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // For Add Item
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // For Purchase Delete
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false); // For Invoice Preview
 
   // Purchase Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -218,7 +220,7 @@ export default function PurchaseDetails() {
         </div>
         
         <div className="details-header-actions">
-          <Button variant="outline" leftIcon="ri-file-list-3-line" onClick={() => {}}>
+          <Button variant="outline" leftIcon="ri-file-list-3-line" onClick={() => setIsInvoiceModalOpen(true)}>
             View Invoice
           </Button>
           <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
@@ -539,6 +541,14 @@ export default function PurchaseDetails() {
         confirmLabel="Delete"
         danger={true}
         isConfirming={deletePurchaseMutation.isLoading}
+      />
+
+      {/* Invoice Preview Modal */}
+      <InvoicePreviewModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setIsInvoiceModalOpen(false)}
+        purchaseId={id}
+        shippingCode={purchase.shipping_code}
       />
 
     </div>
