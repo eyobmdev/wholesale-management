@@ -144,8 +144,8 @@ class SaleReadSerializer(serializers.ModelSerializer):
     total_profit = serializers.SerializerMethodField()
 
     # Human readable payment status
-    payment_status = serializers.SerializerMethodField()
-
+    payment_status = serializers.CharField(read_only=True)
+    
     class Meta:
         model = Sale
         fields = [
@@ -179,16 +179,16 @@ class SaleReadSerializer(serializers.ModelSerializer):
     def get_total_profit(self, obj):
         return sum(item.profit for item in obj.items.all())
 
-    def get_payment_status(self, obj):
-        if obj.payment_type == Sale.PaymentType.CASH:
-            return "Fully Paid"
-        elif obj.payment_type == Sale.PaymentType.CREDIT:
-            return f"Unpaid — owes {obj.credit_amount} {obj.currency}"
-        else:
-            return (
-                f"Partial — paid {obj.amount_paid_now}, "
-                f"owes {obj.credit_amount} {obj.currency}"
-            )
+    # def get_payment_status(self, obj):
+    #     if obj.payment_type == Sale.PaymentType.CASH:
+    #         return "Fully Paid"
+    #     elif obj.payment_type == Sale.PaymentType.CREDIT:
+    #         return f"Unpaid — owes {obj.credit_amount} {obj.currency}"
+    #     else:
+    #         return (
+    #             f"Partial — paid {obj.amount_paid_now}, "
+    #             f"owes {obj.credit_amount} {obj.currency}"
+    #         )
 
 
 class SaleCreateSerializer(serializers.ModelSerializer):

@@ -120,6 +120,27 @@ class Sale(TimeStampedModel):
                 total_sale_amount=self.total_sale_amount,
                 credit_amount=self.credit_amount
             )
+    @property
+    def payment_status(self):
+        if self.total_sale_amount == 0:
+            return "No Items"
+        elif self.amount_paid_now == 0:
+            return "Unpaid"
+        elif  self.amount_paid_now >= self.total_sale_amount:
+            return "Fully Paid"
+        return "Partial"
+
+    # def get_payment_status(self, obj):
+    #     if obj.payment_type == Sale.PaymentType.CASH:
+    #         return "Fully Paid"
+    #     elif obj.payment_type == Sale.PaymentType.CREDIT:
+    #         return f"Unpaid — owes {obj.credit_amount} {obj.currency}"
+    #     else:
+    #         return (
+    #             f"Partial — paid {obj.amount_paid_now}, "
+    #             f"owes {obj.credit_amount} {obj.currency}"
+    #         )
+
 
 
 class SaleItem(TimeStampedModel):
