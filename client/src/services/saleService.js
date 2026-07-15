@@ -21,8 +21,29 @@ export const saleService = {
     return await api.delete(`/sales/${id}/`);
   },
 
+  async getSaleItems(params = {}) {
+    return await api.get('/sale-items/', { params });
+  },
+
+  async createSaleItem(data) {
+    return await api.post('/sale-items/', data);
+  },
+
+  async updateSaleItem(id, data) {
+    return await api.put(`/sale-items/${id}/`, data);
+  },
+
+  async deleteSaleItem(id) {
+    return await api.delete(`/sale-items/${id}/`);
+  },
+
   async getCustomerOptions(search = '') {
     const res = await api.get('/customer-options/', { params: search ? { search } : {} });
+    return res;
+  },
+
+  async getStockOptions(search = '') {
+    const res = await api.get('/stock-options/', { params: search ? { search } : {} });
     return res;
   }
 };

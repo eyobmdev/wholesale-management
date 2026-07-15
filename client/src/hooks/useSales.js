@@ -17,6 +17,15 @@ export const useSale = (id) => {
   });
 };
 
+export const useSaleItems = (params = {}) => {
+  return useQuery({
+    queryKey: ['saleItems', params],
+    queryFn: () => saleService.getSaleItems(params),
+    keepPreviousData: true,
+    enabled: !!params.sale,
+  });
+};
+
 export const useUpdateSale = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -29,11 +38,36 @@ export const useUpdateSale = () => {
   });
 };
 
+export const useUpdateSaleItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => saleService.updateSaleItem(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saleItems'] });
+      queryClient.invalidateQueries({ queryKey: ['sale'] });
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+    }
+  });
+};
+
 export const useDeleteSale = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id) => saleService.deleteSale(id),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    }
+  });
+};
+
+export const useDeleteSaleItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => saleService.deleteSaleItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saleItems'] });
+      queryClient.invalidateQueries({ queryKey: ['sale'] });
       queryClient.invalidateQueries({ queryKey: ['sales'] });
     }
   });
