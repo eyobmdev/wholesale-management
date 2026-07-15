@@ -54,6 +54,13 @@ class SaleViewSet(viewsets.ModelViewSet):
     ordering_fields = [
         'date', 'total_sale_amount', 'amount_paid_now',
         'credit_amount', 'created_at',
+        'stock_batch__item_code',
+        'stock_batch__product_name',
+        'sale__invoice_number',
+        'sale__date',
+        'sale__customer__name',
+        'total_line_amount',
+        'selling_price',
     ]
     ordering = ['-date', '-created_at']
 
@@ -157,7 +164,8 @@ class SaleItemViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = [
         'total_line_amount', 'selling_price',
-        'bags_sold', 'created_at',
+        'bags_sold', 'created_at','stock_batch__item_code',
+        'stock_batch__product_name',
     ]
     ordering = ['-created_at']
 
