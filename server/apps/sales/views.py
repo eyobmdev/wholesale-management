@@ -8,7 +8,7 @@ from .serializers import (
     SaleCreateSerializer,
     SaleUpdateSerializer,
     SaleItemReadSerializer,
-    SaleItemWriteSerializer,
+    SaleItemWriteSerializer, AddSaleItemWriteSerializer,
 )
 from .filters import SaleFilter, SaleItemFilter
 from ..core.pagination import StandardPagination
@@ -163,8 +163,11 @@ class SaleItemViewSet(viewsets.ModelViewSet):
         'stock_batch__product_name',
     ]
     ordering_fields = [
-        'total_line_amount', 'selling_price',
-        'bags_sold', 'created_at','stock_batch__item_code',
+        'total_line_amount',
+        'selling_price',
+        'bags_sold',
+        'created_at',
+        'stock_batch__item_code',
         'stock_batch__product_name',
     ]
     ordering = ['-created_at']
@@ -173,14 +176,20 @@ class SaleItemViewSet(viewsets.ModelViewSet):
         """Return appropriate serializer based on action."""
         if self.action in ('list', 'retrieve'):
             return SaleItemReadSerializer
-        # create, update, partial_update
+
+        if self.action == 'create':
+            return AddSaleItemWriteSerializer
+
+        # update, partial_update, destroy
         return SaleItemWriteSerializer
 
     def get_queryset(self):
         """Optimize queries."""
         qs = super().get_queryset()
-        qs = qs.select_related(
-            'sale', 'sale__customer',
-            'stock_batch', 'stock_batch__factory',
+        return qs.select_related(
+            'sale',
+            'sale__customer',
+            'stock_batch',
+            'stock_batch__factory',
         )
-        return qs
+

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 from .models import Sale, SaleItem
+from ..inventory.models import StockBatch
 
 
 class SaleItemReadSerializer(serializers.ModelSerializer):
@@ -109,6 +110,84 @@ class SaleItemWriteSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"Batch '{batch.shipping_code}' is sold out."
                 )
+
+        return data
+    def save(self, **kwargs):
+        try:
+            return super().save(**kwargs)
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            raise
+
+
+class AddSaleItemWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleItem
+        fields = [
+            'id',
+            'sale',
+            'stock_batch',
+            'bags_sold',
+            'sell_price_type',
+            'selling_price',
+        ]
+        read_only_fields = ['id']
+
+    def validate_sale(self, value):
+        """Ensure the sale exists."""
+        if not value:
+            raise serializers.ValidationError("Sale is required.")
+
+        sale_id = value.pk if hasattr(value, 'pk') else value
+        if not Sale.objects.filter(pk=sale_id).exists():
+            raise serializers.ValidationError("Sale does not exist.")
+
+        return value
+
+    def validate_stock_batch(self, value):
+        """Ensure the stock batch exists."""
+        if not value:
+            raise serializers.ValidationError("Stock batch is required.")
+
+        batch_id = value.pk if hasattr(value, 'pk') else value
+        if not StockBatch.objects.filter(pk=batch_id).exists():
+            raise serializers.ValidationError("Stock batch does not exist.")
+
+        return value
+
+    def validate_bags_sold(self, value):
+        """Bags sold must be positive."""
+        if value <= 0:
+            raise serializers.ValidationError("Bags sold must be greater than 0.")
+        return value
+
+    def validate_selling_price(self, value):
+        """Selling price must be positive."""
+        if value <= 0:
+            raise serializers.ValidationError("Selling price must be greater than 0.")
+        return value
+
+    def validate(self, data):
+        """Stock availability check for new sale item only."""
+        batch = data.get('stock_batch')
+        bags_requested = data.get('bags_sold', 0)
+
+        if batch and bags_requested:
+            available = batch.remaining_bags
+
+            if bags_requested > available:
+                raise serializers.ValidationError({
+                    'bags_sold': (
+                        f"Not enough stock. Batch '{batch.shipping_code}' has "
+                        f"{available} bags available. You requested {bags_requested} bags."
+                    )
+                })
+
+            if batch.is_sold_out:
+                raise serializers.ValidationError({
+                    'stock_batch': f"Batch '{batch.shipping_code}' is sold out."
+                })
 
         return data
 
