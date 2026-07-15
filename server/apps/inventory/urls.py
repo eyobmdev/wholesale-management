@@ -11,10 +11,11 @@ URLs:
 """
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import StockBatchViewSet
+from .views import StockBatchViewSet, StockBatchOptionViewSet
 
 router = DefaultRouter()
 router.register(r'stock', StockBatchViewSet, basename='stock')
+router.register(r'stock-options', StockBatchOptionViewSet, basename='stock-option')
 
 urlpatterns = [
     path('', include(router.urls)),

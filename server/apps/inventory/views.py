@@ -10,7 +10,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
-from django.db.models import Sum, F, DecimalField
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Sum, F, Q, DecimalField
 
 from .models import StockBatch
 from .serializers import StockBatchSerializer, StockSummaryByItemSerializer
@@ -264,3 +265,44 @@ class StockBatchViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+class StockBatchOptionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        queryset = (
+            StockBatch.objects
+            .select_related("factory", "purchase")
+            .filter(sold_bags__lt=F("total_bags_purchased"))
+            .order_by("item_code", "-purchase__date")
+        )
+
+        search = request.query_params.get("search")
+
+        if search:
+            queryset = queryset.filter(
+                Q(item_code__icontains=search) |
+                Q(product_name__icontains=search) |
+                Q(shipping_code__icontains=search) |
+                Q(factory__name__icontains=search)
+            )
+
+        options = []
+
+        for stock in queryset:
+            options.append({
+                "value": stock.id,
+                "label": (
+                    f"{stock.item_code} • "
+                    f"{stock.product_name} • "
+                    f"{stock.shipping_code} • "
+                    f"{stock.remaining_bags:g} Bag"
+                    f"{'' if stock.remaining_bags == 1 else 's'} "
+                    f"({stock.remaining_pieces} pcs)"
+                )
+            })
+
+        return Response(options)
+
+
+
