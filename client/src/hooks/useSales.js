@@ -38,6 +38,18 @@ export const useUpdateSale = () => {
   });
 };
 
+export const useCreateSaleItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => saleService.createSaleItem(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saleItems'] });
+      queryClient.invalidateQueries({ queryKey: ['sale'] });
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+    }
+  });
+};
+
 export const useUpdateSaleItem = () => {
   const queryClient = useQueryClient();
   return useMutation({

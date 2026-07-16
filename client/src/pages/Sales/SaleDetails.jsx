@@ -6,6 +6,7 @@ import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import SaleEditForm from './SaleEditForm.jsx';
 import SaleItemEditForm from './SaleItemEditForm.jsx';
+import SaleItemAddForm from './SaleItemAddForm.jsx';
 
 export default function SaleDetails() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export default function SaleDetails() {
 
   const [selectedItem, setSelectedItem] = useState(null); // For View action
   const [editingItem, setEditingItem] = useState(null); // For Item Edit
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // For Item Add
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Sale Edit
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // For Sale Delete
 
@@ -360,6 +362,16 @@ export default function SaleDetails() {
               keyField="id"
               emptyMessage="No items found for this sale."
               isLoading={itemsLoading}
+              
+              toolbarActions={
+                <Button 
+                  variant="primary" 
+                  leftIcon="ri-add-line"
+                  onClick={() => setIsAddItemModalOpen(true)}
+                >
+                  Add Item
+                </Button>
+              }
 
               searchPlaceholder="Search items..."
               searchValue={itemsSearch}
@@ -523,6 +535,20 @@ export default function SaleDetails() {
             item={editingItem}
             saleId={id}
             onClose={() => setEditingItem(null)}
+          />
+        )}
+      </Modal>
+
+      {/* Add Sale Item Modal */}
+      <Modal
+        isOpen={isAddItemModalOpen}
+        onClose={() => setIsAddItemModalOpen(false)}
+        title="Add Sale Item"
+      >
+        {isAddItemModalOpen && (
+          <SaleItemAddForm
+            saleId={id}
+            onClose={() => setIsAddItemModalOpen(false)}
           />
         )}
       </Modal>
