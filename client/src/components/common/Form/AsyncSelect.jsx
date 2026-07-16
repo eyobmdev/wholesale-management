@@ -138,14 +138,7 @@ export const AsyncSelect = ({
           {options.map((opt) => (
             <div
               key={opt.value}
-              style={{
-                padding: '8px 12px',
-                cursor: 'pointer',
-                background: value?.toString() === opt.value?.toString() ? 'var(--primary-color-light, #eff6ff)' : 'transparent',
-                color: value?.toString() === opt.value?.toString() ? 'var(--primary-color, #2563eb)' : 'inherit'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary, #f3f4f6)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = value?.toString() === opt.value?.toString() ? 'var(--primary-color-light, #eff6ff)' : 'transparent'}
+              className={`async-select-option ${value?.toString() === opt.value?.toString() ? 'is-selected' : ''}`}
               onClick={() => {
                 onChange(opt.value);
                 setSelectedLabel(opt.label);

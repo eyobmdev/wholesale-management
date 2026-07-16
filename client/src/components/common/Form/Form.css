@@ -182,6 +182,32 @@ body.dark-theme .common-select {
   line-height: 1.4;
 }
 
+.async-select-inner-input {
+  color: var(--text-color) !important;
+  caret-color: var(--text-color) !important;
+}
+
 .async-select-inner-input::placeholder {
-  color: #9ca3af !important;
+  color: var(--text-muted) !important;
+}
+
+.async-select-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  transition: background 0.1s ease;
+}
+
+.async-select-option:hover {
+  background: var(--hover-bg);
+}
+
+.async-select-option.is-selected {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+}
+
+.async-select-option.is-selected:hover {
+  background: rgba(14, 165, 233, 0.15);
 }
