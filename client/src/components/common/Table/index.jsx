@@ -38,7 +38,7 @@ const TableFilter = ({ filter, onFilterChange }) => {
     );
   }
 
-  if (type === 'date' || type === 'number') {
+  if (type === 'date' || type === 'number' || type === 'text') {
     return (
       <div className="data-table-filter">
         <Input 

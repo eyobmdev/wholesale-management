@@ -14,8 +14,21 @@ export default function Inventory() {
 
   const filters = {
     factory: searchParams.get('factory') || '',
-    is_low_stock: searchParams.get('is_low_stock') || '',
-    is_sold_out: searchParams.get('is_sold_out') || ''
+    shipping_code: searchParams.get('shipping_code') || '',
+    price_type: searchParams.get('price_type') || '',
+    stock_status: searchParams.get('stock_status') || '',
+    purchase_date_from: searchParams.get('purchase_date_from') || '',
+    purchase_date_to: searchParams.get('purchase_date_to') || '',
+    min_purchase_price: searchParams.get('min_purchase_price') || '',
+    max_purchase_price: searchParams.get('max_purchase_price') || '',
+    min_remaining_bags: searchParams.get('min_remaining_bags') || '',
+  };
+
+  const getStockStatusParams = () => {
+    if (filters.stock_status === 'has_stock') return { has_stock: 'true' };
+    if (filters.stock_status === 'is_sold_out') return { is_sold_out: 'true' };
+    if (filters.stock_status === 'is_low_stock') return { is_low_stock: 'true' };
+    return {};
   };
 
   const queryParams = {
@@ -23,8 +36,14 @@ export default function Inventory() {
     search: search || undefined,
     ordering: activeSort || undefined,
     ...(filters.factory ? { factory: filters.factory } : {}),
-    ...(filters.is_low_stock !== '' ? { is_low_stock: filters.is_low_stock } : {}),
-    ...(filters.is_sold_out !== '' ? { is_sold_out: filters.is_sold_out } : {})
+    ...(filters.shipping_code ? { shipping_code: filters.shipping_code } : {}),
+    ...(filters.price_type ? { price_type: filters.price_type } : {}),
+    ...getStockStatusParams(),
+    ...(filters.purchase_date_from ? { purchase_date_from: filters.purchase_date_from } : {}),
+    ...(filters.purchase_date_to ? { purchase_date_to: filters.purchase_date_to } : {}),
+    ...(filters.min_purchase_price ? { min_purchase_price: filters.min_purchase_price } : {}),
+    ...(filters.max_purchase_price ? { max_purchase_price: filters.max_purchase_price } : {}),
+    ...(filters.min_remaining_bags ? { min_remaining_bags: filters.min_remaining_bags } : {}),
   };
 
   const { data, isLoading } = useInventory(queryParams);
@@ -83,38 +102,75 @@ export default function Inventory() {
       }
     },
     {
-      key: 'is_low_stock',
+      key: 'stock_status',
       type: 'select',
-      label: 'Low Stock',
+      label: 'Stock Status',
       options: [
         { value: '', label: 'All' },
-        { value: 'true', label: 'Low Stock Only' },
-        { value: 'false', label: 'Adequate Stock' }
+        { value: 'has_stock', label: 'Has Stock' },
+        { value: 'is_sold_out', label: 'Sold Out' },
+        { value: 'is_low_stock', label: 'Low Stock' }
       ],
-      value: filters.is_low_stock
+      value: filters.stock_status
     },
     {
-      key: 'is_sold_out',
+      key: 'price_type',
       type: 'select',
-      label: 'Sold Out',
+      label: 'Price Type',
       options: [
         { value: '', label: 'All' },
-        { value: 'true', label: 'Sold Out Only' },
-        { value: 'false', label: 'In Stock' }
+        { value: 'per_piece', label: 'Per Piece' },
+        { value: 'per_bag', label: 'Per Bag' }
       ],
-      value: filters.is_sold_out
+      value: filters.price_type
+    },
+    {
+      type: 'date-range',
+      keyFrom: 'purchase_date_from',
+      keyTo: 'purchase_date_to',
+      valueFrom: filters.purchase_date_from,
+      valueTo: filters.purchase_date_to,
+      placeholderFrom: 'From Date',
+      placeholderTo: 'To Date',
+      label: 'Purchase Date Range'
+    },
+    {
+      type: 'number-range',
+      keyFrom: 'min_purchase_price',
+      keyTo: 'max_purchase_price',
+      valueFrom: filters.min_purchase_price,
+      valueTo: filters.max_purchase_price,
+      placeholderFrom: 'Min Price',
+      placeholderTo: 'Max Price',
+      label: 'Purchase Price Range'
+    },
+    {
+      key: 'shipping_code',
+      type: 'text',
+      label: 'Shipping Code',
+      placeholder: 'Enter shipping code...',
+      value: filters.shipping_code
+    },
+    {
+      key: 'min_remaining_bags',
+      type: 'number',
+      label: 'Min Remaining Bags',
+      placeholder: 'Min bags...',
+      value: filters.min_remaining_bags
     }
   ];
 
   const sortConfig = [
     { value: 'product_name', label: 'Product Name (A-Z)' },
     { value: '-product_name', label: 'Product Name (Z-A)' },
+    { value: '-purchase_date', label: 'Purchase Date (Newest)' },
+    { value: 'purchase_date', label: 'Purchase Date (Oldest)' },
+    { value: '-purchase_price', label: 'Purchase Price (High to Low)' },
+    { value: 'purchase_price', label: 'Purchase Price (Low to High)' },
     { value: '-stock_value', label: 'Stock Value (High to Low)' },
     { value: 'stock_value', label: 'Stock Value (Low to High)' },
-    { value: '-_remaining_bags', label: 'Remaining Bags (High to Low)' },
-    { value: '_remaining_bags', label: 'Remaining Bags (Low to High)' },
-    { value: '-purchase__date', label: 'Purchase Date (Newest)' },
-    { value: 'purchase__date', label: 'Purchase Date (Oldest)' },
+    { value: '-remaining_bags', label: 'Remaining Bags (High to Low)' },
+    { value: 'remaining_bags', label: 'Remaining Bags (Low to High)' },
     { value: '-created_at', label: 'Recently Created' },
     { value: 'created_at', label: 'Oldest Created' }
   ];
