@@ -17,6 +17,10 @@ export const saleService = {
     return await api.patch(`/sales/${id}/`, data);
   },
 
+  async fullUpdateSale(id, data) {
+    return await api.put(`/sales/${id}/`, data);
+  },
+
   async deleteSale(id) {
     return await api.delete(`/sales/${id}/`);
   },
@@ -44,6 +48,11 @@ export const saleService = {
 
   async getStockOptions(search = '') {
     const res = await api.get('/stock-options/', { params: search ? { search } : {} });
+    return res;
+  },
+
+  async getPaymentMethodOptions(search = '') {
+    const res = await api.get('/payment-method-options/', { params: search ? { search } : {} });
     return res;
   }
 };

@@ -4,7 +4,7 @@ import { useSale, useSaleItems, useDeleteSaleItem, useDeleteSale } from '../../h
 import { Card, Badge, Button, DataTable, Modal, ConfirmationDialog, KeyValueGrid, StatCard } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
-import SaleEditForm from './SaleEditForm.jsx';
+import SaleFullEditForm from './SaleFullEditForm.jsx';
 import SaleItemEditForm from './SaleItemEditForm.jsx';
 import SaleItemAddForm from './SaleItemAddForm.jsx';
 
@@ -560,7 +560,7 @@ export default function SaleDetails() {
         title="Edit Sale"
       >
         {isEditModalOpen && (
-          <SaleEditForm
+          <SaleFullEditForm
             initialData={sale}
             onSuccess={() => setIsEditModalOpen(false)}
             onCancel={() => setIsEditModalOpen(false)}

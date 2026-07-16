@@ -83,9 +83,9 @@ export default function SaleEditForm({ initialData, onSuccess, onCancel }) {
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button 
-          type="submit" 
-          variant="primary" 
+        <Button
+          type="submit"
+          variant="primary"
           isLoading={updateMutation.isLoading}
           disabled={updateMutation.isLoading}
         >
