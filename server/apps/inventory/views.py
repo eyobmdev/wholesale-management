@@ -299,7 +299,8 @@ class StockBatchOptionViewSet(viewsets.ViewSet):
                     f"{stock.remaining_bags:g} Bag"
                     f"{'' if stock.remaining_bags == 1 else 's'} "
                     f"({stock.remaining_pieces} pcs)"
-                )
+                ),
+                "pcs_per_bag": stock.pcs_per_bag
             })
 
         return Response(options)
