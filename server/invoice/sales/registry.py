@@ -1,5 +1,5 @@
-from server.invoice.utils.public_documents import register_public_document
-from server.apps.sales.models import Sale
+from invoice.utils.public_documents import register_public_document
+from apps.sales.models import Sale
 from .generator import generate_sale_invoice
 
 

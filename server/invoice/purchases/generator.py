@@ -7,7 +7,7 @@ from reportlab.platypus import (
     HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle,
 )
 
-from server.invoice.utils.pdf_theme import (
+from invoice.utils.pdf_theme import (
     STYLES, PRIMARY, ACCENT, LIGHT_BG, ROW_ALT, BORDER, SUCCESS, DANGER,
     safe, fmt_money, status_color, draw_page_furniture,
 )

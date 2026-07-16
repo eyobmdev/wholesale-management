@@ -1,5 +1,5 @@
-from server.invoice.utils.public_documents import register_public_document
-from server.apps.purchases.models import Purchase
+from invoice.utils.public_documents import register_public_document
+from apps.purchases.models import Purchase
 from .generator import generate_purchase_invoice
 
 
