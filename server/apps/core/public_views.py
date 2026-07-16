@@ -1,7 +1,6 @@
 from django.http import Http404, HttpResponse
 from rest_framework.views import APIView
-
-from server.apps.core.utils.public_documents import resolve_public_pdf, PublicDocumentError
+from invoice.utils.public_documents import resolve_public_pdf, PublicDocumentError
 
 
 class PublicDocumentView(APIView):

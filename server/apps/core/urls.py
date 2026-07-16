@@ -5,7 +5,7 @@ from .public_views import PublicDocumentView
 
 router = DefaultRouter()
 router.register(r'settings', AppSettingViewSet, basename='app-setting')
-router.register(r'payment-method-options',PaymentMethodOptionViewSet, basename='payment-method-options')
+router.register(r'payment-method-options', PaymentMethodOptionViewSet, basename='payment-method-options')
 
 urlpatterns = [
     path('', include(router.urls)),
