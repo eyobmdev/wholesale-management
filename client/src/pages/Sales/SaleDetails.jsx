@@ -7,6 +7,7 @@ import { handleBackendErrors } from '../../utils/errorHandler.js';
 import SaleFullEditForm from './SaleFullEditForm.jsx';
 import SaleItemEditForm from './SaleItemEditForm.jsx';
 import SaleItemAddForm from './SaleItemAddForm.jsx';
+import SaleInvoicePreviewModal from './SaleInvoicePreviewModal.jsx';
 
 export default function SaleDetails() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export default function SaleDetails() {
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // For Item Add
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // For Sale Edit
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // For Sale Delete
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false); // For Invoice Preview
 
   // Sale Items State
   const [itemsPage, setItemsPage] = useState(1);
@@ -257,7 +259,7 @@ export default function SaleDetails() {
         </div>
 
         <div className="details-header-actions">
-          <Button variant="outline" leftIcon="ri-file-list-3-line" onClick={() => console.log('View invoice placeholder')}>
+          <Button variant="outline" leftIcon="ri-file-list-3-line" onClick={() => setIsInvoiceModalOpen(true)}>
             View Invoice
           </Button>
           <Button variant="outline" leftIcon="ri-edit-line" onClick={() => setIsEditModalOpen(true)}>
@@ -578,6 +580,13 @@ export default function SaleDetails() {
         confirmLabel="Delete"
         danger={true}
         isConfirming={deleteSaleMutation.isLoading}
+      />
+
+      <SaleInvoicePreviewModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setIsInvoiceModalOpen(false)}
+        saleId={id}
+        invoiceNumber={sale.invoice_number}
       />
 
     </div>
