@@ -108,6 +108,7 @@ class Sale(TimeStampedModel):
             self.recalculate_totals()
 
         self.payment_type = self.computed_payment_type
+        super().save(*args, **kwargs)
 
     def recalculate_totals(self):
         from django.db.models import Sum
@@ -145,18 +146,6 @@ class Sale(TimeStampedModel):
         elif  self.amount_paid_now >= self.total_sale_amount:
             return "Fully Paid"
         return "Partial"
-
-    # def get_payment_status(self, obj):
-    #     if obj.payment_type == Sale.PaymentType.CASH:
-    #         return "Fully Paid"
-    #     elif obj.payment_type == Sale.PaymentType.CREDIT:
-    #         return f"Unpaid — owes {obj.credit_amount} {obj.currency}"
-    #     else:
-    #         return (
-    #             f"Partial — paid {obj.amount_paid_now}, "
-    #             f"owes {obj.credit_amount} {obj.currency}"
-    #         )
-
 
 
 class SaleItem(TimeStampedModel):
