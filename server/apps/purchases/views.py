@@ -17,11 +17,9 @@ from .serializers import (
 )
 
 from .filters import PurchaseFilter, PurchaseItemFilter
-from .services.invoice_cache import get_cached_invoice_pdf
-from .services.invoices import InvoiceGenerationError
 from ..core.pagination import StandardPagination
-from ..core.utils.public_documents import make_public_token
-
+from invoice.purchases.generator import generate_purchase_invoice, InvoiceGenerationError
+from invoice.utils.public_documents import make_public_token
 
 class PurchaseViewSet(viewsets.ModelViewSet):
     queryset = Purchase.objects.all()
@@ -77,7 +75,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         disposition = "attachment" if request.query_params.get("download") else "inline"
 
         try:
-            pdf_bytes = get_cached_invoice_pdf(purchase)
+            pdf_bytes = generate_purchase_invoice(purchase)
         except InvoiceGenerationError as exc:
             # logger.error("Invoice generation failed for purchase %s: %s", pk, exc)
             return Response(

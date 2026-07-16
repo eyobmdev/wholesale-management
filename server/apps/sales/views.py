@@ -1,8 +1,13 @@
+from django.urls import reverse
+from django.http import HttpResponse
 from django_filters.rest_framework.backends import DjangoFilterBackend
+from rest_framework.decorators import action
 from rest_framework import viewsets, status,filters
 from rest_framework.response import Response
 
 from .models import Sale, SaleItem
+from .filters import SaleFilter, SaleItemFilter
+from invoice.sales.generator import generate_sale_invoice, InvoiceGenerationError
 from .serializers import (
     SaleReadSerializer,
     SaleCreateSerializer,
@@ -10,8 +15,9 @@ from .serializers import (
     SaleItemReadSerializer,
     SaleItemWriteSerializer, AddSaleItemWriteSerializer,
 )
-from .filters import SaleFilter, SaleItemFilter
 from ..core.pagination import StandardPagination
+from ..core.utils.public_documents import make_public_token
+
 
 
 class SaleViewSet(viewsets.ModelViewSet):
@@ -84,6 +90,33 @@ class SaleViewSet(viewsets.ModelViewSet):
                 'items__stock_batch__factory',
             )
         return qs
+
+    @action(detail=True, methods=['get'])
+    def invoice(self, request, pk=None):
+        """Authenticated view/download inside the app."""
+        sale = self.get_object()
+        disposition = "attachment" if request.query_params.get("download") else "inline"
+        try:
+            pdf_bytes = generate_sale_invoice(sale)
+        except InvoiceGenerationError:
+            return Response(
+                {"detail": "Could not generate invoice. Please try again later."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        filename = f"invoice_{sale.invoice_number}.pdf"
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'{disposition}; filename="{filename}"'
+        response["Content-Length"] = len(pdf_bytes)
+        return response
+
+    @action(detail=True, methods=['get'], url_path='invoice/share-link')
+    def invoice_share_link(self, request, pk=None):
+        sale = self.get_object()
+        token = make_public_token("sale-invoice", sale.pk)
+        share_url = request.build_absolute_uri(
+            reverse('public-document', kwargs={'token': token})
+        )
+        return Response({"share_url": share_url})
 
     def destroy(self, request, *args, **kwargs):
         """
