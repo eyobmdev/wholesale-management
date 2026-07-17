@@ -9,6 +9,7 @@ import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 import { IncomeCreateModal } from './IncomeCreateModal.jsx';
+import { FactoryPaymentEditModal } from './FactoryPaymentEditModal.jsx';
 import { customerService } from '../../services/customerService.js';
 
 export default function Payments() {
@@ -25,6 +26,9 @@ export default function Payments() {
   // Factory payments state
   const [isFactoryDeleteDialogOpen, setIsFactoryDeleteDialogOpen] = useState(false);
   const [factoryPaymentToDelete, setFactoryPaymentToDelete] = useState(null);
+  
+  const [isFactoryEditModalOpen, setIsFactoryEditModalOpen] = useState(false);
+  const [factoryPaymentToEdit, setFactoryPaymentToEdit] = useState(null);
 
   const deleteIncomeMutation = useDeleteIncome();
   const deleteFactoryPaymentMutation = useDeleteFactoryPayment();
@@ -363,8 +367,8 @@ export default function Payments() {
       icon: 'ri-pencil-line',
       label: 'Edit',
       onClick: (row) => {
-        // Future: open factory payment edit modal
-        console.log('Edit factory payment', row);
+        setFactoryPaymentToEdit(row);
+        setIsFactoryEditModalOpen(true);
       }
     },
     {
@@ -604,6 +608,15 @@ export default function Payments() {
             setIncomeToDelete(null);
           }
         }}
+      />
+      {/* Factory Payment Edit Modal */}
+      <FactoryPaymentEditModal
+        isOpen={isFactoryEditModalOpen}
+        onClose={() => {
+          setIsFactoryEditModalOpen(false);
+          setFactoryPaymentToEdit(null);
+        }}
+        payment={factoryPaymentToEdit}
       />
       {/* Factory Payment Delete Confirmation Dialog */}
       <ConfirmationDialog
