@@ -5,6 +5,7 @@ import { incomeService } from '../../services/incomeService.js';
 import { DataTable, Card, Button, ConfirmationDialog } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
+import { IncomeCreateModal } from './IncomeCreateModal.jsx';
 
 export default function Payments() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Payments() {
   const [activeTab, setActiveTab] = useState('income'); // 'income' or 'factory'
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState(null);
@@ -262,7 +264,7 @@ export default function Payments() {
         
         rowActions={incomeRowActions}
         toolbarActions={
-          <Button variant="primary" leftIcon="ri-add-line" onClick={() => console.log('Record Payment UI Only')}>
+          <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsCreateModalOpen(true)}>
             Record Payment
           </Button>
         }
@@ -289,9 +291,14 @@ export default function Payments() {
 
   return (
     <div className="page-container">
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <h1 className="page-title">Payments</h1>
-        <p className="page-description">Manage incoming customer payments and outgoing factory payments.</p>
+      <div className="page-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="page-title">Payments</h1>
+          <p className="page-description">Manage incoming customer payments and outgoing factory payments.</p>
+        </div>
+        <div className="page-actions">
+          {/* Add buttons here if needed */}
+        </div>
       </div>
 
       {/* Segmented Switch */}
@@ -327,6 +334,11 @@ export default function Payments() {
           setSelectedIncome(null);
         }}
         income={selectedIncome}
+      />
+
+      <IncomeCreateModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
 
       {/* Delete Confirmation Dialog */}

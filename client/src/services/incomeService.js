@@ -4,6 +4,9 @@ export const incomeService = {
   getIncome: async (params = {}) => {
     return await api.get('/income/', { params });
   },
+  createIncome: async (data) => {
+    return await api.post('/income/', data);
+  },
   getIncomeById: async (id) => {
     return await api.get(`/income/${id}/`);
   },

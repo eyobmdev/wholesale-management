@@ -17,6 +17,18 @@ export const useIncomeById = (id) => {
   });
 };
 
+export const useCreateIncome = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => incomeService.createIncome(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['income'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customer'] });
+    }
+  });
+};
+
 export const useUpdateIncome = () => {
   const queryClient = useQueryClient();
   return useMutation({
