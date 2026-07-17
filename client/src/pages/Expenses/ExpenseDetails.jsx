@@ -177,6 +177,7 @@ export default function ExpenseDetails() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         expense={expense}
+        isDetailPage={true}
       />
 
       {/* Delete Confirmation Dialog */}

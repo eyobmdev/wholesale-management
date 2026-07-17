@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, FormField, Input, Select, AsyncSelect, TextArea, Button } from '../../components/common/index.js';
-import { useUpdateExpense } from '../../hooks/useExpenses.js';
+import { useUpdateExpense, usePatchExpense } from '../../hooks/useExpenses.js';
 import { incomeService } from '../../services/incomeService.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 
-export function ExpenseEditModal({ isOpen, onClose, expense }) {
+export function ExpenseEditModal({ isOpen, onClose, expense, isDetailPage = false }) {
   const [editFormData, setEditFormData] = useState({
     date: '',
     description: '',
     amount: '',
     currency: 'ETB',
-    payment_method: ''
+    payment_method: '',
+    notes: ''
   });
   const [editErrors, setEditErrors] = useState({});
 
   const updateExpenseMutation = useUpdateExpense();
+  const patchExpenseMutation = usePatchExpense();
 
   useEffect(() => {
     if (isOpen && expense) {
@@ -24,7 +26,8 @@ export function ExpenseEditModal({ isOpen, onClose, expense }) {
         description: expense.description || '',
         amount: expense.amount || '',
         currency: expense.currency || 'ETB',
-        payment_method: expense.payment_method?.value || expense.payment_method || ''
+        payment_method: expense.payment_method?.value || expense.payment_method || '',
+        notes: expense.notes || ''
       });
       setEditErrors({});
     }
@@ -45,26 +48,32 @@ export function ExpenseEditModal({ isOpen, onClose, expense }) {
     }
 
     const toastId = showToast.loading('Updating expense...');
-    updateExpenseMutation.mutate(
-      { id: expense.id, data: editFormData },
-      {
-        onSuccess: () => {
-          showToast.dismiss(toastId);
-          showToast.success('Expense updated successfully');
-          onClose();
-        },
-        onError: (error) => {
-          showToast.dismiss(toastId);
-          handleBackendErrors(error, setEditErrors, 'Failed to update expense');
-        }
+    const mutationArgs = {
+      onSuccess: () => {
+        showToast.dismiss(toastId);
+        showToast.success('Expense updated successfully');
+        onClose();
+      },
+      onError: (error) => {
+        showToast.dismiss(toastId);
+        handleBackendErrors(error, setEditErrors, 'Failed to update expense');
       }
-    );
+    };
+
+    if (isDetailPage) {
+      updateExpenseMutation.mutate({ id: expense.id, data: editFormData }, mutationArgs);
+    } else {
+      const { notes, ...patchData } = editFormData;
+      patchExpenseMutation.mutate({ id: expense.id, data: patchData }, mutationArgs);
+    }
   };
+
+  const isPending = updateExpenseMutation.isPending || patchExpenseMutation.isPending;
 
   return (
     <Modal 
       isOpen={isOpen} 
-      onClose={() => !updateExpenseMutation.isPending && onClose()}
+      onClose={() => !isPending && onClose()}
       title="Edit Expense"
     >
       <form onSubmit={handleSubmit}>
@@ -140,11 +149,25 @@ export function ExpenseEditModal({ isOpen, onClose, expense }) {
             />
           </FormField>
 
+          {isDetailPage && (
+            <FormField label="Notes" error={editErrors.notes}>
+              <TextArea
+                value={editFormData.notes}
+                onChange={(e) => {
+                  setEditFormData({ ...editFormData, notes: e.target.value });
+                  if (editErrors.notes) setEditErrors({ ...editErrors, notes: null });
+                }}
+                placeholder="Optional notes..."
+                rows={3}
+              />
+            </FormField>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-            <Button type="button" variant="outline" onClick={() => onClose()} disabled={updateExpenseMutation.isPending}>
+            <Button type="button" variant="outline" onClick={() => onClose()} disabled={isPending}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" isLoading={updateExpenseMutation.isPending}>
+            <Button type="submit" variant="primary" isLoading={isPending}>
               Save Changes
             </Button>
           </div>

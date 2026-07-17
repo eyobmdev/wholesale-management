@@ -37,6 +37,16 @@ export const useUpdateExpense = () => {
   });
 };
 
+export const usePatchExpense = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => expenseService.patchExpense(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    }
+  });
+};
+
 export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
   return useMutation({
