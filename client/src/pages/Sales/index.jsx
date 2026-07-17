@@ -254,6 +254,8 @@ export default function Sales() {
           pagination={{
             currentPage: page,
             totalPages: data?.count ? Math.ceil(data.count / 10) : 1,
+            hasNext: !!data?.next,
+            hasPrev: !!data?.previous,
             onPageChange: (newPage) => updateURLParams({ page: newPage })
           }}
         />

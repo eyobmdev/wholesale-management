@@ -256,6 +256,8 @@ export default function Purchases() {
         pagination={{
           currentPage: page,
           totalPages: totalPages,
+          hasNext: !!data?.next,
+          hasPrev: !!data?.previous,
           onPageChange: (newPage) => setPage(newPage)
         }}
       />

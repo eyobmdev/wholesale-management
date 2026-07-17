@@ -309,16 +309,19 @@ export const DataTable = ({
       </div>
 
       {/* Pagination Area */}
-      {pagination && pagination.totalPages > 1 && (
+      {pagination && (pagination.totalPages > 1 || pagination.hasNext || pagination.hasPrev) && (
         <div className="data-table-pagination">
           <span className="pagination-info">
-            Page {pagination.currentPage} of {pagination.totalPages}
+            {pagination.totalPages ? `Page ${pagination.currentPage} of ${pagination.totalPages}` : `Page ${pagination.currentPage}`}
           </span>
           <div className="pagination-controls">
             <Button 
               variant="outline" 
               size="sm" 
-              disabled={pagination.currentPage <= 1 || isLoading}
+              disabled={
+                isLoading || 
+                (pagination.hasPrev !== undefined ? !pagination.hasPrev : pagination.currentPage <= 1)
+              }
               onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
               leftIcon="ri-arrow-left-s-line"
             >
@@ -327,7 +330,10 @@ export const DataTable = ({
             <Button 
               variant="outline" 
               size="sm" 
-              disabled={pagination.currentPage >= pagination.totalPages || isLoading}
+              disabled={
+                isLoading || 
+                (pagination.hasNext !== undefined ? !pagination.hasNext : pagination.currentPage >= pagination.totalPages)
+              }
               onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
               rightIcon="ri-arrow-right-s-line"
             >

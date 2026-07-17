@@ -167,6 +167,8 @@ export default function Factories() {
         pagination={{
           currentPage: page,
           totalPages: totalPages,
+          hasNext: !!data?.next,
+          hasPrev: !!data?.previous,
           onPageChange: (newPage) => setPage(newPage)
         }}
       />
