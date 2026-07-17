@@ -5,6 +5,7 @@ import { DataTable, Card, Button, ConfirmationDialog, Badge } from '../../compon
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { incomeService } from '../../services/incomeService.js';
+import { ExpenseEditModal } from './ExpenseEditModal.jsx';
 
 export default function Expenses() {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ export default function Expenses() {
   // UI state
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState(null);
 
   const deleteExpenseMutation = useDeleteExpense();
 
@@ -126,8 +130,8 @@ export default function Expenses() {
       icon: 'ri-pencil-line',
       label: 'Edit',
       onClick: (row) => {
-        // UI only per requirements
-        console.log('Edit expense', row);
+        setExpenseToEdit(row);
+        setIsEditModalOpen(true);
       }
     },
     {
@@ -297,6 +301,16 @@ export default function Expenses() {
             setExpenseToDelete(null);
           }
         }}
+      />
+      
+      {/* Edit Modal */}
+      <ExpenseEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setExpenseToEdit(null);
+        }}
+        expense={expenseToEdit}
       />
     </div>
   );
