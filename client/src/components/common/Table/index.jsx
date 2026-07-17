@@ -94,6 +94,10 @@ export const DataTable = ({
   onSort,
   sortColumn,
   sortDirection = 'asc',
+  
+  // Expandable Rows (optional)
+  expandedRowId = null,
+  renderExpandedRow,
 }) => {
 
   const [localSearch, setLocalSearch] = useState(searchValue);
@@ -256,33 +260,49 @@ export const DataTable = ({
                 </td>
               </tr>
             ) : (
-              data.map((row, rowIndex) => (
-                <tr key={row.id || rowIndex}>
-                  {columns.map((col, colIndex) => (
-                    <td key={col.key || colIndex}>
-                      {col.render ? col.render(row[col.key], row) : row[col.key]}
-                    </td>
-                  ))}
-                  
-                  {rowActions.length > 0 && (
-                    <td className="actions-column">
-                      <div className="row-actions">
-                        {rowActions.map((action, actionIndex) => (
-                          <button 
-                            key={actionIndex}
-                            className={`row-action-btn ${action.variant ? `text-${action.variant}` : ''}`}
-                            onClick={() => action.onClick(row)}
-                            title={action.label}
-                          >
-                            {action.icon && <i className={action.icon}></i>}
-                            {!action.icon && action.label}
-                          </button>
-                        ))}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))
+              data.map((row, rowIndex) => {
+                const isExpanded = expandedRowId === (row.id || rowIndex);
+                
+                return (
+                  <React.Fragment key={row.id || rowIndex}>
+                    <tr className={isExpanded ? 'is-expanded' : ''}>
+                      {columns.map((col, colIndex) => (
+                        <td key={col.key || colIndex}>
+                          {col.render ? col.render(row[col.key], row) : row[col.key]}
+                        </td>
+                      ))}
+                      
+                      {rowActions.length > 0 && (
+                        <td className="actions-column">
+                          <div className="row-actions">
+                            {rowActions.map((action, actionIndex) => (
+                              <button 
+                                key={actionIndex}
+                                className={`row-action-btn ${action.variant ? `text-${action.variant}` : ''}`}
+                                onClick={() => action.onClick(row)}
+                                title={action.label}
+                              >
+                                {action.icon && <i className={action.icon}></i>}
+                                {!action.icon && action.label}
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                    
+                    {isExpanded && renderExpandedRow && (
+                      <tr className="expanded-row-container">
+                        <td colSpan={columns.length + (rowActions.length > 0 ? 1 : 0)} style={{ padding: 0 }}>
+                          <div className="expanded-row-content">
+                            {renderExpandedRow(row)}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })
             )}
           </tbody>
         </table>

@@ -281,3 +281,35 @@ body.dark-theme .data-table-pagination {
 .filter-chip-clear:hover {
   text-decoration: underline;
 }
+
+/* Expandable Row Styles */
+.common-table tr.is-expanded td {
+  border-bottom: none;
+  background-color: var(--hover-bg);
+}
+
+.expanded-row-container {
+  background-color: var(--hover-bg);
+}
+
+.expanded-row-container td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.expanded-row-content {
+  padding: 16px 20px 24px 20px;
+  background-color: var(--hover-bg);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

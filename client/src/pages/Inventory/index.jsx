@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInventory } from '../../hooks/useInventory.js';
 import { factoryService } from '../../services/factoryService.js';
-import { DataTable, Card } from '../../components/common/index.js';
+import { DataTable, Card, Button } from '../../components/common/index.js';
 
 export default function Inventory() {
   const navigate = useNavigate();
@@ -193,9 +193,18 @@ export default function Inventory() {
 
   return (
     <div className="page-container">
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <h1 className="page-title">Inventory</h1>
-        <p className="page-description">Manage stock levels, tracking, and valuation.</p>
+      <div className="page-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="page-title">Inventory</h1>
+          <p className="page-description">Manage stock levels, tracking, and valuation.</p>
+        </div>
+        <Button 
+          variant="primary" 
+          leftIcon="ri-bar-chart-box-line" 
+          onClick={() => navigate('/inventory-summary')}
+        >
+          View Summary
+        </Button>
       </div>
 
       <Card>
