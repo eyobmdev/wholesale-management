@@ -6,6 +6,7 @@ import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { incomeService } from '../../services/incomeService.js';
 import { ExpenseEditModal } from './ExpenseEditModal.jsx';
+import { ExpenseCreateModal } from './ExpenseCreateModal.jsx';
 
 export default function Expenses() {
   const navigate = useNavigate();
@@ -34,6 +35,8 @@ export default function Expenses() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const deleteExpenseMutation = useDeleteExpense();
 
@@ -256,7 +259,7 @@ export default function Expenses() {
 
           rowActions={rowActions}
           toolbarActions={
-            <Button variant="primary" leftIcon="ri-add-line" onClick={() => console.log('Record Expense - UI Only')}>
+            <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsCreateModalOpen(true)}>
               Record Expense
             </Button>
           }
@@ -311,6 +314,12 @@ export default function Expenses() {
           setExpenseToEdit(null);
         }}
         expense={expenseToEdit}
+      />
+
+      {/* Create Modal */}
+      <ExpenseCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
     </div>
   );
