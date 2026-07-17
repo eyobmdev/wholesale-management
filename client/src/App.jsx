@@ -53,7 +53,7 @@ export default function App() {
           <Route path="/purchases/new" element={<PurchaseCreate />} />
           <Route path="/purchases/:id" element={<PurchaseDetails />} />
           <Route path="/sales" element={<Sales />} />
-          <Route path="/sales/create" element={<SaleCreate />} />
+          <Route path="/sales/new" element={<SaleCreate />} />
           <Route path="/sales/:id" element={<SaleDetails />} />
           <Route path="/payments" element={<Payments />} />
           <Route path="/payments/income/:id" element={<IncomeDetails />} />
