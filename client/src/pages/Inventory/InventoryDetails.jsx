@@ -101,7 +101,7 @@ export default function InventoryDetails() {
           <StatCard
             label="Remaining Pieces"
             value={item.remaining_pieces}
-            icon="uni-puzzle-piece-o"
+            icon="ri-function-line"
           />
           <StatCard
             label="Stock Value"
