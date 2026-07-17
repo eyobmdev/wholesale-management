@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Header({ onMenuClick }) {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
 
   useEffect(() => {
     if (isDark) {
       document.body.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.body.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
 
