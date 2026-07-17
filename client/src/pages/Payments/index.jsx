@@ -68,6 +68,10 @@ export default function Payments() {
     date_to: searchParams.get('date_to') || '',
     min_amount: searchParams.get('min_amount') || '',
     max_amount: searchParams.get('max_amount') || '',
+    is_auto: searchParams.get('is_auto') || '',
+    has_purchase: searchParams.get('has_purchase') || '',
+    currency: searchParams.get('currency') || '',
+    payment_number: searchParams.get('payment_number') || '',
   };
 
   const factoryQueryParams = {
@@ -80,6 +84,10 @@ export default function Payments() {
     ...(factoryFilters.date_to ? { date_to: factoryFilters.date_to } : {}),
     ...(factoryFilters.min_amount ? { min_amount: factoryFilters.min_amount } : {}),
     ...(factoryFilters.max_amount ? { max_amount: factoryFilters.max_amount } : {}),
+    ...(factoryFilters.is_auto ? { is_auto: factoryFilters.is_auto } : {}),
+    ...(factoryFilters.has_purchase ? { has_purchase: factoryFilters.has_purchase } : {}),
+    ...(factoryFilters.currency ? { currency: factoryFilters.currency } : {}),
+    ...(factoryFilters.payment_number ? { payment_number: factoryFilters.payment_number } : {}),
   };
 
   const { data: incomeData, isLoading: isIncomeLoading } = useIncome(queryParams);
@@ -370,6 +378,7 @@ export default function Payments() {
   ];
 
   const factoryFilterConfig = [
+    // First 3 shown inline, rest go to Advanced Filters modal
     {
       key: 'factory',
       type: 'async-select',
@@ -411,6 +420,47 @@ export default function Payments() {
       placeholderFrom: 'From Date',
       placeholderTo: 'To Date',
       label: 'Date Range'
+    },
+    // — Advanced Filters below (goes into modal since > 3 total) —
+    {
+      key: 'is_auto',
+      type: 'select',
+      label: 'Auto Payment',
+      value: factoryFilters.is_auto,
+      options: [
+        { value: '', label: 'All' },
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ]
+    },
+    {
+      key: 'has_purchase',
+      type: 'select',
+      label: 'Linked To Purchase',
+      value: factoryFilters.has_purchase,
+      options: [
+        { value: '', label: 'All' },
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ]
+    },
+    {
+      key: 'currency',
+      type: 'select',
+      label: 'Currency',
+      value: factoryFilters.currency,
+      options: [
+        { value: '', label: 'All Currencies' },
+        { value: 'ETB', label: 'ETB' },
+        { value: 'USD', label: 'USD' }
+      ]
+    },
+    {
+      key: 'payment_number',
+      type: 'text',
+      label: 'Payment Number',
+      placeholder: 'PAY-2024...',
+      value: factoryFilters.payment_number
     },
     {
       type: 'number-range',
