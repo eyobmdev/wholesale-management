@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomer, useDeleteCustomer } from '../../services/customerService.js';
 import { Card, Button, Badge, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 import CustomerForm from './CustomerForm.jsx';
 import './Customers.css';
 
@@ -58,7 +59,7 @@ export default function CustomerDetails() {
           navigate('/customers', { replace: true });
         },
         onError: (err) => {
-          showToast.error('Delete Failed', err.message || 'Could not delete customer');
+          handleBackendErrors(err, null, 'Delete Failed');
           showToast.dismiss(toastId);
         }
       });

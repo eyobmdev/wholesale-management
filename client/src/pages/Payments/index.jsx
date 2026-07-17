@@ -6,6 +6,7 @@ import { incomeService } from '../../services/incomeService.js';
 import { factoryService } from '../../services/factoryService.js';
 import { DataTable, Card, Button, ConfirmationDialog } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 import { IncomeCreateModal } from './IncomeCreateModal.jsx';
 import { customerService } from '../../services/customerService.js';
@@ -592,7 +593,7 @@ export default function Payments() {
             },
             onError: (err) => {
               showToast.dismiss(toastId);
-              showToast.error(err.response?.data?.detail || 'Failed to delete payment');
+              handleBackendErrors(err, null, 'Failed to delete payment');
               setIsDeleteDialogOpen(false);
             }
           });
@@ -624,7 +625,7 @@ export default function Payments() {
             },
             onError: (err) => {
               showToast.dismiss(toastId);
-              showToast.error(err?.detail || 'Failed to delete factory payment');
+              handleBackendErrors(err, null, 'Failed to delete factory payment');
               setIsFactoryDeleteDialogOpen(false);
             }
           });

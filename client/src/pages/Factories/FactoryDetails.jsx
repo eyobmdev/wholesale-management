@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useFactory, useDeleteFactory } from '../../services/factoryService.js';
 import { Card, Button, Badge, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 import FactoryForm from './FactoryForm.jsx';
 import '../Customers/Customers.css'; // Reusing the same grid layout styles
 
@@ -58,7 +59,7 @@ export default function FactoryDetails() {
           navigate('/factories', { replace: true });
         },
         onError: (err) => {
-          showToast.error('Delete Failed', err.message || 'Could not delete factory');
+          handleBackendErrors(err, null, 'Delete Failed');
           showToast.dismiss(toastId);
         }
       });

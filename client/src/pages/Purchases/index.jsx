@@ -4,6 +4,7 @@ import { usePurchases, useDeletePurchase, purchaseService } from '../../services
 import { DataTable, Badge, Button, Modal } from '../../components/common/index.js';
 import PurchaseEditForm from './PurchaseEditForm.jsx';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export default function Purchases() {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ export default function Purchases() {
           showToast.dismiss(toastId);
         },
         onError: (err) => {
-          showToast.error('Delete Failed', err.message || 'Could not delete purchase');
+          handleBackendErrors(err, null, 'Delete Failed');
           showToast.dismiss(toastId);
         }
       });

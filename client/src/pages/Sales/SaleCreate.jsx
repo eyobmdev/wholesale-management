@@ -5,6 +5,7 @@ import { FormField, Input, Select, TextArea, AsyncSelect } from '../../component
 import { saleService } from '../../services/saleService.js';
 import { useCreateSale } from '../../hooks/useSales.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export default function SaleCreate() {
   const navigate = useNavigate();
@@ -139,12 +140,9 @@ export default function SaleCreate() {
       },
       onError: (err) => {
         showToast.dismiss(toastId);
-        showToast.error('Error', err.message || 'Failed to create sale');
-        
-        // Handle backend validation errors
+        // Handle nested item errors manually
         if (err && typeof err === 'object') {
-          const backendErrors = { ...newErrors };
-          
+          const backendErrors = {};
           Object.keys(err).forEach(key => {
             if (key === 'items' && Array.isArray(err[key])) {
               err[key].forEach((itemErr, i) => {
@@ -155,12 +153,12 @@ export default function SaleCreate() {
                 }
               });
             } else {
-               backendErrors[key] = Array.isArray(err[key]) ? err[key][0] : err[key];
+              backendErrors[key] = Array.isArray(err[key]) ? err[key][0] : err[key];
             }
           });
-          
           setErrors(backendErrors);
         }
+        handleBackendErrors(err, null, 'Failed to create sale');
       }
     });
   };

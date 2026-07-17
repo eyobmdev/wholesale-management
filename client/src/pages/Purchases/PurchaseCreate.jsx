@@ -5,6 +5,7 @@ import { FormField, Input, Select, TextArea, AsyncSelect } from '../../component
 import { factoryService } from '../../services/factoryService.js';
 import { useCreatePurchase } from '../../services/purchaseService.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export default function PurchaseCreate() {
   const navigate = useNavigate();
@@ -136,12 +137,9 @@ export default function PurchaseCreate() {
       },
       onError: (err) => {
         showToast.dismiss(toastId);
-        showToast.error('Error', err.message || 'Failed to create purchase');
-        
-        // Handle backend validation errors (DRF returns field errors)
+        // Handle nested item errors manually, then fall through to handleBackendErrors for top-level
         if (err && typeof err === 'object') {
-          const backendErrors = { ...newErrors };
-          
+          const backendErrors = {};
           Object.keys(err).forEach(key => {
             if (key === 'items' && Array.isArray(err[key])) {
               err[key].forEach((itemErr, i) => {
@@ -152,12 +150,12 @@ export default function PurchaseCreate() {
                 }
               });
             } else {
-               backendErrors[key] = Array.isArray(err[key]) ? err[key][0] : err[key];
+              backendErrors[key] = Array.isArray(err[key]) ? err[key][0] : err[key];
             }
           });
-          
           setErrors(backendErrors);
         }
+        handleBackendErrors(err, null, 'Failed to create purchase');
       }
     });
   };

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useIncomeById, useDeleteIncome } from '../../hooks/useIncome.js';
 import { Card, Badge, Button, ConfirmationDialog, KeyValueGrid, StatCard } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 
 export default function IncomeDetails() {
@@ -25,7 +26,7 @@ export default function IncomeDetails() {
       },
       onError: (err) => {
         showToast.dismiss(toastId);
-        showToast.error(err.response?.data?.detail || 'Failed to delete payment');
+        handleBackendErrors(err, null, 'Failed to delete payment');
         setIsDeleteModalOpen(false);
       }
     });
