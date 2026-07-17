@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useIncome, useUpdateIncome, useDeleteIncome } from '../../hooks/useIncome.js';
+import { useIncome, useDeleteIncome } from '../../hooks/useIncome.js';
+import { useFactoryPayments, useDeleteFactoryPayment } from '../../hooks/useFactoryPayments.js';
 import { incomeService } from '../../services/incomeService.js';
+import { factoryService } from '../../services/factoryService.js';
 import { DataTable, Card, Button, ConfirmationDialog } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 import { IncomeCreateModal } from './IncomeCreateModal.jsx';
-import {customerService} from "../../services/customerService.js";
+import { customerService } from '../../services/customerService.js';
 
 export default function Payments() {
   const navigate = useNavigate();
@@ -19,12 +21,18 @@ export default function Payments() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState(null);
 
+  // Factory payments state
+  const [isFactoryDeleteDialogOpen, setIsFactoryDeleteDialogOpen] = useState(false);
+  const [factoryPaymentToDelete, setFactoryPaymentToDelete] = useState(null);
+
   const deleteIncomeMutation = useDeleteIncome();
+  const deleteFactoryPaymentMutation = useDeleteFactoryPayment();
 
   const page = parseInt(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
   const activeSort = searchParams.get('ordering') || '-date';
 
+  // --- Income filters ---
   const filters = {
     customer: searchParams.get('customer') || '',
     payment_method: searchParams.get('payment_method') || '',
@@ -52,7 +60,32 @@ export default function Payments() {
     ...(filters.max_amount ? { max_amount: filters.max_amount } : {}),
   };
 
+  // --- Factory payment filters ---
+  const factoryFilters = {
+    factory: searchParams.get('factory') || '',
+    payment_method: searchParams.get('payment_method') || '',
+    date_from: searchParams.get('date_from') || '',
+    date_to: searchParams.get('date_to') || '',
+    min_amount: searchParams.get('min_amount') || '',
+    max_amount: searchParams.get('max_amount') || '',
+  };
+
+  const factoryQueryParams = {
+    page,
+    search: search || undefined,
+    ordering: activeSort || undefined,
+    ...(factoryFilters.factory ? { factory: factoryFilters.factory } : {}),
+    ...(factoryFilters.payment_method ? { payment_method: factoryFilters.payment_method } : {}),
+    ...(factoryFilters.date_from ? { date_from: factoryFilters.date_from } : {}),
+    ...(factoryFilters.date_to ? { date_to: factoryFilters.date_to } : {}),
+    ...(factoryFilters.min_amount ? { min_amount: factoryFilters.min_amount } : {}),
+    ...(factoryFilters.max_amount ? { max_amount: factoryFilters.max_amount } : {}),
+  };
+
   const { data: incomeData, isLoading: isIncomeLoading } = useIncome(queryParams);
+  const { data: factoryPaymentsData, isLoading: isFactoryLoading } = useFactoryPayments(
+    activeTab === 'factory' ? factoryQueryParams : { page: 1 }
+  );
 
   const formatCurrency = (val, currency = 'ETB') => {
     if (val === undefined || val === null) return '-';
@@ -281,13 +314,159 @@ export default function Payments() {
     </Card>
   );
 
-  const renderFactoryPaymentsPlaceholder = () => (
+  // --- Factory Payments columns, actions, filters, sort ---
+  const factoryColumns = [
+    { key: 'payment_number', title: 'Payment Number', sortable: true },
+    { key: 'factory_name', title: 'Factory', sortable: false },
+    {
+      key: 'purchase_shipping_code',
+      title: 'Purchase',
+      sortable: false,
+      render: (val) => val ? val : '-'
+    },
+    {
+      key: 'date',
+      title: 'Payment Date',
+      sortable: true,
+      render: (val) => val ? new Date(val).toLocaleDateString() : '-'
+    },
+    {
+      key: 'paid_amount',
+      title: 'Paid Amount',
+      sortable: true,
+      render: (_, row) => formatCurrency(row.paid_amount, row.currency)
+    },
+    {
+      key: 'payment_method',
+      title: 'Payment Method',
+      sortable: false,
+      render: (val) => formatPaymentMethod(val)
+    }
+  ];
+
+  const factoryRowActions = [
+    {
+      icon: 'ri-eye-line',
+      label: 'View',
+      onClick: (row) => navigate(`/payments/factory/${row.id}`)
+    },
+    {
+      icon: 'ri-pencil-line',
+      label: 'Edit',
+      onClick: (row) => {
+        // Future: open factory payment edit modal
+        console.log('Edit factory payment', row);
+      }
+    },
+    {
+      icon: 'ri-delete-bin-line',
+      label: 'Delete',
+      variant: 'danger',
+      onClick: (row) => {
+        setFactoryPaymentToDelete(row);
+        setIsFactoryDeleteDialogOpen(true);
+      }
+    }
+  ];
+
+  const factoryFilterConfig = [
+    {
+      key: 'factory',
+      type: 'async-select',
+      label: 'Factory',
+      placeholder: 'All Factories',
+      value: factoryFilters.factory,
+      loadOptions: async (query) => {
+        try {
+          const res = await factoryService.getFactoryOptions(query);
+          return Array.isArray(res) ? res : (res.results || []);
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+    },
+    {
+      key: 'payment_method',
+      type: 'async-select',
+      label: 'Payment Method',
+      placeholder: 'All Methods',
+      value: factoryFilters.payment_method,
+      loadOptions: async () => {
+        try {
+          const res = await incomeService.getPaymentMethodOptions();
+          return Array.isArray(res) ? res : (res.results || []);
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+    },
+    {
+      type: 'date-range',
+      keyFrom: 'date_from',
+      keyTo: 'date_to',
+      valueFrom: factoryFilters.date_from,
+      valueTo: factoryFilters.date_to,
+      placeholderFrom: 'From Date',
+      placeholderTo: 'To Date',
+      label: 'Date Range'
+    },
+    {
+      type: 'number-range',
+      keyFrom: 'min_amount',
+      keyTo: 'max_amount',
+      valueFrom: factoryFilters.min_amount,
+      valueTo: factoryFilters.max_amount,
+      placeholderFrom: 'Min Amount',
+      placeholderTo: 'Max Amount',
+      label: 'Amount Range'
+    }
+  ];
+
+  const factorySortConfig = [
+    { value: '-date', label: 'Payment Date (Newest)' },
+    { value: 'date', label: 'Payment Date (Oldest)' },
+    { value: '-paid_amount', label: 'Paid Amount (Highest)' },
+    { value: 'paid_amount', label: 'Paid Amount (Lowest)' },
+    { value: '-created_at', label: 'Created At (Newest)' },
+    { value: 'created_at', label: 'Created At (Oldest)' }
+  ];
+
+  const renderFactoryPaymentsTable = () => (
     <Card>
-      <div style={{ padding: '64px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-        <i className="ri-tools-fill" style={{ fontSize: '3rem', marginBottom: '16px', display: 'inline-block' }}></i>
-        <h3 style={{ fontSize: '1.25rem', color: 'var(--text-color)', marginBottom: '8px' }}>Under Construction</h3>
-        <p>The Factory Payments module is currently being developed and will be available soon.</p>
-      </div>
+      <DataTable
+        columns={factoryColumns}
+        data={factoryPaymentsData?.results || []}
+        isLoading={isFactoryLoading}
+        keyField="id"
+
+        searchPlaceholder="Search payment number, factory..."
+        searchValue={search}
+        onSearch={(v) => updateURLParams({ search: v, page: 1 })}
+
+        filters={factoryFilterConfig}
+        onFilterChange={handleFilterChange}
+
+        sortOptions={factorySortConfig}
+        activeSort={activeSort}
+        onSortChange={(val) => updateURLParams({ ordering: val, page: 1 })}
+
+        rowActions={factoryRowActions}
+        toolbarActions={
+          <Button variant="primary" leftIcon="ri-add-line" onClick={() => console.log('Record Factory Payment - coming soon')}>
+            Record Payment
+          </Button>
+        }
+
+        pagination={{
+          currentPage: page,
+          totalPages: factoryPaymentsData?.total_pages || 1,
+          hasNext: !!factoryPaymentsData?.next,
+          hasPrev: !!factoryPaymentsData?.previous,
+          onPageChange: (newPage) => updateURLParams({ page: newPage })
+        }}
+      />
     </Card>
   );
 
@@ -327,7 +506,7 @@ export default function Payments() {
         </button>
       </div>
 
-      {activeTab === 'income' ? renderIncomeTable() : renderFactoryPaymentsPlaceholder()}
+      {activeTab === 'income' ? renderIncomeTable() : renderFactoryPaymentsTable()}
 
       <IncomeEditModal 
         isOpen={isEditModalOpen}
@@ -372,6 +551,38 @@ export default function Payments() {
           if (!deleteIncomeMutation.isPending) {
             setIsDeleteDialogOpen(false);
             setIncomeToDelete(null);
+          }
+        }}
+      />
+      {/* Factory Payment Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isFactoryDeleteDialogOpen}
+        title="Delete Factory Payment"
+        message={`Are you sure you want to delete payment ${factoryPaymentToDelete?.payment_number || ''}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger={true}
+        isConfirming={deleteFactoryPaymentMutation.isPending}
+        onConfirm={() => {
+          const toastId = showToast.loading('Deleting factory payment...');
+          deleteFactoryPaymentMutation.mutate(factoryPaymentToDelete.id, {
+            onSuccess: () => {
+              showToast.dismiss(toastId);
+              showToast.success('Factory payment deleted successfully');
+              setIsFactoryDeleteDialogOpen(false);
+              setFactoryPaymentToDelete(null);
+            },
+            onError: (err) => {
+              showToast.dismiss(toastId);
+              showToast.error(err?.detail || 'Failed to delete factory payment');
+              setIsFactoryDeleteDialogOpen(false);
+            }
+          });
+        }}
+        onClose={() => {
+          if (!deleteFactoryPaymentMutation.isPending) {
+            setIsFactoryDeleteDialogOpen(false);
+            setFactoryPaymentToDelete(null);
           }
         }}
       />
