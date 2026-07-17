@@ -16,6 +16,7 @@ import Sales from './pages/Sales/index.jsx';
 import SaleDetails from './pages/Sales/SaleDetails.jsx';
 import SaleCreate from './pages/Sales/SaleCreate.jsx';
 import Inventory from './pages/Inventory/index.jsx';
+import InventoryDetails from './pages/Inventory/InventoryDetails.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory/:id" element={<InventoryDetails />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetails />} />
           <Route path="/factories" element={<Factories />} />
