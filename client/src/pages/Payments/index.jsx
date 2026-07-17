@@ -10,6 +10,7 @@ import { handleBackendErrors } from '../../utils/errorHandler.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 import { IncomeCreateModal } from './IncomeCreateModal.jsx';
 import { FactoryPaymentEditModal } from './FactoryPaymentEditModal.jsx';
+import { FactoryPaymentCreateModal } from './FactoryPaymentCreateModal.jsx';
 import { customerService } from '../../services/customerService.js';
 
 export default function Payments() {
@@ -29,6 +30,8 @@ export default function Payments() {
   
   const [isFactoryEditModalOpen, setIsFactoryEditModalOpen] = useState(false);
   const [factoryPaymentToEdit, setFactoryPaymentToEdit] = useState(null);
+
+  const [isFactoryCreateModalOpen, setIsFactoryCreateModalOpen] = useState(false);
 
   const deleteIncomeMutation = useDeleteIncome();
   const deleteFactoryPaymentMutation = useDeleteFactoryPayment();
@@ -509,7 +512,7 @@ export default function Payments() {
 
         rowActions={factoryRowActions}
         toolbarActions={
-          <Button variant="primary" leftIcon="ri-add-line" onClick={() => console.log('Record Factory Payment - coming soon')}>
+          <Button variant="primary" leftIcon="ri-add-line" onClick={() => setIsFactoryCreateModalOpen(true)}>
             Record Payment
           </Button>
         }
@@ -617,6 +620,11 @@ export default function Payments() {
           setFactoryPaymentToEdit(null);
         }}
         payment={factoryPaymentToEdit}
+      />
+      {/* Factory Payment Create Modal */}
+      <FactoryPaymentCreateModal
+        isOpen={isFactoryCreateModalOpen}
+        onClose={() => setIsFactoryCreateModalOpen(false)}
       />
       {/* Factory Payment Delete Confirmation Dialog */}
       <ConfirmationDialog
