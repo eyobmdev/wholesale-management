@@ -197,7 +197,7 @@ class StockBatchViewSet(viewsets.ModelViewSet):
                 'total_stock_value': aggregates['total_stock_value'] or 0,
                 'has_low_stock_batch': has_low_stock,
                 'has_sold_out_batch': has_sold_out,
-                'batches': batches_serializer.data,
+                'batches': batch_list,
             })
 
         # Paginate the summary data
