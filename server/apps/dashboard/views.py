@@ -793,23 +793,24 @@ class DashboardViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"], url_path="overdue-customers")
     def overdue_customers(self, request):
-        """
-        Customers who haven't paid recently, grouped into time buckets.
+        try:
+            buckets = self._compute_overdue_buckets()
+            flat_list = self._compute_overdue_flat()
 
-        Buckets: 1-7, 7-15, 15-30, 30-60, 60+ days since last payment.
-        """
-        buckets = self._compute_overdue_buckets()
-        flat_list = self._compute_overdue_flat()
+            total_amount = sum((c["current_balance"] for c in flat_list), Decimal("0"))
+            total_customers = len(flat_list)
 
-        result = {
-            "total_overdue_amount": sum(b["total_amount"] for b in buckets),
-            "total_overdue_customers": sum(b["count"] for b in buckets),
-            "buckets": buckets,
-            "all_overdue": flat_list,
-        }
-        return Response(OverdueCustomersSerializer(result).data)
+            result = {
+                "total_overdue_amount": total_amount,
+                "total_overdue_customers": total_customers,
+                "buckets": buckets,
+                "all_overdue": flat_list,
+            }
+            return Response(OverdueCustomersSerializer(result).data)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
 
-    # STOCK OVERVIEW  GET /api/dashboard/stock-overview/
 
     @action(detail=False, methods=["get"], url_path="stock-overview")
     def stock_overview(self, request):
@@ -1490,11 +1491,10 @@ class DashboardViewSet(viewsets.ViewSet):
     # ── Overdue buckets ──────────────────────────────────────────
 
     _BUCKET_DEFS = [
-        ("1-7 days", 1, 7),
-        ("7-15 days", 8, 15),
-        ("15-30 days", 16, 30),
-        ("30-60 days", 31, 60),
-        ("60+ days", 61, 99999),
+        ("7-15 days", 7, 14),
+        ("15-30 days", 15, 29),
+        ("30-60 days", 30, 59),
+        ("60+ days", 60, 99999),
     ]
 
     def _days_overdue(self, customer: Customer, today: datetime.date) -> int | None:
@@ -1509,7 +1509,7 @@ class DashboardViewSet(viewsets.ViewSet):
             return days
         # No payment ever recorded — measure from first sale
         first_sale = customer.sales.order_by("date").first()
-        if first_sale:
+        if first_sale and first_sale.date:
             return (today - first_sale.date).days
         return None
 
@@ -1533,12 +1533,12 @@ class DashboardViewSet(viewsets.ViewSet):
         }
 
         for c in customers:
-            bal = c.current_balance  # Customer property
+            bal = c.current_balance
             if bal <= 0:
                 continue
 
             days = self._days_overdue(c, today)
-            if not days or days < 1:
+            if days is None or days < 7:
                 continue
 
             for label, min_d, max_d in self._BUCKET_DEFS:
@@ -1549,7 +1549,7 @@ class DashboardViewSet(viewsets.ViewSet):
                         {
                             "id": c.id,
                             "name": c.name,
-                            "amount": float(bal),
+                            "amount": bal,  # keep as Decimal
                             "days": days,
                         }
                     )
@@ -1558,14 +1558,6 @@ class DashboardViewSet(viewsets.ViewSet):
         return list(buckets.values())
 
     def _compute_overdue_flat(self) -> list:
-        """
-        Flat list of every overdue customer, sorted by days descending.
-
-        Uses Customer model properties:
-            current_balance, total_sales_amount, total_payments_received,
-            last_payment_date, last_purchase_date, days_since_last_payment,
-            initial_credit_currency (for status labels)
-        """
         today = datetime.date.today()
         customers = Customer.objects.filter(is_active=True).prefetch_related(
             "income_records", "sales"
@@ -1578,19 +1570,15 @@ class DashboardViewSet(viewsets.ViewSet):
                 continue
 
             days = self._days_overdue(c, today)
-            if not days or days < 1:
+            if days is None or days < 7:
                 continue
 
-            if days <= 7:
-                bucket = "1-7 days"
-            elif days <= 15:
-                bucket = "7-15 days"
-            elif days <= 30:
-                bucket = "15-30 days"
-            elif days <= 60:
-                bucket = "30-60 days"
-            else:
-                bucket = "60+ days"
+            # Assign bucket using the same definitions
+            bucket_label = "60+ days"
+            for label, min_d, max_d in self._BUCKET_DEFS:
+                if min_d <= days <= max_d:
+                    bucket_label = label
+                    break
 
             overdue.append(
                 {
@@ -1599,23 +1587,16 @@ class DashboardViewSet(viewsets.ViewSet):
                     "phone": c.phone,
                     "location": c.location,
                     "current_balance": bal,
-                    # total_sales_amount = SUM(sale.total_sale_amount) — Customer property
                     "total_sales_amount": c.total_sales_amount,
-                    # total_payments_received = SUM(income.paid_amount) — Customer property
                     "total_paid": c.total_payments_received,
-                    # last_payment_date — Customer property
                     "last_payment_date": c.last_payment_date,
-                    # last_purchase_date — Customer property
                     "last_purchase_date": c.last_purchase_date,
-                    # days_since_last_payment — Customer property
                     "days_since_last_payment": days,
-                    "bucket": bucket,
+                    "bucket": bucket_label,
                 }
             )
 
-        overdue.sort(
-            key=lambda x: x["days_since_last_payment"] or 0, reverse=True
-        )
+        overdue.sort(key=lambda x: x["days_since_last_payment"] or 0, reverse=True)
         return overdue
 
     # ── Recent transactions ──────────────────────────────────────
