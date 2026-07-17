@@ -6,6 +6,7 @@ import { DataTable, Card, Button, ConfirmationDialog } from '../../components/co
 import { showToast } from '../../utils/toast.js';
 import { IncomeEditModal } from './IncomeEditModal.jsx';
 import { IncomeCreateModal } from './IncomeCreateModal.jsx';
+import {customerService} from "../../services/customerService.js";
 
 export default function Payments() {
   const navigate = useNavigate();
