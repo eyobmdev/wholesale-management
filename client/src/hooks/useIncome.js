@@ -9,6 +9,14 @@ export const useIncome = (params = {}) => {
   });
 };
 
+export const useIncomeById = (id) => {
+  return useQuery({
+    queryKey: ['income', id],
+    queryFn: () => incomeService.getIncomeById(id),
+    enabled: !!id,
+  });
+};
+
 export const useUpdateIncome = () => {
   const queryClient = useQueryClient();
   return useMutation({
