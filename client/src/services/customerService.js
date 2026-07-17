@@ -12,6 +12,10 @@ export const customerService = {
     return await api.get(`/customers/${id}/`);
   },
 
+  async getCustomerOptions(query = '') {
+    return await api.get('/customer-options/', { params: { search: query } });
+  },
+
   async createCustomer(data) {
     return await api.post('/customers/', data);
   },

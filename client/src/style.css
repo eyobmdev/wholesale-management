@@ -614,3 +614,42 @@ body {
     display: none;
   }
 }
+
+/* Date input calendar icon fix for dark mode */
+body.dark-theme input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Segmented Control UI */
+.segmented-control {
+  display: flex;
+  gap: 4px;
+  background-color: var(--card-bg);
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  width: fit-content;
+  border: 1px solid var(--card-border);
+}
+
+.segmented-tab {
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.segmented-tab:hover {
+  color: var(--text-color);
+}
+
+.segmented-tab.active {
+  background: var(--text-color);
+  color: var(--bg-color);
+}

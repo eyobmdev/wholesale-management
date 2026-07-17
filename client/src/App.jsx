@@ -18,6 +18,7 @@ import SaleCreate from './pages/Sales/SaleCreate.jsx';
 import Inventory from './pages/Inventory/index.jsx';
 import InventoryDetails from './pages/Inventory/InventoryDetails.jsx';
 import InventorySummary from './pages/InventorySummary/index.jsx';
+import Payments from './pages/Payments/index.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -48,8 +49,9 @@ export default function App() {
           <Route path="/purchases/new" element={<PurchaseCreate />} />
           <Route path="/purchases/:id" element={<PurchaseDetails />} />
           <Route path="/sales" element={<Sales />} />
-          <Route path="/sales/new" element={<SaleCreate />} />
+          <Route path="/sales/create" element={<SaleCreate />} />
           <Route path="/sales/:id" element={<SaleDetails />} />
+          <Route path="/payments" element={<Payments />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
             <div style={{padding: '32px', textAlign: 'center'}}>
