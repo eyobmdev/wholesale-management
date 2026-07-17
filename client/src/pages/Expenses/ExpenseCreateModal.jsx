@@ -89,15 +89,22 @@ export function ExpenseCreateModal({ isOpen, onClose }) {
             />
           </FormField>
 
-          <FormField label="Description" required error={errors.description}>
-            <Input
-              type="text"
-              value={formData.description}
-              onChange={(e) => {
-                setFormData({ ...formData, description: e.target.value });
-                if (errors.description) setErrors({ ...errors, description: null });
+          <FormField label="Payment Method" required error={errors.payment_method}>
+            <AsyncSelect
+              value={formData.payment_method}
+              onChange={(val) => {
+                setFormData({ ...formData, payment_method: val });
+                if (errors.payment_method) setErrors({ ...errors, payment_method: null });
               }}
-              placeholder="Expense description..."
+              loadOptions={async () => {
+                try {
+                  const res = await incomeService.getPaymentMethodOptions();
+                  return Array.isArray(res) ? res : (res.results || []);
+                } catch (e) {
+                  return [];
+                }
+              }}
+              placeholder="Select Payment Method..."
             />
           </FormField>
 
@@ -130,22 +137,15 @@ export function ExpenseCreateModal({ isOpen, onClose }) {
             </FormField>
           </div>
 
-          <FormField label="Payment Method" required error={errors.payment_method}>
-            <AsyncSelect
-              value={formData.payment_method}
-              onChange={(val) => {
-                setFormData({ ...formData, payment_method: val });
-                if (errors.payment_method) setErrors({ ...errors, payment_method: null });
+          <FormField label="Description" required error={errors.description}>
+            <Input
+              type="text"
+              value={formData.description}
+              onChange={(e) => {
+                setFormData({ ...formData, description: e.target.value });
+                if (errors.description) setErrors({ ...errors, description: null });
               }}
-              loadOptions={async () => {
-                try {
-                  const res = await incomeService.getPaymentMethodOptions();
-                  return Array.isArray(res) ? res : (res.results || []);
-                } catch (e) {
-                  return [];
-                }
-              }}
-              placeholder="Select Payment Method..."
+              placeholder="Expense description..."
             />
           </FormField>
 

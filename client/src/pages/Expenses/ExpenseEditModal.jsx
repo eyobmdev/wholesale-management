@@ -89,15 +89,22 @@ export function ExpenseEditModal({ isOpen, onClose, expense, isDetailPage = fals
             />
           </FormField>
 
-          <FormField label="Description" required error={editErrors.description}>
-            <Input
-              type="text"
-              value={editFormData.description}
-              onChange={(e) => {
-                setEditFormData({ ...editFormData, description: e.target.value });
-                if (editErrors.description) setEditErrors({ ...editErrors, description: null });
+          <FormField label="Payment Method" required error={editErrors.payment_method}>
+            <AsyncSelect
+              value={editFormData.payment_method}
+              onChange={(val) => {
+                setEditFormData({ ...editFormData, payment_method: val });
+                if (editErrors.payment_method) setEditErrors({ ...editErrors, payment_method: null });
               }}
-              placeholder="Expense description..."
+              loadOptions={async () => {
+                try {
+                  const res = await incomeService.getPaymentMethodOptions();
+                  return Array.isArray(res) ? res : (res.results || []);
+                } catch (e) {
+                  return [];
+                }
+              }}
+              placeholder="Select Payment Method..."
             />
           </FormField>
 
@@ -130,22 +137,15 @@ export function ExpenseEditModal({ isOpen, onClose, expense, isDetailPage = fals
             </FormField>
           </div>
 
-          <FormField label="Payment Method" required error={editErrors.payment_method}>
-            <AsyncSelect
-              value={editFormData.payment_method}
-              onChange={(val) => {
-                setEditFormData({ ...editFormData, payment_method: val });
-                if (editErrors.payment_method) setEditErrors({ ...editErrors, payment_method: null });
+          <FormField label="Description" required error={editErrors.description}>
+            <Input
+              type="text"
+              value={editFormData.description}
+              onChange={(e) => {
+                setEditFormData({ ...editFormData, description: e.target.value });
+                if (editErrors.description) setEditErrors({ ...editErrors, description: null });
               }}
-              loadOptions={async () => {
-                try {
-                  const res = await incomeService.getPaymentMethodOptions();
-                  return Array.isArray(res) ? res : (res.results || []);
-                } catch (e) {
-                  return [];
-                }
-              }}
-              placeholder="Select Payment Method..."
+              placeholder="Expense description..."
             />
           </FormField>
 
