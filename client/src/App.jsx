@@ -21,6 +21,7 @@ import InventorySummary from './pages/InventorySummary/index.jsx';
 import Payments from './pages/Payments/index.jsx';
 import IncomeDetails from './pages/Payments/IncomeDetails.jsx';
 import FactoryPaymentDetails from './pages/Payments/FactoryPaymentDetails.jsx';
+import Expenses from './pages/Expenses/index.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/payments" element={<Payments />} />
           <Route path="/payments/income/:id" element={<IncomeDetails />} />
           <Route path="/payments/factory/:id" element={<FactoryPaymentDetails />} />
+          <Route path="/expenses" element={<Expenses />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={
             <div style={{padding: '32px', textAlign: 'center'}}>
