@@ -121,12 +121,6 @@ class Sale(TimeStampedModel):
         if self.credit_amount < 0:
             self.credit_amount = 0
 
-        if self.pk:
-            Sale.objects.filter(pk=self.pk).update(
-                total_sale_amount=self.total_sale_amount,
-                credit_amount=self.credit_amount
-            )
-
 
     @property
     def computed_payment_type(self):
@@ -268,6 +262,7 @@ class SaleItem(TimeStampedModel):
 
         # Recalculate parent sale totals
         self.sale.recalculate_totals()
+        self.sale.save()
 
     def _adjust_stock(self, old_bags, old_pieces):
         from django.db.models import F
@@ -290,6 +285,7 @@ class SaleItem(TimeStampedModel):
         sale = self.sale
         super().delete(*args, **kwargs)
         sale.recalculate_totals()
+        sale.save()
 
     @property
     def selling_price_per_piece(self):
