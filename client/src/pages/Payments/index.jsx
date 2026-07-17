@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useIncome } from '../../hooks/useIncome.js';
+import { incomeService } from '../../services/incomeService.js';
 import { customerService } from '../../services/customerService.js';
 import { DataTable, Card, Button } from '../../components/common/index.js';
 
