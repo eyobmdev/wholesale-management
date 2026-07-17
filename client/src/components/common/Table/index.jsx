@@ -309,7 +309,11 @@ export const DataTable = ({
       </div>
 
       {/* Pagination Area */}
-      {pagination && (pagination.totalPages > 1 || pagination.hasNext || pagination.hasPrev) && (
+      {pagination && (
+        (pagination.hasNext !== undefined || pagination.hasPrev !== undefined) 
+          ? (pagination.hasNext || pagination.hasPrev) 
+          : (pagination.totalPages > 1)
+      ) && (
         <div className="data-table-pagination">
           <span className="pagination-info">
             {pagination.totalPages ? `Page ${pagination.currentPage} of ${pagination.totalPages}` : `Page ${pagination.currentPage}`}
