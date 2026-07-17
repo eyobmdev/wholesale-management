@@ -4,6 +4,7 @@ import { useCreateIncome } from '../../hooks/useIncome.js';
 import { customerService } from '../../services/customerService.js';
 import { incomeService } from '../../services/incomeService.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export function IncomeCreateModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -48,22 +49,6 @@ export function IncomeCreateModal({ isOpen, onClose }) {
       return;
     }
 
-    const flattenErrors = (errObj) => {
-      const result = {};
-      if (typeof errObj !== 'object' || errObj === null) return { non_field_errors: errObj };
-      for (const [key, val] of Object.entries(errObj)) {
-        if (Array.isArray(val)) {
-          result[key] = val.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ');
-        } else if (typeof val === 'object' && val !== null) {
-          const firstVal = Object.values(val)[0];
-          result[key] = Array.isArray(firstVal) ? firstVal.join(', ') : JSON.stringify(val);
-        } else {
-          result[key] = val;
-        }
-      }
-      return result;
-    };
-
     const toastId = showToast.loading('Recording payment...');
     createIncomeMutation.mutate(formData, {
       onSuccess: () => {
@@ -73,11 +58,7 @@ export function IncomeCreateModal({ isOpen, onClose }) {
       },
       onError: (error) => {
         showToast.dismiss(toastId);
-        if (error.response?.data) {
-          setErrors(flattenErrors(error.response.data));
-        } else {
-          showToast.error('Failed to record payment');
-        }
+        handleBackendErrors(error, setErrors, 'Failed to record payment');
       }
     });
   };

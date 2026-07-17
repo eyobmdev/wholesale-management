@@ -4,6 +4,7 @@ import { useUpdateIncome } from '../../hooks/useIncome.js';
 import { customerService } from '../../services/customerService.js';
 import { incomeService } from '../../services/incomeService.js';
 import { showToast } from '../../utils/toast.js';
+import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export function IncomeEditModal({ isOpen, onClose, income }) {
   const [editFormData, setEditFormData] = useState({
@@ -46,22 +47,6 @@ export function IncomeEditModal({ isOpen, onClose, income }) {
       return;
     }
 
-    const flattenErrors = (errObj) => {
-      const result = {};
-      if (typeof errObj !== 'object' || errObj === null) return { non_field_errors: errObj };
-      for (const [key, val] of Object.entries(errObj)) {
-        if (Array.isArray(val)) {
-          result[key] = val.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ');
-        } else if (typeof val === 'object' && val !== null) {
-          const firstVal = Object.values(val)[0];
-          result[key] = Array.isArray(firstVal) ? firstVal.join(', ') : JSON.stringify(val);
-        } else {
-          result[key] = val;
-        }
-      }
-      return result;
-    };
-
     const toastId = showToast.loading('Updating income...');
     updateIncomeMutation.mutate(
       { id: income.id, data: editFormData },
@@ -73,11 +58,7 @@ export function IncomeEditModal({ isOpen, onClose, income }) {
         },
         onError: (error) => {
           showToast.dismiss(toastId);
-          if (error.response?.data) {
-            setEditErrors(flattenErrors(error.response.data));
-          } else {
-            showToast.error('Failed to update income');
-          }
+          handleBackendErrors(error, setEditErrors, 'Failed to update income');
         }
       }
     );
