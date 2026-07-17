@@ -150,14 +150,18 @@ export const DataTable = ({
   }, []);
 
   const clearAllFilters = () => {
+    const updates = {};
     filters.forEach(filter => {
       if (filter.type === 'date-range' || filter.type === 'number-range') {
-        if (filter.valueFrom) onFilterChange(filter.keyFrom, '');
-        if (filter.valueTo) onFilterChange(filter.keyTo, '');
+        if (filter.valueFrom) updates[filter.keyFrom] = '';
+        if (filter.valueTo) updates[filter.keyTo] = '';
       } else {
-        if (filter.value) onFilterChange(filter.key, '');
+        if (filter.value) updates[filter.key] = '';
       }
     });
+    if (Object.keys(updates).length > 0) {
+      onFilterChange(updates);
+    }
   };
 
   const exceedsFilterThreshold = filters.length > 3;

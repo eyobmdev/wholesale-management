@@ -131,15 +131,17 @@ export default function Payments() {
   };
 
   const updateURLParams = (updates) => {
-    const newParams = new URLSearchParams(searchParams);
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '') {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+          newParams.delete(key);
+        } else {
+          newParams.set(key, value);
+        }
+      });
+      return newParams;
     });
-    setSearchParams(newParams, { replace: true });
   };
 
   const handleFilterChange = (key, val) => {

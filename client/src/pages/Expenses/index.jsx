@@ -22,6 +22,9 @@ export default function Expenses() {
     date_to: searchParams.get('date_to') || '',
     min_amount: searchParams.get('min_amount') || '',
     max_amount: searchParams.get('max_amount') || '',
+    currency: searchParams.get('currency') || '',
+    description: searchParams.get('description') || '',
+    expense_number: searchParams.get('expense_number') || '',
   };
 
   // UI state
@@ -31,15 +34,18 @@ export default function Expenses() {
   const deleteExpenseMutation = useDeleteExpense();
 
   // Helper to sync state to URL
-  const updateURLParams = (newParams) => {
-    const currentParams = Object.fromEntries(searchParams.entries());
-    const updatedParams = { ...currentParams, ...newParams };
-    Object.keys(updatedParams).forEach(key => {
-      if (updatedParams[key] === '' || updatedParams[key] === undefined || updatedParams[key] === null) {
-        delete updatedParams[key];
-      }
+  const updateURLParams = (updates) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+          newParams.delete(key);
+        } else {
+          newParams.set(key, value);
+        }
+      });
+      return newParams;
     });
-    setSearchParams(updatedParams);
   };
 
   // Fetch data
@@ -52,6 +58,9 @@ export default function Expenses() {
     ...(filters.date_to ? { date_to: filters.date_to } : {}),
     ...(filters.min_amount ? { min_amount: filters.min_amount } : {}),
     ...(filters.max_amount ? { max_amount: filters.max_amount } : {}),
+    ...(filters.currency ? { currency: filters.currency } : {}),
+    ...(filters.description ? { description: filters.description } : {}),
+    ...(filters.expense_number ? { expense_number: filters.expense_number } : {}),
   };
 
   const { data, isLoading } = useExpenses(queryParams);
@@ -168,6 +177,31 @@ export default function Expenses() {
       placeholderFrom: 'Min Amount',
       placeholderTo: 'Max Amount',
       label: 'Amount Range'
+    },
+    {
+      key: 'currency',
+      type: 'select',
+      label: 'Currency',
+      value: filters.currency,
+      options: [
+        { value: '', label: 'All Currencies' },
+        { value: 'ETB', label: 'ETB' },
+        { value: 'USD', label: 'USD' }
+      ]
+    },
+    {
+      key: 'description',
+      type: 'text',
+      label: 'Description',
+      placeholder: 'Search description...',
+      value: filters.description
+    },
+    {
+      key: 'expense_number',
+      type: 'text',
+      label: 'Expense Number',
+      placeholder: 'EXP-2024...',
+      value: filters.expense_number
     }
   ];
 
@@ -176,12 +210,16 @@ export default function Expenses() {
     { value: 'date', label: 'Date (Oldest)' },
     { value: '-amount', label: 'Amount (Highest)' },
     { value: 'amount', label: 'Amount (Lowest)' },
-    { value: '-created_at', label: 'Created At (Newest)' },
-    { value: 'created_at', label: 'Created At (Oldest)' }
+    { value: '-description', label: 'Description (Z-A)' },
+    { value: 'description', label: 'Description (A-Z)' }
   ];
 
-  const handleFilterChange = (key, val) => {
-    updateURLParams({ [key]: val, page: 1 });
+  const handleFilterChange = (keyOrUpdates, val) => {
+    if (typeof keyOrUpdates === 'object') {
+      updateURLParams({ ...keyOrUpdates, page: 1 });
+    } else {
+      updateURLParams({ [keyOrUpdates]: val, page: 1 });
+    }
   };
 
   return (

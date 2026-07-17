@@ -236,19 +236,25 @@ export default function InventorySummary() {
   ];
 
   const updateURLParams = (updates) => {
-    const newParams = new URLSearchParams(searchParams);
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '') {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+          newParams.delete(key);
+        } else {
+          newParams.set(key, value);
+        }
+      });
+      return newParams;
     });
-    setSearchParams(newParams, { replace: true });
   };
 
-  const handleFilterChange = (key, val) => {
-    updateURLParams({ [key]: val, page: 1 });
+  const handleFilterChange = (keyOrUpdates, val) => {
+    if (typeof keyOrUpdates === 'object') {
+      updateURLParams({ ...keyOrUpdates, page: 1 });
+    } else {
+      updateURLParams({ [keyOrUpdates]: val, page: 1 });
+    }
   };
 
   return (

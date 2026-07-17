@@ -115,8 +115,12 @@ export default function Customers() {
     setPage(1); // Reset to page 1 on new search
   };
 
-  const handleFilterChange = (key, val) => {
-    setFilters(prev => ({ ...prev, [key]: val }));
+  const handleFilterChange = (keyOrUpdates, val) => {
+    if (typeof keyOrUpdates === 'object') {
+      setFilters(prev => ({ ...prev, ...keyOrUpdates }));
+    } else {
+      setFilters(prev => ({ ...prev, [keyOrUpdates]: val }));
+    }
     setPage(1); // Reset to page 1 on filter change
   };
 

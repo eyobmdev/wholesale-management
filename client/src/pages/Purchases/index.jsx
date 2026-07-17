@@ -204,9 +204,12 @@ export default function Purchases() {
     setPage(1);
   };
 
-  const handleFilterChange = (key, val) => {
-    setFilters(prev => ({ ...prev, [key]: val }));
-    setPage(1);
+  const handleFilterChange = (keyOrUpdates, val) => {
+    if (typeof keyOrUpdates === 'object') {
+      updateURLParams({ ...keyOrUpdates, page: 1 });
+    } else {
+      updateURLParams({ [keyOrUpdates]: val, page: 1 });
+    }
   };
 
   const handleSortChange = (val) => {
