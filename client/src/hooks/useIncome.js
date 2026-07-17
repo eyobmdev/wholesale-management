@@ -20,3 +20,15 @@ export const useUpdateIncome = () => {
     }
   });
 };
+
+export const useDeleteIncome = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => incomeService.deleteIncome(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['income'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customer'] });
+    }
+  });
+};

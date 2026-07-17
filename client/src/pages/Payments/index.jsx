@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useIncome, useUpdateIncome } from '../../hooks/useIncome.js';
+import { useIncome, useUpdateIncome, useDeleteIncome } from '../../hooks/useIncome.js';
 import { incomeService } from '../../services/incomeService.js';
 import { customerService } from '../../services/customerService.js';
-import { DataTable, Card, Button, Modal, FormField, Input, Select, AsyncSelect, TextArea } from '../../components/common/index.js';
+import { DataTable, Card, Button, Modal, FormField, Input, Select, AsyncSelect, TextArea, ConfirmationDialog } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 
 export default function Payments() {
@@ -12,6 +12,9 @@ export default function Payments() {
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [incomeToDelete, setIncomeToDelete] = useState(null);
+
   const [editFormData, setEditFormData] = useState({
     customer: '',
     date: '',
@@ -23,6 +26,7 @@ export default function Payments() {
   const [editErrors, setEditErrors] = useState({});
 
   const updateIncomeMutation = useUpdateIncome();
+  const deleteIncomeMutation = useDeleteIncome();
 
   const page = parseInt(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
@@ -156,7 +160,10 @@ export default function Payments() {
       icon: 'ri-delete-bin-line',
       label: 'Delete',
       variant: 'danger',
-      onClick: (row) => console.log('Delete income', row.id)
+      onClick: (row) => {
+        setIncomeToDelete(row);
+        setIsDeleteDialogOpen(true);
+      }
     }
   ];
 
@@ -335,7 +342,7 @@ export default function Payments() {
       {/* Edit Income Modal */}
       <Modal 
         isOpen={isEditModalOpen} 
-        onClose={() => !updateIncomeMutation.isLoading && setIsEditModalOpen(false)}
+        onClose={() => !updateIncomeMutation.isPending && setIsEditModalOpen(false)}
         title="Edit Customer Income"
       >
         <form onSubmit={(e) => {
@@ -480,16 +487,49 @@ export default function Payments() {
             </FormField>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={updateIncomeMutation.isLoading}>
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={updateIncomeMutation.isPending}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" isLoading={updateIncomeMutation.isLoading}>
+              <Button type="submit" variant="primary" isLoading={updateIncomeMutation.isPending}>
                 Save Changes
               </Button>
             </div>
           </div>
         </form>
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        title="Delete Payment"
+        message={`Are you sure you want to delete payment ${incomeToDelete?.receipt_number || ''}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger={true}
+        isConfirming={deleteIncomeMutation.isPending}
+        onConfirm={() => {
+          const toastId = showToast.loading('Deleting payment...');
+          deleteIncomeMutation.mutate(incomeToDelete.id, {
+            onSuccess: () => {
+              showToast.dismiss(toastId);
+              showToast.success('Payment deleted successfully');
+              setIsDeleteDialogOpen(false);
+              setIncomeToDelete(null);
+            },
+            onError: (err) => {
+              showToast.dismiss(toastId);
+              showToast.error(err.response?.data?.detail || 'Failed to delete payment');
+              setIsDeleteDialogOpen(false);
+            }
+          });
+        }}
+        onClose={() => {
+          if (!deleteIncomeMutation.isPending) {
+            setIsDeleteDialogOpen(false);
+            setIncomeToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

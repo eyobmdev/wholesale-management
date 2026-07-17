@@ -9,5 +9,8 @@ export const incomeService = {
   },
   updateIncome: async (id, data) => {
     return await api.put(`/income/${id}/`, data);
+  },
+  deleteIncome: async (id) => {
+    return await api.delete(`/income/${id}/`);
   }
 };
