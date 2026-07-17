@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useIncome } from '../../hooks/useIncome.js';
+import { useIncome, useUpdateIncome } from '../../hooks/useIncome.js';
 import { incomeService } from '../../services/incomeService.js';
 import { customerService } from '../../services/customerService.js';
-import { DataTable, Card, Button } from '../../components/common/index.js';
+import { DataTable, Card, Button, Modal, FormField, Input, Select, AsyncSelect, TextArea } from '../../components/common/index.js';
+import { showToast } from '../../utils/toast.js';
 
 export default function Payments() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('income'); // 'income' or 'factory'
+  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedIncome, setSelectedIncome] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    customer: '',
+    date: '',
+    paid_amount: '',
+    currency: 'ETB',
+    payment_method: '',
+    notes: ''
+  });
+  const [editErrors, setEditErrors] = useState({});
+
+  const updateIncomeMutation = useUpdateIncome();
 
   const page = parseInt(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
@@ -123,7 +138,19 @@ export default function Payments() {
     {
       icon: 'ri-pencil-line',
       label: 'Edit',
-      onClick: (row) => console.log('Edit income', row.id)
+      onClick: (row) => {
+        setSelectedIncome(row);
+        setEditFormData({
+          customer: row.customer?.id || row.customer || '',
+          date: row.date ? row.date.split('T')[0] : '',
+          paid_amount: row.paid_amount || '',
+          currency: row.currency || 'ETB',
+          payment_method: row.payment_method?.value || row.payment_method || '',
+          notes: row.notes || ''
+        });
+        setEditErrors({});
+        setIsEditModalOpen(true);
+      }
     },
     {
       icon: 'ri-delete-bin-line',
@@ -304,6 +331,165 @@ export default function Payments() {
       </div>
 
       {activeTab === 'income' ? renderIncomeTable() : renderFactoryPaymentsPlaceholder()}
+
+      {/* Edit Income Modal */}
+      <Modal 
+        isOpen={isEditModalOpen} 
+        onClose={() => !updateIncomeMutation.isLoading && setIsEditModalOpen(false)}
+        title="Edit Customer Income"
+      >
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          
+          // Basic Validation
+          const errors = {};
+          if (!editFormData.customer) errors.customer = 'Customer is required';
+          if (!editFormData.date) errors.date = 'Date is required';
+          if (!editFormData.paid_amount) errors.paid_amount = 'Paid amount is required';
+          if (!editFormData.payment_method) errors.payment_method = 'Payment method is required';
+          if (Object.keys(errors).length > 0) {
+            setEditErrors(errors);
+            return;
+          }
+
+          const flattenErrors = (errObj) => {
+            const result = {};
+            if (typeof errObj !== 'object' || errObj === null) return { non_field_errors: errObj };
+            for (const [key, val] of Object.entries(errObj)) {
+              if (Array.isArray(val)) {
+                result[key] = val.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ');
+              } else if (typeof val === 'object' && val !== null) {
+                const firstVal = Object.values(val)[0];
+                result[key] = Array.isArray(firstVal) ? firstVal.join(', ') : JSON.stringify(val);
+              } else {
+                result[key] = val;
+              }
+            }
+            return result;
+          };
+
+          const toastId = showToast.loading('Updating income...');
+          updateIncomeMutation.mutate(
+            { id: selectedIncome.id, data: editFormData },
+            {
+              onSuccess: () => {
+                showToast.dismiss(toastId);
+                showToast.success('Income updated successfully');
+                setIsEditModalOpen(false);
+              },
+              onError: (error) => {
+                showToast.dismiss(toastId);
+                if (error.response?.data) {
+                  setEditErrors(flattenErrors(error.response.data));
+                } else {
+                  showToast.error('Failed to update income');
+                }
+              }
+            }
+          );
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField label="Customer" required error={editErrors.customer}>
+              <AsyncSelect
+                value={editFormData.customer}
+                onChange={(val) => {
+                  setEditFormData({ ...editFormData, customer: val });
+                  if (editErrors.customer) setEditErrors({ ...editErrors, customer: null });
+                }}
+                loadOptions={async (query) => {
+                  try {
+                    const res = await customerService.getCustomerOptions(query);
+                    return Array.isArray(res) ? res : (res.results || []);
+                  } catch (e) {
+                    return [];
+                  }
+                }}
+                placeholder="Select Customer..."
+              />
+            </FormField>
+
+            <FormField label="Payment Date" required error={editErrors.date}>
+              <Input
+                type="date"
+                value={editFormData.date}
+                onChange={(e) => {
+                  setEditFormData({ ...editFormData, date: e.target.value });
+                  if (editErrors.date) setEditErrors({ ...editErrors, date: null });
+                }}
+              />
+            </FormField>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
+              <FormField label="Paid Amount" required error={editErrors.paid_amount}>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={editFormData.paid_amount}
+                  onChange={(e) => {
+                    setEditFormData({ ...editFormData, paid_amount: e.target.value });
+                    if (editErrors.paid_amount) setEditErrors({ ...editErrors, paid_amount: null });
+                  }}
+                  placeholder="0.00"
+                />
+              </FormField>
+
+              <FormField label="Currency" required error={editErrors.currency}>
+                <Select
+                  value={editFormData.currency}
+                  onChange={(e) => {
+                    setEditFormData({ ...editFormData, currency: e.target.value });
+                    if (editErrors.currency) setEditErrors({ ...editErrors, currency: null });
+                  }}
+                  options={[
+                    { label: 'ETB', value: 'ETB' },
+                    { label: 'USD', value: 'USD' }
+                  ]}
+                />
+              </FormField>
+            </div>
+
+            <FormField label="Payment Method" required error={editErrors.payment_method}>
+              <AsyncSelect
+                value={editFormData.payment_method}
+                onChange={(val) => {
+                  setEditFormData({ ...editFormData, payment_method: val });
+                  if (editErrors.payment_method) setEditErrors({ ...editErrors, payment_method: null });
+                }}
+                loadOptions={async () => {
+                  try {
+                    const res = await incomeService.getPaymentMethodOptions();
+                    return Array.isArray(res) ? res : (res.results || []);
+                  } catch (e) {
+                    return [];
+                  }
+                }}
+                placeholder="Select Payment Method..."
+              />
+            </FormField>
+
+            <FormField label="Notes" error={editErrors.notes}>
+              <TextArea
+                value={editFormData.notes}
+                onChange={(e) => {
+                  setEditFormData({ ...editFormData, notes: e.target.value });
+                  if (editErrors.notes) setEditErrors({ ...editErrors, notes: null });
+                }}
+                placeholder="Optional notes..."
+                rows={3}
+              />
+            </FormField>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={updateIncomeMutation.isLoading}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" isLoading={updateIncomeMutation.isLoading}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

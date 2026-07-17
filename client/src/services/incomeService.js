@@ -6,5 +6,8 @@ export const incomeService = {
   },
   getPaymentMethodOptions: async () => {
     return await api.get('/payment-method-options/');
+  },
+  updateIncome: async (id, data) => {
+    return await api.put(`/income/${id}/`, data);
   }
 };

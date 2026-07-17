@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { incomeService } from '../services/incomeService.js';
 
 export const useIncome = (params = {}) => {
@@ -6,5 +6,17 @@ export const useIncome = (params = {}) => {
     queryKey: ['income', params],
     queryFn: () => incomeService.getIncome(params),
     keepPreviousData: true,
+  });
+};
+
+export const useUpdateIncome = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => incomeService.updateIncome(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['income'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customer'] });
+    }
   });
 };
