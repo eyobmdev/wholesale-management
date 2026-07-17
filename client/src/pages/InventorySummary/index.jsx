@@ -91,14 +91,6 @@ export default function InventorySummary() {
     setExpandedRowId(prev => prev === rowId ? null : rowId);
   };
 
-  const parentRowActions = [
-    {
-      icon: 'ri-eye-line',
-      label: 'View',
-      onClick: handleRowExpandToggle
-    }
-  ];
-
   // --- Nested Table Configuration ---
   const nestedColumns = [
     { key: 'shipping_code', title: 'Shipping Code' },
@@ -290,8 +282,6 @@ export default function InventorySummary() {
           sortOptions={sortConfig}
           activeSort={activeSort}
           onSortChange={(val) => updateURLParams({ ordering: val, page: 1 })}
-          
-          rowActions={parentRowActions}
           
           expandedRowId={expandedRowId}
           renderExpandedRow={renderExpandedRow}
