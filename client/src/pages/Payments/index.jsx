@@ -15,10 +15,13 @@ export default function Payments() {
   const filters = {
     customer: searchParams.get('customer') || '',
     payment_method: searchParams.get('payment_method') || '',
+    has_sale: searchParams.get('has_sale') || '',
     is_auto: searchParams.get('is_auto') || '',
+    receipt_number: searchParams.get('receipt_number') || '',
     date_from: searchParams.get('date_from') || '',
     date_to: searchParams.get('date_to') || '',
     min_amount: searchParams.get('min_amount') || '',
+    max_amount: searchParams.get('max_amount') || '',
   };
 
   const queryParams = {
@@ -27,10 +30,13 @@ export default function Payments() {
     ordering: activeSort || undefined,
     ...(filters.customer ? { customer: filters.customer } : {}),
     ...(filters.payment_method ? { payment_method: filters.payment_method } : {}),
+    ...(filters.has_sale ? { has_sale: filters.has_sale } : {}),
     ...(filters.is_auto ? { is_auto: filters.is_auto } : {}),
+    ...(filters.receipt_number ? { receipt_number: filters.receipt_number } : {}),
     ...(filters.date_from ? { date_from: filters.date_from } : {}),
     ...(filters.date_to ? { date_to: filters.date_to } : {}),
     ...(filters.min_amount ? { min_amount: filters.min_amount } : {}),
+    ...(filters.max_amount ? { max_amount: filters.max_amount } : {}),
   };
 
   const { data: incomeData, isLoading: isIncomeLoading } = useIncome(queryParams);
@@ -145,29 +151,19 @@ export default function Payments() {
     },
     {
       key: 'payment_method',
-      type: 'select',
+      type: 'async-select',
       label: 'Payment Method',
-      options: [
-        { value: '', label: 'All Methods' },
-        { value: 'cash', label: 'Cash' },
-        { value: 'telebirr', label: 'Telebirr' },
-        { value: 'cbe', label: 'CBE' },
-        { value: 'awash', label: 'Awash Bank' },
-        { value: 'dashen', label: 'Dashen Bank' },
-        { value: 'abyssinia', label: 'Bank of Abyssinia' }
-      ],
-      value: filters.payment_method
-    },
-    {
-      key: 'is_auto',
-      type: 'select',
-      label: 'Payment Type',
-      options: [
-        { value: '', label: 'All Payments' },
-        { value: 'true', label: 'Auto (From Sale)' },
-        { value: 'false', label: 'Manual' }
-      ],
-      value: filters.is_auto
+      placeholder: 'All Methods',
+      value: filters.payment_method,
+      loadOptions: async () => {
+        try {
+          const res = await incomeService.getPaymentMethodOptions();
+          return Array.isArray(res) ? res : (res.results || []);
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
     },
     {
       type: 'date-range',
@@ -180,21 +176,53 @@ export default function Payments() {
       label: 'Date Range'
     },
     {
-      key: 'min_amount',
-      type: 'number',
-      label: 'Minimum Amount',
-      placeholder: 'Min Amount...',
-      value: filters.min_amount
+      key: 'has_sale',
+      type: 'select',
+      label: 'Payment Source',
+      options: [
+        { value: '', label: 'All' },
+        { value: 'true', label: 'Automatic (Created from Sale)' },
+        { value: 'false', label: 'Manual' }
+      ],
+      value: filters.has_sale
+    },
+    {
+      key: 'is_auto',
+      type: 'select',
+      label: 'Auto Generated',
+      options: [
+        { value: '', label: 'All' },
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ],
+      value: filters.is_auto
+    },
+    {
+      key: 'receipt_number',
+      type: 'text',
+      label: 'Receipt Number',
+      placeholder: 'RCP-2026...',
+      value: filters.receipt_number
+    },
+    {
+      type: 'number-range',
+      keyFrom: 'min_amount',
+      keyTo: 'max_amount',
+      valueFrom: filters.min_amount,
+      valueTo: filters.max_amount,
+      placeholderFrom: 'Min Amount',
+      placeholderTo: 'Max Amount',
+      label: 'Amount Range'
     }
   ];
 
   const incomeSortConfig = [
-    { value: '-date', label: 'Newest First' },
-    { value: 'date', label: 'Oldest First' },
-    { value: '-paid_amount', label: 'Largest Payment' },
-    { value: 'paid_amount', label: 'Smallest Payment' },
-    { value: 'receipt_number', label: 'Receipt No. (A-Z)' },
-    { value: '-receipt_number', label: 'Receipt No. (Z-A)' }
+    { value: '-date', label: 'Payment Date (Newest)' },
+    { value: 'date', label: 'Payment Date (Oldest)' },
+    { value: '-paid_amount', label: 'Paid Amount (Highest)' },
+    { value: 'paid_amount', label: 'Paid Amount (Lowest)' },
+    { value: '-created_at', label: 'Created At (Newest)' },
+    { value: 'created_at', label: 'Created At (Oldest)' }
   ];
 
   const renderIncomeTable = () => (

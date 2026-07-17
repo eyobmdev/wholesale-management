@@ -194,7 +194,7 @@ export const DataTable = ({
                 leftIcon="ri-filter-3-line"
                 onClick={() => setIsFilterModalOpen(true)}
               >
-                Filters {activeFilters.length > 0 ? `(${activeFilters.length})` : ''}
+                Advanced Filters {activeFilters.length > 0 ? `(${activeFilters.length})` : ''}
               </Button>
             )}
 
