@@ -391,7 +391,7 @@ export default function SaleDetails() {
 
               pagination={{
                 currentPage: itemsPage,
-                totalPages: itemsData?.count ? Math.ceil(itemsData.count / 10) : 1,
+                totalPages: itemsData?.total_pages || 1,
                 hasNext: !!itemsData?.next,
                 hasPrev: !!itemsData?.previous,
                 onPageChange: (newPage) => setItemsPage(newPage)

@@ -292,7 +292,7 @@ export default function InventorySummary() {
           
           pagination={{
             currentPage: page,
-            totalPages: data ? Math.ceil(data.count / 15) : 1, // Assuming page size 15
+            totalPages: data?.total_pages || 1,
             totalItems: data?.count || 0,
             hasNext: !!data?.next,
             hasPrev: !!data?.previous,

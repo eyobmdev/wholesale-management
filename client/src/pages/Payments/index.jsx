@@ -271,7 +271,7 @@ export default function Payments() {
         
         pagination={{
           currentPage: page,
-          totalPages: incomeData?.count ? Math.ceil(incomeData.count / 10) : 1,
+          totalPages: incomeData?.total_pages || 1,
           hasNext: !!incomeData?.next,
           hasPrev: !!incomeData?.previous,
           onPageChange: (newPage) => updateURLParams({ page: newPage })

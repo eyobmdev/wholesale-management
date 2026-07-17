@@ -129,7 +129,7 @@ export default function Factories() {
   };
 
   // Pagination config
-  const totalPages = data?.count ? Math.ceil(data.count / 10) : 1;
+  const totalPages = data?.total_pages || 1;
 
   return (
     <div className="middle-class">

@@ -131,7 +131,7 @@ export default function Customers() {
 
   // Pagination config
   // DRF returns { count, next, previous, results } by default using StandardPagination
-  const totalPages = data?.count ? Math.ceil(data.count / 20) : 1; // Assuming page_size=20
+  const totalPages = data?.total_pages || 1;
 
   return (
     <div className="middle-class">
