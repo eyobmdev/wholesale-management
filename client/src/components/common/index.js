@@ -1,6 +1,7 @@
 export { Button } from './Button/index.jsx';
 export { Card } from './Card/index.jsx';
 export { StatCard } from './Card/StatCard.jsx';
+export { SummaryCard } from './Card/SummaryCard.jsx';
 export { Modal } from './Modal/index.jsx';
 export { ConfirmationDialog } from './Modal/ConfirmationDialog.jsx';
 export * from './Form/index.jsx';
