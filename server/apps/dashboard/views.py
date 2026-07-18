@@ -817,23 +817,19 @@ class DashboardViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"], url_path="overdue-customers")
     def overdue_customers(self, request):
-        try:
-            buckets = self._compute_overdue_buckets()
-            flat_list = self._compute_overdue_flat()
+        buckets = self._compute_overdue_buckets()
+        flat_list = self._compute_overdue_flat()
 
-            total_amount = sum((c["current_balance"] for c in flat_list), Decimal("0"))
-            total_customers = len(flat_list)
+        total_amount = sum((c["current_balance"] for c in flat_list), Decimal("0"))
+        total_customers = len(flat_list)
 
-            result = {
-                "total_overdue_amount": total_amount,
-                "total_overdue_customers": total_customers,
-                "buckets": buckets,
-                "all_overdue": flat_list,
-            }
-            return Response(OverdueCustomersSerializer(result).data)
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
+        result = {
+            "total_overdue_amount": total_amount,
+            "total_overdue_customers": total_customers,
+            "buckets": buckets,
+            "all_overdue": flat_list,
+        }
+        return Response(OverdueCustomersSerializer(result).data)
 
 
     @action(detail=False, methods=["get"], url_path="stock-overview")
