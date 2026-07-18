@@ -118,7 +118,7 @@ def _make_card(label, value, currency, previous=None, positive_direction="up"):
     elif direction == "down":
         is_positive = positive_direction == "down"
     else:
-        is_positive = True  # neutral is fine
+        is_positive = True
 
     return {
         "label": label,
@@ -131,10 +131,28 @@ def _make_card(label, value, currency, previous=None, positive_direction="up"):
 
 
 def _trunc_fn(period: str):
-    return {"daily": TruncDate, "weekly": TruncWeek, "monthly": TruncMonth}[period]
+    if period == "daily":
+        return lambda field_name: F(field_name)
 
+    if period == "weekly":
+        return lambda field_name: TruncWeek(field_name)
 
-# VIEWSET
+    if period == "monthly":
+        return lambda field_name: TruncMonth(field_name)
+
+    raise ValidationError("period must be daily, weekly, or monthly.")
+
+def _period_expr(field_name: str, period: str):
+    if period == "daily":
+        return F(field_name)
+
+    if period == "weekly":
+        return TruncWeek(field_name)
+
+    if period == "monthly":
+        return TruncMonth(field_name)
+
+    raise ValidationError("period must be daily, weekly, or monthly.")
 
 class DashboardViewSet(viewsets.ViewSet):
     """READ-ONLY Dashboard API — no mutations allowed."""
@@ -165,21 +183,21 @@ class DashboardViewSet(viewsets.ViewSet):
 
         cards = [
             _make_card(
-                "Total Sales",
+                "Monthly Sales",
                 this_month["sales"],
                 currency,
                 last_month["sales"],
                 "up",
             ),
             _make_card(
-                "Gross Profit",
+                "Monthly Profit",
                 this_month["profit"],
                 currency,
                 last_month["profit"],
                 "up",
             ),
             _make_card(
-                "Total Expenses",
+                "Monthly Expenses",
                 this_month["expenses"],
                 currency,
                 last_month["expenses"],
@@ -330,12 +348,8 @@ class DashboardViewSet(viewsets.ViewSet):
         """Total value of all remaining stock at purchase cost."""
         total = Decimal("0")
         for batch in StockBatch.objects.all():
-            total += batch.stock_value  # uses the `stock_value` property
+            total += batch.stock_value
         return total
-
-    # ────────────────────────────────────────────────────────────
-    # SALES TREND  GET /api/dashboard/sales-trend/
-    # ────────────────────────────────────────────────────────────
 
     @action(detail=False, methods=["get"], url_path="sales-trend")
     def sales_trend(self, request):
@@ -348,105 +362,115 @@ class DashboardViewSet(viewsets.ViewSet):
             end_date   → default: today
             currency   → default: app default
         """
-        period = request.query_params.get("period", "daily")
-        if period not in ("daily", "weekly", "monthly"):
-            raise ValidationError("period must be daily, weekly, or monthly.")
+        try:
+            period = request.query_params.get("period", "daily")
+            if period not in ("daily", "weekly", "monthly"):
+                raise ValidationError("period must be daily, weekly, or monthly.")
 
-        start_date, end_date = _date_range_from_request(request, default_days=30)
-        currency = _currency_from_request(request)
-        trunc = _trunc_fn(period)
+            start_date, end_date = _date_range_from_request(request, default_days=30)
+            currency = _currency_from_request(request)
 
-        # ── Revenue per period ──
-        sales_qs = (
-            Sale.objects.filter(
-                date__gte=start_date, date__lte=end_date, currency=currency
+            sales_period = _period_expr("date", period)
+            items_period = _period_expr("sale__date", period)
+
+            sales_qs = (
+                Sale.objects.filter(
+                    date__isnull=False,
+                    date__gte=start_date,
+                    date__lte=end_date,
+                    currency=currency,
+                )
+                .annotate(period=sales_period)
+                .values("period")
+                .annotate(
+                    total_sales=Coalesce(Sum("total_sale_amount"), Decimal("0")),
+                    num_sales=Count("id"),
+                )
+                .order_by("period")
             )
-            .annotate(period=trunc("date"))
-            .values("period")
-            .annotate(
-                total_sales=Coalesce(Sum("total_sale_amount"), Decimal("0")),
-                num_sales=Count("id"),
+
+            items_qs = (
+                SaleItem.objects.filter(
+                    sale__date__isnull=False,
+                    sale__date__gte=start_date,
+                    sale__date__lte=end_date,
+                    sale__currency=currency,
+                )
+                .annotate(
+                    period=items_period,
+                    line_cost=ExpressionWrapper(
+                        F("purchase_cost_per_piece") * F("pieces_sold"),
+                        output_field=DecimalField(max_digits=20, decimal_places=2),
+                    ),
+                )
+                .values("period")
+                .annotate(
+                    total_cost=Coalesce(Sum("line_cost"), Decimal("0")),
+                    num_items_sold=Coalesce(Sum("pieces_sold"), 0),
+                )
+                .order_by("period")
             )
-            .order_by("period")
-        )
 
-        # ── Cost of goods + items sold per period ──
-        items_qs = (
-            SaleItem.objects.filter(
-                sale__date__gte=start_date,
-                sale__date__lte=end_date,
-                sale__currency=currency,
+            sales_lookup = {r["period"]: r for r in sales_qs if r["period"]}
+            items_lookup = {r["period"]: r for r in items_qs if r["period"]}
+
+            all_periods = sorted(
+                set(list(sales_lookup.keys()) + list(items_lookup.keys()))
             )
-            .annotate(
-                period=trunc("sale__date"),
-                line_cost=ExpressionWrapper(
-                    F("purchase_cost_per_piece") * F("pieces_sold"),
-                    output_field=DecimalField(max_digits=20, decimal_places=2),
-                ),
+
+            data_points = []
+            totals = {
+                "total_sales": Decimal("0"),
+                "total_cost": Decimal("0"),
+                "gross_profit": Decimal("0"),
+                "num_sales": 0,
+                "num_items_sold": 0,
+            }
+
+            for p in all_periods:
+                s = sales_lookup.get(p, {})
+                i = items_lookup.get(p, {})
+
+                t_sales = s.get("total_sales", Decimal("0"))
+                t_cost = i.get("total_cost", Decimal("0"))
+                gp = t_sales - t_cost
+                n_sales = s.get("num_sales", 0)
+                n_items = i.get("num_items_sold", 0)
+
+                data_points.append(
+                    {
+                        "date": p.isoformat() if hasattr(p, "isoformat") else str(p),
+                        "total_sales": t_sales,
+                        "total_cost": t_cost,
+                        "gross_profit": gp,
+                        "num_sales": n_sales,
+                        "num_items_sold": n_items,
+                    }
+                )
+
+                totals["total_sales"] += t_sales
+                totals["total_cost"] += t_cost
+                totals["gross_profit"] += gp
+                totals["num_sales"] += n_sales
+                totals["num_items_sold"] += n_items
+
+            result = {
+                "period": period,
+                "start_date": start_date,
+                "end_date": end_date,
+                "currency": currency,
+                "data": data_points,
+                "totals": totals,
+            }
+
+            return Response(SalesTrendSerializer(result).data)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {"error": str(e)},
+                status=500,
             )
-            .values("period")
-            .annotate(
-                total_cost=Coalesce(Sum("line_cost"), Decimal("0")),
-                num_items_sold=Coalesce(Sum("pieces_sold"), 0),
-            )
-            .order_by("period")
-        )
-
-        sales_lookup = {
-            r["period"]: r for r in sales_qs if r["period"]
-        }
-        items_lookup = {
-            r["period"]: r for r in items_qs if r["period"]
-        }
-
-        all_periods = sorted(
-            set(list(sales_lookup.keys()) + list(items_lookup.keys()))
-        )
-
-        data_points = []
-        totals = {
-            "total_sales": Decimal("0"),
-            "total_cost": Decimal("0"),
-            "gross_profit": Decimal("0"),
-            "num_sales": 0,
-            "num_items_sold": 0,
-        }
-
-        for p in all_periods:
-            s = sales_lookup.get(p, {})
-            i = items_lookup.get(p, {})
-            t_sales = s.get("total_sales", Decimal("0"))
-            t_cost = i.get("total_cost", Decimal("0"))
-            gp = t_sales - t_cost
-            n_sales = s.get("num_sales", 0)
-            n_items = i.get("num_items_sold", 0)
-
-            data_points.append(
-                {
-                    "date": p.isoformat() if hasattr(p, "isoformat") else str(p),
-                    "total_sales": t_sales,
-                    "total_cost": t_cost,
-                    "gross_profit": gp,
-                    "num_sales": n_sales,
-                    "num_items_sold": n_items,
-                }
-            )
-            totals["total_sales"] += t_sales
-            totals["total_cost"] += t_cost
-            totals["gross_profit"] += gp
-            totals["num_sales"] += n_sales
-            totals["num_items_sold"] += n_items
-
-        result = {
-            "period": period,
-            "start_date": start_date,
-            "end_date": end_date,
-            "currency": currency,
-            "data": data_points,
-            "totals": totals,
-        }
-        return Response(SalesTrendSerializer(result).data)
-
     # ────────────────────────────────────────────────────────────
     # PROFIT TREND  GET /api/dashboard/profit-trend/
     # ────────────────────────────────────────────────────────────
@@ -1609,7 +1633,7 @@ class DashboardViewSet(viewsets.ViewSet):
         transactions = []
 
         for sale in Sale.objects.select_related("customer").order_by(
-            "-date", "-created_at"
+                "-date", "-created_at"
         )[:limit]:
             transactions.append(
                 {
@@ -1625,7 +1649,7 @@ class DashboardViewSet(viewsets.ViewSet):
             )
 
         for income in CustomerIncome.objects.select_related("customer").order_by(
-            "-date", "-created_at"
+                "-date", "-created_at"
         )[:limit]:
             label = "Auto" if income.is_auto else "Manual"
             transactions.append(
@@ -1642,7 +1666,7 @@ class DashboardViewSet(viewsets.ViewSet):
             )
 
         for payment in FactoryPayment.objects.select_related("factory").order_by(
-            "-date", "-created_at"
+                "-date", "-created_at"
         )[:limit]:
             label = "Auto" if payment.is_auto else "Manual"
             transactions.append(
@@ -1671,6 +1695,9 @@ class DashboardViewSet(viewsets.ViewSet):
                     "party_name": "",
                 }
             )
+
+        # Drop any transaction with no date — can't be sorted/ranked meaningfully
+        transactions = [t for t in transactions if t["date"] is not None]
 
         transactions.sort(key=lambda x: x["date"], reverse=True)
         return transactions[:limit]
