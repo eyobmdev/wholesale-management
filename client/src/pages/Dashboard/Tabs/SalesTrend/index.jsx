@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
-import { DashboardToggle } from '../../components/DashboardToggle.jsx';
-import { DashboardDatePicker } from '../../components/DashboardDatePicker.jsx';
+import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
 import './SalesTrendTab.css';
 
 export default function SalesTrendTab() {
   const [period, setPeriod] = useState('daily');
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
-
-  const isDatePickerDisabled = period !== '';
 
   // Calculate Dates and Params
   let fetchPeriod = period;
@@ -82,22 +79,20 @@ export default function SalesTrendTab() {
       <div className="sales-trend-header">
         <div>
           <h1 className="sales-trend-title">Sales Trend</h1>
-          <p className="sales-trend-subtitle">
-            {getHumanReadableDuration(displayStartDate, displayEndDate)} data &middot; {displayCurrency}
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <DashboardDatePicker 
-            startDate={customRange.start} 
-            endDate={customRange.end} 
-            onChange={setCustomRange} 
-            disabled={isDatePickerDisabled}
-          />
-          <DashboardToggle 
-            options={['daily', 'weekly', 'monthly']} 
-            value={period} 
-            onChange={setPeriod} 
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <DashboardDateSelector 
+              period={period}
+              startDate={customRange.start}
+              endDate={customRange.end}
+              displayDuration={getHumanReadableDuration(displayStartDate, displayEndDate)}
+              onChange={(val) => {
+                setPeriod(val.period);
+                setCustomRange({ start: val.start, end: val.end });
+              }}
+              options={['daily', 'weekly', 'monthly']}
+            />
+            <span className="sales-trend-subtitle" style={{ margin: 0 }}>&middot; {displayCurrency}</span>
+          </div>
         </div>
       </div>
 

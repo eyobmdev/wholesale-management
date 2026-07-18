@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import { useProfitTrend } from '../../../../services/dashboardService.js';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
-import { DashboardToggle } from '../../components/DashboardToggle.jsx';
-import { DashboardDatePicker } from '../../components/DashboardDatePicker.jsx';
+import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
 import './ProfitTrendTab.css';
 
 export default function ProfitTrendTab() {
   const [period, setPeriod] = useState('monthly');
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
-
-  const isDatePickerDisabled = period !== '';
 
   // Calculate Dates and Params
   let fetchPeriod = period;
@@ -75,22 +72,20 @@ export default function ProfitTrendTab() {
       <div className="profit-trend-header">
         <div>
           <h1 className="profit-trend-title">Profit Trend</h1>
-          <p className="profit-trend-subtitle">
-            {getHumanReadableDuration(displayStartDate, displayEndDate)} data &middot; {displayCurrency}
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <DashboardDatePicker 
-            startDate={customRange.start} 
-            endDate={customRange.end} 
-            onChange={setCustomRange} 
-            disabled={isDatePickerDisabled}
-          />
-          <DashboardToggle 
-            options={['daily', 'monthly']} 
-            value={period} 
-            onChange={setPeriod} 
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <DashboardDateSelector 
+              period={period}
+              startDate={customRange.start}
+              endDate={customRange.end}
+              displayDuration={getHumanReadableDuration(displayStartDate, displayEndDate)}
+              onChange={(val) => {
+                setPeriod(val.period);
+                setCustomRange({ start: val.start, end: val.end });
+              }}
+              options={['daily', 'monthly']}
+            />
+            <span className="profit-trend-subtitle" style={{ margin: 0 }}>&middot; {displayCurrency}</span>
+          </div>
         </div>
       </div>
 
@@ -106,15 +101,15 @@ export default function ProfitTrendTab() {
         <>
           {/* Summary Cards */}
           <div className="profit-trend-cards">
-            <div className="pt-card" style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+            <div className="pt-card" style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)' }}>
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Gross Profit</p>
               <h3 className="pt-card-value" style={{ color: '#10b981' }}>{formatCurrency(totals.GrossProfit)}</h3>
             </div>
-            <div className="pt-card" style={{ backgroundColor: 'rgba(225, 29, 72, 0.05)', borderColor: 'rgba(225, 29, 72, 0.2)' }}>
+            <div className="pt-card" style={{ backgroundColor: 'rgba(225, 29, 72, 0.05)' }}>
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Expenses</p>
               <h3 className="pt-card-value" style={{ color: '#e11d48' }}>{formatCurrency(totals.Expenses)}</h3>
             </div>
-            <div className="pt-card" style={{ backgroundColor: 'rgba(99, 102, 241, 0.05)', borderColor: 'rgba(99, 102, 241, 0.2)' }}>
+            <div className="pt-card" style={{ backgroundColor: 'rgba(99, 102, 241, 0.05)' }}>
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Net Profit</p>
               <h3 className="pt-card-value" style={{ color: '#6366f1' }}>{formatCurrency(totals.NetProfit)}</h3>
             </div>

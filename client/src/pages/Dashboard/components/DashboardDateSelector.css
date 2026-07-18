@@ -1,0 +1,119 @@
+.dashboard-date-selector {
+  position: relative;
+}
+
+.selector-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--search-bg);
+  color: var(--text-color);
+  border: 1px solid var(--card-border);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.selector-trigger:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--text-color);
+  color: var(--text-color);
+}
+
+.selector-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  min-width: 280px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.selector-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: block;
+  font-weight: 600;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preset-buttons button {
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.preset-buttons button:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-color);
+}
+
+.preset-buttons button.active {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active);
+  font-weight: 600;
+}
+
+.selector-divider {
+  height: 1px;
+  background-color: var(--card-border);
+  width: 100%;
+}
+
+.custom-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-date-inputs input {
+  background-color: var(--search-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.custom-date-inputs input:focus {
+  border-color: var(--search-focus-border);
+}
+
+.custom-date-inputs input::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+.selector-arrow {
+  color: var(--text-muted);
+}
