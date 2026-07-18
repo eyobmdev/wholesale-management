@@ -101,17 +101,17 @@ export default function ProfitTrendTab() {
         <>
           {/* Summary Cards */}
           <div className="profit-trend-cards">
-            <div className="pt-card" style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)' }}>
+            <div className="pt-card stat-bg-success">
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Gross Profit</p>
-              <h3 className="pt-card-value" style={{ color: '#10b981' }}>{formatCurrency(totals.GrossProfit)}</h3>
+              <h3 className="pt-card-value stat-text-success">{formatCurrency(totals.GrossProfit)}</h3>
             </div>
-            <div className="pt-card" style={{ backgroundColor: 'rgba(225, 29, 72, 0.05)' }}>
+            <div className="pt-card stat-bg-danger">
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Expenses</p>
-              <h3 className="pt-card-value" style={{ color: '#e11d48' }}>{formatCurrency(totals.Expenses)}</h3>
+              <h3 className="pt-card-value stat-text-danger">{formatCurrency(totals.Expenses)}</h3>
             </div>
-            <div className="pt-card" style={{ backgroundColor: 'rgba(99, 102, 241, 0.05)' }}>
+            <div className="pt-card stat-bg-primary">
               <p className="pt-card-label" style={{ color: 'var(--text-muted)' }}>Total Net Profit</p>
-              <h3 className="pt-card-value" style={{ color: '#6366f1' }}>{formatCurrency(totals.NetProfit)}</h3>
+              <h3 className="pt-card-value stat-text-primary">{formatCurrency(totals.NetProfit)}</h3>
             </div>
           </div>
 

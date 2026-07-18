@@ -228,6 +228,36 @@ body {
   color: var(--sidebar-active);
 }
 
+/* Stat Card Utility Backgrounds (Soft Pastels for B&W Theme) */
+.stat-bg-success {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+.stat-bg-danger {
+  background-color: rgba(225, 29, 72, 0.05);
+}
+.stat-bg-primary {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+.stat-bg-info {
+  background-color: rgba(6, 182, 212, 0.05);
+}
+.stat-bg-purple {
+  background-color: rgba(147, 51, 234, 0.05);
+}
+
+/* Stat Card Utility Text Colors (Muted/Consistent) */
+.stat-text-success { color: #059669; }
+.stat-text-danger { color: #be123c; }
+.stat-text-primary { color: #4f46e5; }
+.stat-text-info { color: #0891b2; }
+.stat-text-purple { color: #7e22ce; }
+
+body.dark-theme .stat-text-success { color: #34d399; }
+body.dark-theme .stat-text-danger { color: #fb7185; }
+body.dark-theme .stat-text-primary { color: #818cf8; }
+body.dark-theme .stat-text-info { color: #22d3ee; }
+body.dark-theme .stat-text-purple { color: #c084fc; }
+
 .sidebar-footer {
   padding: 16px;
   border-top: 1px solid #222;

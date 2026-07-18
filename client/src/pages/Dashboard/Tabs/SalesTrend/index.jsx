@@ -108,24 +108,24 @@ export default function SalesTrendTab() {
         <>
           {/* Summary Cards */}
           <div className="sales-trend-cards">
-            <div className="st-card" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-              <h3 className="st-card-value">{formatCurrency(totals.Sales)}</h3>
+            <div className="st-card stat-bg-primary">
+              <h3 className="st-card-value stat-text-primary">{formatCurrency(totals.Sales)}</h3>
               <p className="st-card-label" style={{ color: 'var(--text-muted)' }}>Total Sales</p>
             </div>
-            <div className="st-card" style={{ backgroundColor: 'rgba(225, 29, 72, 0.1)', color: '#e11d48' }}>
-              <h3 className="st-card-value">{formatCurrency(totals.Cost)}</h3>
+            <div className="st-card stat-bg-danger">
+              <h3 className="st-card-value stat-text-danger">{formatCurrency(totals.Cost)}</h3>
               <p className="st-card-label" style={{ color: 'var(--text-muted)' }}>Total Cost</p>
             </div>
-            <div className="st-card" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-              <h3 className="st-card-value">{formatCurrency(totals.Profit)}</h3>
+            <div className="st-card stat-bg-success">
+              <h3 className="st-card-value stat-text-success">{formatCurrency(totals.Profit)}</h3>
               <p className="st-card-label" style={{ color: 'var(--text-muted)' }}>Gross Profit</p>
             </div>
-            <div className="st-card" style={{ backgroundColor: 'rgba(2, 132, 199, 0.1)', color: '#0284c7' }}>
-              <h3 className="st-card-value">{totals.Invoices.toLocaleString()}</h3>
+            <div className="st-card stat-bg-info">
+              <h3 className="st-card-value stat-text-info">{totals.Invoices.toLocaleString()}</h3>
               <p className="st-card-label" style={{ color: 'var(--text-muted)' }}># Invoices</p>
             </div>
-            <div className="st-card" style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', color: '#9333ea' }}>
-              <h3 className="st-card-value">{totals.Items.toLocaleString()}</h3>
+            <div className="st-card stat-bg-purple">
+              <h3 className="st-card-value stat-text-purple">{totals.Items.toLocaleString()}</h3>
               <p className="st-card-label" style={{ color: 'var(--text-muted)' }}>Items Sold</p>
             </div>
           </div>
