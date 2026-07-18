@@ -3,21 +3,26 @@ import { useProfitTrend } from '../../../../services/dashboardService.js';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency } from '../../../../utils/formatters.js';
 import { DashboardToggle } from '../../components/DashboardToggle.jsx';
+import { DashboardDatePicker } from '../../components/DashboardDatePicker.jsx';
 import './ProfitTrendTab.css';
 
 export default function ProfitTrendTab() {
   const [period, setPeriod] = useState('monthly');
+  const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
   // Dynamic Date Calculation
   const today = new Date();
-  const endDateStr = today.toISOString().split('T')[0];
-  let startDate = new Date();
+  const defaultEndDateStr = today.toISOString().split('T')[0];
+  let defaultStartDate = new Date();
   if (period === 'daily') {
-    startDate.setDate(today.getDate() - 30);
+    defaultStartDate.setDate(today.getDate() - 30);
   } else if (period === 'monthly') {
-    startDate.setMonth(today.getMonth() - 12);
+    defaultStartDate.setMonth(today.getMonth() - 12);
   }
-  const startDateStr = startDate.toISOString().split('T')[0];
+  const defaultStartDateStr = defaultStartDate.toISOString().split('T')[0];
+
+  const startDateStr = customRange.start || defaultStartDateStr;
+  const endDateStr = customRange.end || defaultEndDateStr;
 
   // Fetch Data
   const { data: trendData, isLoading, isError } = useProfitTrend(period, startDateStr, endDateStr);
@@ -63,11 +68,18 @@ export default function ProfitTrendTab() {
             {startDateStr} &rarr; {endDateStr} &middot; ETB
           </p>
         </div>
-        <DashboardToggle 
-          options={['daily', 'monthly']} 
-          value={period} 
-          onChange={setPeriod} 
-        />
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <DashboardDatePicker 
+            startDate={customRange.start} 
+            endDate={customRange.end} 
+            onChange={setCustomRange} 
+          />
+          <DashboardToggle 
+            options={['daily', 'monthly']} 
+            value={period} 
+            onChange={setPeriod} 
+          />
+        </div>
       </div>
 
       {showLoading ? (

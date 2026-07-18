@@ -1,0 +1,48 @@
+.dashboard-date-picker {
+  display: flex;
+  align-items: center;
+  background-color: var(--search-bg);
+  padding: 4px 12px;
+  border-radius: 8px;
+  gap: 12px;
+  border: 1px solid var(--card-border);
+}
+
+.date-input {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+.date-separator {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.date-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.date-clear-btn:hover {
+  background-color: var(--hover-bg);
+  color: #ef4444;
+}
