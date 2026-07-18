@@ -6,7 +6,7 @@ import { DashboardCards, DashboardCardsSkeleton } from './DashboardCards.jsx';
 import { QuickStatsRow, QuickStatsRowSkeleton } from './QuickStatsRow.jsx';
 import { SalesTrendChart, SalesTrendChartSkeleton } from './SalesTrendChart.jsx';
 import { MonthlyComparison, MonthlyComparisonSkeleton } from '../ProfitTrend/MonthlyComparison.jsx';
-import { OverdueCustomersList, OverdueCustomersSkeleton } from '../CustomerInsights/OverdueCustomersList.jsx';
+import { OverdueCustomersList, OverdueCustomersSkeleton } from './OverdueCustomersWidget.jsx';
 import { RecentTransactionsTable, RecentTransactionsSkeleton } from './RecentTransactionsTable.jsx';
 import { StockAlertsWidget, StockAlertsSkeleton } from './StockAlertsWidget.jsx';
 
