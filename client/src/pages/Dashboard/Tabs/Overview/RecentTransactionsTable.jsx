@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatCurrency, formatDate, getTransactionTypeLabel } from '../../utils/formatters.js';
+import { formatCurrency, formatDate, getTransactionTypeLabel } from '../../../../utils/formatters.js';
 
 const getTailwindColor = (type) => {
   const map = {

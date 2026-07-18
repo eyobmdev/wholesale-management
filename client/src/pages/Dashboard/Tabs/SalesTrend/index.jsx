@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency } from '../../../../utils/formatters.js';
+import { DashboardToggle } from '../../components/DashboardToggle.jsx';
 import './SalesTrendTab.css';
 
 export default function SalesTrendTab() {
@@ -70,17 +71,11 @@ export default function SalesTrendTab() {
             {startDateStr} &rarr; {endDateStr} &middot; ETB
           </p>
         </div>
-        <div className="sales-trend-toggle">
-          {['daily', 'weekly', 'monthly'].map(p => (
-            <button
-              key={p}
-              className={period === p ? 'active' : ''}
-              onClick={() => setPeriod(p)}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
+        <DashboardToggle 
+          options={['daily', 'weekly', 'monthly']} 
+          value={period} 
+          onChange={setPeriod} 
+        />
       </div>
 
       {showLoading ? (

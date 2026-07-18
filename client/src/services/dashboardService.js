@@ -11,6 +11,13 @@ export const dashboardService = {
     if (startDate) params.start_date = startDate;
     if (endDate) params.end_date = endDate;
     return await api.get('/dashboard/sales-trend/', { params });
+  },
+
+  async getProfitTrend(period = 'monthly', startDate = null, endDate = null) {
+    const params = { period };
+    if (startDate) params.start_date = startDate;
+    if (endDate) params.end_date = endDate;
+    return await api.get('/dashboard/profit-trend/', { params });
   }
 };
 
@@ -26,5 +33,13 @@ export const useSalesTrend = (period = 'daily', startDate = null, endDate = null
     queryKey: ['salesTrend', period, startDate, endDate],
     queryFn: () => dashboardService.getSalesTrend(period, startDate, endDate),
     refetchInterval: 30000, // Live updates every 30s
+  });
+};
+
+export const useProfitTrend = (period = 'monthly', startDate = null, endDate = null) => {
+  return useQuery({
+    queryKey: ['profitTrend', period, startDate, endDate],
+    queryFn: () => dashboardService.getProfitTrend(period, startDate, endDate),
+    refetchInterval: 30000,
   });
 };

@@ -1,24 +1,24 @@
-.sales-trend-page {
+.profit-trend-page {
   display: flex;
   flex-direction: column;
   gap: 32px;
   min-height: 100vh;
 }
 
-.sales-trend-header {
+.profit-trend-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.sales-trend-title {
+.profit-trend-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-color);
   margin: 0 0 4px 0;
 }
 
-.sales-trend-subtitle {
+.profit-trend-subtitle {
   color: var(--text-muted);
   font-size: 0.875rem;
   margin: 0;
@@ -26,33 +26,35 @@
 
 
 
-.sales-trend-cards {
+.profit-trend-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
 }
 
-.st-card {
+.pt-card {
   border-radius: 12px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border: 1px solid var(--card-border);
 }
 
-.st-card-value {
-  font-size: 1.5rem;
+.pt-card-value {
+  font-size: 2rem;
   font-weight: 700;
   margin: 0;
 }
 
-.st-card-label {
+.pt-card-label {
   font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
   margin: 0;
-  opacity: 0.8;
 }
 
-.st-section {
+.pt-section {
   background-color: var(--card-bg);
   border-radius: 16px;
   border: 1px solid var(--card-border);
@@ -60,25 +62,25 @@
   padding: 24px;
 }
 
-.st-section-title {
+.pt-section-title {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-color);
   margin: 0 0 4px 0;
 }
 
-.st-section-subtitle {
+.pt-section-subtitle {
   font-size: 0.875rem;
   color: var(--text-muted);
   margin: 0 0 24px 0;
 }
 
-.st-table {
+.pt-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.st-table th {
+.pt-table th {
   text-align: left;
   padding: 12px 16px;
   font-size: 0.75rem;
@@ -88,13 +90,38 @@
   border-bottom: 1px solid var(--card-border);
 }
 
-.st-table td {
+.pt-table td {
   padding: 16px;
   font-size: 0.875rem;
   font-weight: 600;
   border-bottom: 1px solid var(--card-border);
 }
 
-.st-table tr:last-child td {
+.pt-table tr:last-child td {
   border-bottom: none;
+}
+
+.pt-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pt-badge-green {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.pt-badge-yellow {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.pt-badge-red {
+  background-color: rgba(225, 29, 72, 0.15);
+  color: #e11d48;
 }

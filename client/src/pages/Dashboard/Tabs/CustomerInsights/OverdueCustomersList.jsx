@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatCurrency } from '../../utils/formatters.js';
+import { formatCurrency } from '../../../../utils/formatters.js';
 
 const getTailwindBucketColor = (label) => {
   const l = label.toLowerCase();

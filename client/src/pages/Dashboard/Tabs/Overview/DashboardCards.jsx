@@ -1,5 +1,5 @@
 import React from 'react';
-import { SummaryCard } from '../../components/common/index.js';
+import { SummaryCard } from '../../../../components/common/index.js';
 
 const cardIcons = [
   "ri-line-chart-line", 

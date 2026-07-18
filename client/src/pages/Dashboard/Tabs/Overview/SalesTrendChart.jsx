@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useSalesTrend } from '../../services/dashboardService.js';
+import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { formatMonthLabel } from '../../utils/formatters.js';
+import { formatMonthLabel } from '../../../../utils/formatters.js';
 
 export function SalesTrendChart() {
   const [period, setPeriod] = useState('daily');

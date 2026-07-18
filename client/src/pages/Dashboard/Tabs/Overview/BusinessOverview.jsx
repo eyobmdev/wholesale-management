@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from '../../components/common/index.js';
-import { formatCurrencyFull, formatPercent } from '../../utils/formatters.js';
+import { Card } from '../../../../components/common/index.js';
+import { formatCurrencyFull, formatPercent } from '../../../../utils/formatters.js';
 
 export function BusinessOverview({ data }) {
   if (!data) return null;
