@@ -1,7 +1,7 @@
 import React from 'react';
 import './DashboardDatePicker.css';
 
-export function DashboardDatePicker({ startDate, endDate, onChange }) {
+export function DashboardDatePicker({ startDate, endDate, onChange, disabled }) {
   const handleStartChange = (e) => {
     onChange({ start: e.target.value, end: endDate });
   };
@@ -15,13 +15,14 @@ export function DashboardDatePicker({ startDate, endDate, onChange }) {
   };
 
   return (
-    <div className="dashboard-date-picker">
+    <div className={`dashboard-date-picker ${disabled ? 'disabled' : ''}`}>
       <input 
         type="date" 
         value={startDate} 
         onChange={handleStartChange} 
         className="date-input"
         placeholder="Start Date"
+        disabled={disabled}
       />
       <span className="date-separator">&rarr;</span>
       <input 
@@ -31,6 +32,7 @@ export function DashboardDatePicker({ startDate, endDate, onChange }) {
         className="date-input"
         placeholder="End Date"
         min={startDate}
+        disabled={disabled}
       />
       {(startDate || endDate) && (
         <button className="date-clear-btn" onClick={handleClear} title="Clear Custom Date">

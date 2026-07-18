@@ -10,7 +10,10 @@ export function DashboardToggle({ options, value, onChange }) {
         <button
           key={option}
           className={value === option ? 'active' : ''}
-          onClick={() => onChange(option)}
+          onClick={() => {
+            console.log("Toggle clicked:", option, "Current value:", value);
+            onChange(value === option ? '' : option);
+          }}
         >
           {option}
         </button>

@@ -6,15 +6,17 @@ export const dashboardService = {
     return await api.get('/dashboard/');
   },
 
-  async getSalesTrend(period = 'daily', startDate = null, endDate = null) {
-    const params = { period };
+  async getSalesTrend(period, startDate, endDate) {
+    const params = {};
+    if (period) params.period = period;
     if (startDate) params.start_date = startDate;
     if (endDate) params.end_date = endDate;
     return await api.get('/dashboard/sales-trend/', { params });
   },
 
-  async getProfitTrend(period = 'monthly', startDate = null, endDate = null) {
-    const params = { period };
+  async getProfitTrend(period, startDate, endDate) {
+    const params = {};
+    if (period) params.period = period;
     if (startDate) params.start_date = startDate;
     if (endDate) params.end_date = endDate;
     return await api.get('/dashboard/profit-trend/', { params });
@@ -28,7 +30,7 @@ export const useDashboardStats = () => {
   });
 };
 
-export const useSalesTrend = (period = 'daily', startDate = null, endDate = null) => {
+export const useSalesTrend = (period, startDate, endDate) => {
   return useQuery({
     queryKey: ['salesTrend', period, startDate, endDate],
     queryFn: () => dashboardService.getSalesTrend(period, startDate, endDate),
@@ -36,7 +38,7 @@ export const useSalesTrend = (period = 'daily', startDate = null, endDate = null
   });
 };
 
-export const useProfitTrend = (period = 'monthly', startDate = null, endDate = null) => {
+export const useProfitTrend = (period, startDate, endDate) => {
   return useQuery({
     queryKey: ['profitTrend', period, startDate, endDate],
     queryFn: () => dashboardService.getProfitTrend(period, startDate, endDate),

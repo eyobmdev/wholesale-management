@@ -10,26 +10,33 @@ export default function ProfitTrendTab() {
   const [period, setPeriod] = useState('monthly');
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
-  // Dynamic Date Calculation
-  const today = new Date();
-  const defaultEndDateStr = today.toISOString().split('T')[0];
-  let defaultStartDate = new Date();
-  if (period === 'daily') {
-    defaultStartDate.setDate(today.getDate() - 30);
-  } else if (period === 'monthly') {
-    defaultStartDate.setMonth(today.getMonth() - 12);
-  }
-  const defaultStartDateStr = defaultStartDate.toISOString().split('T')[0];
+  const isDatePickerDisabled = period !== '';
 
-  const startDateStr = customRange.start || defaultStartDateStr;
-  const endDateStr = customRange.end || defaultEndDateStr;
+  // Calculate Dates and Params
+  let fetchPeriod = period;
+  let startDateStr = '';
+  let endDateStr = '';
+
+  if (period !== '') {
+    // Preset Mode
+    const today = new Date();
+    endDateStr = today.toISOString().split('T')[0];
+    let startDate = new Date();
+    if (period === 'daily') startDate.setDate(today.getDate() - 30);
+    if (period === 'monthly') startDate.setMonth(today.getMonth() - 12);
+    startDateStr = startDate.toISOString().split('T')[0];
+  } else {
+    // Custom Mode
+    fetchPeriod = '';
+    startDateStr = customRange.start;
+    endDateStr = customRange.end;
+  }
 
   // Fetch Data
-  const { data: trendData, isLoading, isError } = useProfitTrend(period, startDateStr, endDateStr);
-  const isDataStale = trendData && trendData.period !== period;
+  const { data: trendData, isLoading, isError } = useProfitTrend(fetchPeriod, startDateStr, endDateStr);
+  const isDataStale = trendData && period !== '' && trendData.period !== period;
   const showLoading = isLoading || isDataStale;
 
-  // Formatting helpers
   const formatXAxisLabel = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -38,6 +45,10 @@ export default function ProfitTrendTab() {
     }
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
+
+  const displayStartDate = trendData?.start_date || startDateStr || '...';
+  const displayEndDate = trendData?.end_date || endDateStr || '...';
+  const displayCurrency = trendData?.currency || 'ETB';
 
   // Map Data
   const rawData = trendData?.data || [];
@@ -65,7 +76,7 @@ export default function ProfitTrendTab() {
         <div>
           <h1 className="profit-trend-title">Profit Trend</h1>
           <p className="profit-trend-subtitle">
-            {startDateStr} &rarr; {endDateStr} &middot; ETB
+            {displayStartDate} &rarr; {displayEndDate} &middot; {displayCurrency}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -73,6 +84,7 @@ export default function ProfitTrendTab() {
             startDate={customRange.start} 
             endDate={customRange.end} 
             onChange={setCustomRange} 
+            disabled={isDatePickerDisabled}
           />
           <DashboardToggle 
             options={['daily', 'monthly']} 
