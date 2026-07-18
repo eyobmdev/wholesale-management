@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import OverviewTab from './Tabs/OverviewTab.jsx';
-import SalesTrendTab from './Tabs/SalesTrendTab.jsx';
-import ProfitTrendTab from './Tabs/ProfitTrendTab.jsx';
-import CustomerInsightsTab from './Tabs/CustomerInsightsTab.jsx';
+import OverviewTab from './Tabs/Overview/index.jsx';
+import SalesTrendTab from './Tabs/SalesTrend/index.jsx';
+import ProfitTrendTab from './Tabs/ProfitTrend/index.jsx';
+import CustomerInsightsTab from './Tabs/CustomerInsights/index.jsx';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');

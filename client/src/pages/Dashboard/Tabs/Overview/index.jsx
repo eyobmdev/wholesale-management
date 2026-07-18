@@ -1,14 +1,14 @@
 import React from 'react';
-import { useDashboardStats } from '../../../services/dashboardService.js';
-import { Button } from '../../../components/common/index.js';
+import { useDashboardStats } from '../../../../services/dashboardService.js';
+import { Button } from '../../../../components/common/index.js';
 
-import { DashboardCards, DashboardCardsSkeleton } from '../DashboardCards.jsx';
-import { QuickStatsRow, QuickStatsRowSkeleton } from '../QuickStatsRow.jsx';
-import { SalesTrendChart, SalesTrendChartSkeleton } from '../SalesTrendChart.jsx';
-import { MonthlyComparison, MonthlyComparisonSkeleton } from '../MonthlyComparison.jsx';
-import { OverdueCustomersList, OverdueCustomersSkeleton } from '../OverdueCustomersList.jsx';
-import { RecentTransactionsTable, RecentTransactionsSkeleton } from '../RecentTransactionsTable.jsx';
-import { StockAlertsWidget, StockAlertsSkeleton } from '../StockAlertsWidget.jsx';
+import { DashboardCards, DashboardCardsSkeleton } from './DashboardCards.jsx';
+import { QuickStatsRow, QuickStatsRowSkeleton } from './QuickStatsRow.jsx';
+import { SalesTrendChart, SalesTrendChartSkeleton } from './SalesTrendChart.jsx';
+import { MonthlyComparison, MonthlyComparisonSkeleton } from '../ProfitTrend/MonthlyComparison.jsx';
+import { OverdueCustomersList, OverdueCustomersSkeleton } from '../CustomerInsights/OverdueCustomersList.jsx';
+import { RecentTransactionsTable, RecentTransactionsSkeleton } from './RecentTransactionsTable.jsx';
+import { StockAlertsWidget, StockAlertsSkeleton } from './StockAlertsWidget.jsx';
 
 export default function OverviewTab() {
   const { data: stats, isLoading, isError, refetch } = useDashboardStats();

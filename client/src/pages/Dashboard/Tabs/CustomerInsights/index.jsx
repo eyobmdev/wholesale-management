@@ -1,6 +1,6 @@
 import React from 'react';
-import { OverdueCustomersList } from '../OverdueCustomersList.jsx';
-import { useDashboardStats } from '../../../services/dashboardService.js';
+import { OverdueCustomersList } from './OverdueCustomersList.jsx';
+import { useDashboardStats } from '../../../../services/dashboardService.js';
 
 export default function CustomerInsightsTab() {
   const { data: stats } = useDashboardStats();

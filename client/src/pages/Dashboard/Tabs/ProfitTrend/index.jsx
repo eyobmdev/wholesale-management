@@ -1,6 +1,6 @@
 import React from 'react';
-import { MonthlyComparison } from '../MonthlyComparison.jsx';
-import { useDashboardStats } from '../../../services/dashboardService.js';
+import { MonthlyComparison } from './MonthlyComparison.jsx';
+import { useDashboardStats } from '../../../../services/dashboardService.js';
 
 export default function ProfitTrendTab() {
   const { data: stats } = useDashboardStats();
