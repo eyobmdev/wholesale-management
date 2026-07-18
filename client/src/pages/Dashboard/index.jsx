@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import OverviewTab from './Tabs/OverviewTab.jsx';
-import FinancialAnalyticsTab from './Tabs/FinancialAnalyticsTab.jsx';
+import SalesTrendTab from './Tabs/SalesTrendTab.jsx';
+import ProfitTrendTab from './Tabs/ProfitTrendTab.jsx';
 import CustomerInsightsTab from './Tabs/CustomerInsightsTab.jsx';
 
 export default function Dashboard() {
@@ -8,7 +9,8 @@ export default function Dashboard() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'ri-dashboard-line' },
-    { id: 'financials', label: 'Financial Analytics', icon: 'ri-bar-chart-box-line' },
+    { id: 'sales-trend', label: 'Sales Trend', icon: 'ri-line-chart-line' },
+    { id: 'profit-trend', label: 'Profit Trend', icon: 'ri-bar-chart-box-line' },
     { id: 'customers', label: 'Customer Insights', icon: 'ri-team-line' },
   ];
 
@@ -76,7 +78,8 @@ export default function Dashboard() {
 
       <div>
         {activeTab === 'overview' && <OverviewTab />}
-        {activeTab === 'financials' && <FinancialAnalyticsTab />}
+        {activeTab === 'sales-trend' && <SalesTrendTab />}
+        {activeTab === 'profit-trend' && <ProfitTrendTab />}
         {activeTab === 'customers' && <CustomerInsightsTab />}
       </div>
     </div>
