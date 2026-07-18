@@ -63,7 +63,7 @@ export default function Dashboard() {
               border: 'none',
               backgroundColor: activeTab === tab.id ? 'var(--sidebar-active-bg)' : 'transparent',
               color: activeTab === tab.id ? 'var(--sidebar-active)' : 'var(--text-muted)',
-              fontWeight: activeTab === tab.id ? 600 : 500,
+              fontWeight: 500,
               fontSize: '0.875rem',
               cursor: 'pointer',
               transition: 'all 0.2s ease',

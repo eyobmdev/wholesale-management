@@ -412,6 +412,7 @@ body.dark-theme .stat-text-purple { color: #c084fc; }
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 /* Content Styling for preview */
