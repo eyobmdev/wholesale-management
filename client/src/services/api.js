@@ -30,7 +30,7 @@ api.interceptors.response.use(
     // Check if the error is 401 and we haven't already tried to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) {
@@ -41,7 +41,7 @@ api.interceptors.response.use(
         const res = await axios.post(`${api.defaults.baseURL}/auth/refresh/`, {
           refresh: refreshToken
         });
-        
+
         // If successful, save the new token
         if (res.data.access) {
           localStorage.setItem('access_token', res.data.access);
@@ -59,12 +59,12 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     // For all other errors, reject with the response data (the JSON from django)
     if (error.response) {
       return Promise.reject(error.response.data);
     }
-    
+
     // Network errors or timeout
     return Promise.reject(error);
   }
