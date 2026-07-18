@@ -24,6 +24,28 @@ export const formatPercent = (val) => {
   return `${prefix}${Number(val).toFixed(1)}%`;
 };
 
+export const getHumanReadableDuration = (startDateStr, endDateStr) => {
+  if (!startDateStr || !endDateStr) return '';
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
+  const diffTime = Math.abs(end - start);
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays >= 365) {
+    const years = Math.round(diffDays / 365);
+    return `${years} year${years > 1 ? 's' : ''}`;
+  }
+  if (diffDays >= 28) {
+    const months = Math.round(diffDays / 30);
+    return `${months} month${months > 1 ? 's' : ''}`;
+  }
+  if (diffDays >= 7) {
+    const weeks = Math.round(diffDays / 7);
+    return `${weeks} week${weeks > 1 ? 's' : ''}`;
+  }
+  return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+};
+
 export const formatDate = (dateString) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString();

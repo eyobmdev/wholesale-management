@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProfitTrend } from '../../../../services/dashboardService.js';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '../../../../utils/formatters.js';
+import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { DashboardToggle } from '../../components/DashboardToggle.jsx';
 import { DashboardDatePicker } from '../../components/DashboardDatePicker.jsx';
 import './ProfitTrendTab.css';
@@ -76,7 +76,7 @@ export default function ProfitTrendTab() {
         <div>
           <h1 className="profit-trend-title">Profit Trend</h1>
           <p className="profit-trend-subtitle">
-            {displayStartDate} &rarr; {displayEndDate} &middot; {displayCurrency}
+            {getHumanReadableDuration(displayStartDate, displayEndDate)} data &middot; {displayCurrency}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>

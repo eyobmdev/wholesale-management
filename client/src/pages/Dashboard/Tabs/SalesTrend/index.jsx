@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '../../../../utils/formatters.js';
+import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { DashboardToggle } from '../../components/DashboardToggle.jsx';
 import { DashboardDatePicker } from '../../components/DashboardDatePicker.jsx';
 import './SalesTrendTab.css';
@@ -83,7 +83,7 @@ export default function SalesTrendTab() {
         <div>
           <h1 className="sales-trend-title">Sales Trend</h1>
           <p className="sales-trend-subtitle">
-            {displayStartDate} &rarr; {displayEndDate} &middot; {displayCurrency}
+            {getHumanReadableDuration(displayStartDate, displayEndDate)} data &middot; {displayCurrency}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
