@@ -20,6 +20,10 @@ export const dashboardService = {
     if (startDate) params.start_date = startDate;
     if (endDate) params.end_date = endDate;
     return await api.get('/dashboard/profit-trend/', { params });
+  },
+
+  async getOverdueCustomers() {
+    return await api.get('/dashboard/overdue-customers/');
   }
 };
 
@@ -43,5 +47,13 @@ export const useProfitTrend = (period, startDate, endDate) => {
     queryKey: ['profitTrend', period, startDate, endDate],
     queryFn: () => dashboardService.getProfitTrend(period, startDate, endDate),
     refetchInterval: 30000,
+  });
+};
+
+export const useOverdueCustomers = () => {
+  return useQuery({
+    queryKey: ['overdueCustomers'],
+    queryFn: () => dashboardService.getOverdueCustomers(),
+    refetchInterval: 60000, // Refresh every minute
   });
 };

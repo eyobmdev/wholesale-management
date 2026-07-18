@@ -1,0 +1,266 @@
+.ci-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 100vh;
+}
+
+/* Stat Cards */
+.ci-summary-row {
+  display: flex;
+  gap: 24px;
+}
+
+.ci-summary-card {
+  flex: 1;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--card-border);
+}
+
+.ci-summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.ci-summary-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ci-summary-subvalue {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Middle Layout */
+.ci-middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1000px) {
+  .ci-middle-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ci-panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.ci-panel-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ci-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.ci-panel-content {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Bucket List */
+.ci-bucket-item {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.ci-bucket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px dashed var(--card-border);
+  padding-bottom: 12px;
+}
+
+.ci-bucket-total {
+  text-align: right;
+}
+
+.ci-bucket-total-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.ci-bucket-total-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ci-bucket-customers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ci-bucket-customer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.ci-bucket-customer-name {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.ci-bucket-customer-details {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Donut Chart Legend */
+.ci-donut-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.ci-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.ci-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Customer List Layout */
+.ci-customer-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ci-customer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--card-border);
+  transition: background-color 0.2s ease;
+}
+
+.ci-customer-row:last-child {
+  border-bottom: none;
+}
+
+.ci-customer-row:hover {
+  background-color: var(--hover-bg);
+}
+
+.ci-customer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ci-customer-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ci-customer-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.ci-customer-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ci-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ci-customer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ci-customer-balance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0;
+}
+
+.ci-customer-days {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ci-customer-paid-summary {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ci-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
