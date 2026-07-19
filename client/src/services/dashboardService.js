@@ -35,6 +35,13 @@ export const dashboardService = {
     if (startDate) params.start_date = startDate;
     if (endDate) params.end_date = endDate;
     return await api.get('/dashboard/payment-methods/', { params });
+  },
+
+  async getProductPerformance(startDate, endDate) {
+    const params = {};
+    if (startDate) params.start_date = startDate;
+    if (endDate) params.end_date = endDate;
+    return await api.get('/dashboard/product-performance/', { params });
   }
 };
 
@@ -81,6 +88,14 @@ export const usePaymentMethods = (startDate, endDate) => {
   return useQuery({
     queryKey: ['paymentMethods', startDate, endDate],
     queryFn: () => dashboardService.getPaymentMethods(startDate, endDate),
+    refetchInterval: 60000,
+  });
+};
+
+export const useProductPerformance = (startDate, endDate) => {
+  return useQuery({
+    queryKey: ['productPerformance', startDate, endDate],
+    queryFn: () => dashboardService.getProductPerformance(startDate, endDate),
     refetchInterval: 60000,
   });
 };

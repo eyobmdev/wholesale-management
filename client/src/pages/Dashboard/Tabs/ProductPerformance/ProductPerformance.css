@@ -1,0 +1,296 @@
+.pp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 100vh;
+}
+
+.pp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pp-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.pp-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 4px 0 0 0;
+}
+
+/* Stat Cards */
+.pp-summary-row {
+  display: flex;
+  gap: 24px;
+}
+
+@media (max-width: 1000px) {
+  .pp-summary-row {
+    flex-wrap: wrap;
+  }
+}
+
+.pp-summary-card {
+  flex: 1;
+  min-width: 200px;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--card-border);
+}
+
+.pp-summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.pp-summary-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Stat Cards Specific Colors */
+.stat-bg-primary { background-color: rgba(99, 102, 241, 0.08); }
+.stat-text-primary { color: #6366f1; }
+
+.stat-bg-success { background-color: rgba(16, 185, 129, 0.08); }
+.stat-text-success { color: #10b981; }
+
+.stat-bg-warning { background-color: rgba(245, 158, 11, 0.08); }
+.stat-text-warning { color: #f59e0b; }
+
+.stat-bg-danger { background-color: rgba(239, 68, 68, 0.08); }
+.stat-text-danger { color: #ef4444; }
+
+/* Panel Common */
+.pp-panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pp-panel-header {
+  margin-bottom: 20px;
+}
+
+.pp-panel-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: var(--text-color);
+}
+
+.pp-panel-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pp-panel-content {
+  flex: 1;
+}
+
+/* Product Cards Grid */
+.pp-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.pp-product-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+
+.pp-product-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.pp-pc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.pp-pc-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 2px 0;
+  line-height: 1.25;
+}
+
+.pp-pc-code {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pp-pc-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.pp-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: capitalize;
+  border: 1px solid;
+  background-color: transparent;
+}
+
+/* Velocity Badges */
+.badge-velocity-fast { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+.badge-velocity-medium { color: #6366f1; border-color: rgba(99, 102, 241, 0.2); }
+.badge-velocity-slow { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+.badge-velocity-dead { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+
+/* Status Badges */
+.badge-status-healthy { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+.badge-status-low-stock, .badge-status-low_stock { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+.badge-status-sold-out, .badge-status-sold_out { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+.badge-status-overstocked { color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2); }
+
+.pp-pc-progress-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.pp-pc-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.pp-pc-progress-label span:first-child { color: var(--text-muted); }
+.pp-pc-progress-label span:last-child { font-weight: 700; }
+
+.pp-pc-progress-bar {
+  height: 8px;
+  background-color: var(--card-border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.pp-pc-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.pp-pc-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.pp-pc-metric-box {
+  background-color: var(--bg-color);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-pc-metric-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pp-pc-metric-val {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.val-revenue { color: #4f46e5; }
+.val-profit { color: #059669; }
+.val-remaining { color: var(--text-color); }
+.val-margin { color: #7c3aed; }
+
+.pp-pc-footer {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Table */
+.pp-table-wrapper {
+  overflow-x: auto;
+}
+
+.pp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.pp-table th, .pp-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border);
+  vertical-align: middle;
+}
+
+.pp-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.pp-table tbody tr:hover {
+  background-color: var(--hover-bg);
+}
+
+.pp-table-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pp-table-progress-bar {
+  flex: 1;
+  height: 4px;
+  background-color: var(--bg-color);
+  border-radius: 2px;
+  min-width: 60px;
+}
