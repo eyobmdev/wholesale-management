@@ -110,7 +110,7 @@ export default function Settings() {
 
     const toastId = showToast.loading('Saving settings...');
 
-    updateSettingsMutation.mutate(formData, {
+    updateSettingsMutation.mutate({ id: formData.id, data: formData }, {
       onSuccess: () => {
         showToast.success('Settings saved successfully!');
         showToast.dismiss(toastId);
