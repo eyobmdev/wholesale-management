@@ -1508,8 +1508,6 @@ class DashboardViewSet(viewsets.ViewSet):
 
     # PRIVATE COMPUTATION HELPERS
 
-    # ── Overdue buckets ──────────────────────────────────────────
-
     _BUCKET_DEFS = [
         ("7-15 days", 7, 14),
         ("15-30 days", 15, 29),
