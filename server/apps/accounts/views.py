@@ -98,7 +98,6 @@ class LoginViewSet(viewsets.ViewSet):
             cookie_age = None
             print("Default 7 days")
 
-        print("Final Access EXP:", datetime.fromtimestamp(access['exp']))
 
         response = Response({
             "success": True,
