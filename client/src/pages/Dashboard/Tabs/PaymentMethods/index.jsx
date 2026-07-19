@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePaymentMethods } from '../../../../services/dashboardService.js';
 import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
-import { formatCurrency } from '../../../../utils/formatters.js';
+import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie } from 'recharts';
 import './PaymentMethods.css';
 
@@ -115,6 +115,9 @@ export default function PaymentMethodsTab() {
 
   const { data, isLoading, isError } = usePaymentMethods(startDateStr, endDateStr);
 
+  const displayStartDate = data?.start_date || startDateStr || '...';
+  const displayEndDate = data?.end_date || endDateStr || '...';
+
   if (isLoading) {
     return (
       <div className="pm-page">
@@ -187,9 +190,14 @@ export default function PaymentMethodsTab() {
         
         <DashboardDateSelector 
           period={period}
-          setPeriod={setPeriod}
-          customRange={customRange}
-          setCustomRange={setCustomRange}
+          startDate={customRange.start}
+          endDate={customRange.end}
+          displayDuration={getHumanReadableDuration(displayStartDate, displayEndDate)}
+          onChange={(val) => {
+            setPeriod(val.period);
+            setCustomRange({ start: val.start, end: val.end });
+          }}
+          options={['daily', 'monthly']}
         />
       </div>
 
