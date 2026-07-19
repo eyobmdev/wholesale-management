@@ -66,17 +66,37 @@
 }
 
 /* Stat Cards Specific Colors */
-.stat-bg-primary { background-color: rgba(99, 102, 241, 0.08); }
-.stat-text-primary { color: #6366f1; }
+.stat-bg-primary {
+  background-color: rgba(99, 102, 241, 0.08);
+}
 
-.stat-bg-success { background-color: rgba(16, 185, 129, 0.08); }
-.stat-text-success { color: #10b981; }
+.stat-text-primary {
+  color: #6366f1;
+}
 
-.stat-bg-warning { background-color: rgba(245, 158, 11, 0.08); }
-.stat-text-warning { color: #f59e0b; }
+.stat-bg-success {
+  background-color: rgba(16, 185, 129, 0.08);
+}
 
-.stat-bg-danger { background-color: rgba(239, 68, 68, 0.08); }
-.stat-text-danger { color: #ef4444; }
+.stat-text-success {
+  color: #10b981;
+}
+
+.stat-bg-warning {
+  background-color: rgba(245, 158, 11, 0.08);
+}
+
+.stat-text-warning {
+  color: #f59e0b;
+}
+
+.stat-bg-danger {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.stat-text-danger {
+  color: #ef4444;
+}
 
 /* Panel Common */
 .pp-panel {
@@ -171,16 +191,48 @@
 }
 
 /* Velocity Badges */
-.badge-velocity-fast { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
-.badge-velocity-medium { color: #6366f1; border-color: rgba(99, 102, 241, 0.2); }
-.badge-velocity-slow { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
-.badge-velocity-dead { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+.badge-velocity-fast {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.badge-velocity-medium {
+  color: #6366f1;
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.badge-velocity-slow {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.badge-velocity-dead {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
 
 /* Status Badges */
-.badge-status-healthy { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
-.badge-status-low-stock, .badge-status-low_stock { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
-.badge-status-sold-out, .badge-status-sold_out { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
-.badge-status-overstocked { color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2); }
+.badge-status-healthy {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.badge-status-low-stock,
+.badge-status-low_stock {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.badge-status-sold-out,
+.badge-status-sold_out {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.badge-status-overstocked {
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.2);
+}
 
 .pp-pc-progress-container {
   display: flex;
@@ -195,8 +247,13 @@
   margin-bottom: 4px;
 }
 
-.pp-pc-progress-label span:first-child { color: var(--text-muted); }
-.pp-pc-progress-label span:last-child { font-weight: 700; }
+.pp-pc-progress-label span:first-child {
+  color: var(--text-muted);
+}
+
+.pp-pc-progress-label span:last-child {
+  font-weight: 700;
+}
 
 .pp-pc-progress-bar {
   height: 8px;
@@ -217,7 +274,8 @@
 }
 
 .pp-pc-metric-box {
-  background-color: var(--bg-color);
+  background-color: rgba(128, 128, 128, 0.08);
+  border: 1px solid var(--card-border);
   padding: 8px;
   border-radius: 8px;
   display: flex;
@@ -237,10 +295,21 @@
   margin: 0;
 }
 
-.val-revenue { color: #4f46e5; }
-.val-profit { color: #059669; }
-.val-remaining { color: var(--text-color); }
-.val-margin { color: #7c3aed; }
+.val-revenue {
+  color: #818cf8;
+}
+
+.val-profit {
+  color: #34d399;
+}
+
+.val-remaining {
+  color: var(--text-color);
+}
+
+.val-margin {
+  color: #a78bfa;
+}
 
 .pp-pc-footer {
   margin-top: 8px;
@@ -262,7 +331,8 @@
   font-size: 0.875rem;
 }
 
-.pp-table th, .pp-table td {
+.pp-table th,
+.pp-table td {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid var(--card-border);
