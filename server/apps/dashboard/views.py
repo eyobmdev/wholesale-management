@@ -875,7 +875,7 @@ class DashboardViewSet(viewsets.ViewSet):
                 sold_out_count += 1
             elif agg["total_bags"] > 0 and (
                 remaining_bags / agg["total_bags"]
-            ) < threshold:
+            ) <= threshold:
                 status = "low_stock"
                 low_stock_count += 1
             else:
