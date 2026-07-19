@@ -27,6 +27,7 @@ import Login from './pages/Auth/Login.jsx';
 import Signup from './pages/Auth/Signup.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import ResetPassword from './pages/Auth/ResetPassword.jsx';
+import NotFound from './pages/NotFound/index.jsx';
 
 export default function App() {
   return (
@@ -61,12 +62,7 @@ export default function App() {
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/expenses/:id" element={<ExpenseDetails />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={
-            <div style={{padding: '32px', textAlign: 'center'}}>
-              <h2>Page not implemented yet</h2>
-              <p style={{color: 'var(--text-muted)', marginTop: '16px'}}>Select Dashboard or Settings from the sidebar.</p>
-            </div>
-          } />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
     </Routes>
