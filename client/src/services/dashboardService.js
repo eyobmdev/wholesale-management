@@ -24,6 +24,10 @@ export const dashboardService = {
 
   async getOverdueCustomers() {
     return await api.get('/dashboard/overdue-customers/');
+  },
+
+  async getStockOverview() {
+    return await api.get('/dashboard/stock-overview/');
   }
 };
 
@@ -54,6 +58,14 @@ export const useOverdueCustomers = () => {
   return useQuery({
     queryKey: ['overdueCustomers'],
     queryFn: () => dashboardService.getOverdueCustomers(),
+    refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+export const useStockOverview = () => {
+  return useQuery({
+    queryKey: ['stockOverview'],
+    queryFn: () => dashboardService.getStockOverview(),
     refetchInterval: 60000, // Refresh every minute
   });
 };
