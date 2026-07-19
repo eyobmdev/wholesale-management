@@ -1,25 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from './api.js';
-import { mockSettingsData } from './mock/settingsData.js';
-
-// Toggle this to false when the backend is ready
-const USE_MOCK = true;
 
 export const settingsService = {
   async getSettings() {
-    if (USE_MOCK) {
-      return new Promise(resolve => setTimeout(() => resolve(mockSettingsData), 500));
-    }
-    // Real API call
-    return await api.get('/settings');
+    const response = await api.get('/settings/');
+    return response.data;
   },
   
-  async updateSettings(data) {
-    if (USE_MOCK) {
-      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Settings updated successfully', data }), 800));
-    }
-    // Real API call
-    return await api.put('/settings', data);
+  async updateSettings(id, data) {
+    const response = await api.put(`/settings/${id}/`, data);
+    return response.data;
+  },
+
+  async patchSettings(id, data) {
+    const response = await api.patch(`/settings/${id}/`, data);
+    return response.data;
   }
 };
 
@@ -33,8 +28,19 @@ export const useSettings = () => {
 export const useUpdateSettings = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data) => settingsService.updateSettings(data),
-    onSuccess: (response) => {
+    mutationFn: ({ id, data }) => settingsService.updateSettings(id, data),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+    },
+  });
+};
+
+export const usePatchSettings = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => settingsService.patchSettings(id, data),
+    onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['settings'] });
     },
