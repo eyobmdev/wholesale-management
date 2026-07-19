@@ -1,0 +1,131 @@
+.pm-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 100vh;
+}
+
+.pm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pm-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.pm-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 4px 0 0 0;
+}
+
+/* Panel Common */
+.pm-panel {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.pm-panel-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.pm-panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.pm-panel-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 4px 0 0 0;
+}
+
+.pm-panel-content {
+  padding: 24px;
+  flex: 1;
+}
+
+/* Top Section */
+.pm-top-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bottom Section */
+.pm-bottom-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1100px) {
+  .pm-bottom-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .pm-bottom-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Legend for Donut Charts */
+.pm-donut-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pm-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.pm-legend-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.pm-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.pm-legend-right {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  flex: 1;
+}
+
+.pm-legend-amount {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pm-legend-stats {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

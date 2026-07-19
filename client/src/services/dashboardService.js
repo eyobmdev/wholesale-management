@@ -28,6 +28,13 @@ export const dashboardService = {
 
   async getStockOverview() {
     return await api.get('/dashboard/stock-overview/');
+  },
+
+  async getPaymentMethods(startDate, endDate) {
+    const params = {};
+    if (startDate) params.start_date = startDate;
+    if (endDate) params.end_date = endDate;
+    return await api.get('/dashboard/payment-methods/', { params });
   }
 };
 
@@ -67,5 +74,13 @@ export const useStockOverview = () => {
     queryKey: ['stockOverview'],
     queryFn: () => dashboardService.getStockOverview(),
     refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+export const usePaymentMethods = (startDate, endDate) => {
+  return useQuery({
+    queryKey: ['paymentMethods', startDate, endDate],
+    queryFn: () => dashboardService.getPaymentMethods(startDate, endDate),
+    refetchInterval: 60000,
   });
 };
