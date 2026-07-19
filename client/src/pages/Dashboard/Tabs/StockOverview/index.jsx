@@ -84,14 +84,14 @@ export default function StockOverviewTab() {
     );
   }
 
-  const { 
-    total_stock_value = 0, 
-    total_products = 0, 
-    total_batches = 0, 
-    sold_out_count = 0, 
-    low_stock_count = 0, 
-    healthy_stock_count = 0, 
-    products = [] 
+  const {
+    total_stock_value = 0,
+    total_products = 0,
+    total_batches = 0,
+    sold_out_count = 0,
+    low_stock_count = 0,
+    healthy_stock_count = 0,
+    products = []
   } = data || {};
 
   // Donut Chart Data
@@ -146,11 +146,12 @@ export default function StockOverviewTab() {
 
       {/* 2. Middle Row (Donut vs Bar Chart) */}
       <div className="so-middle-row">
-        
+
         {/* Left: Stock Health Distribution (Donut Chart) */}
         <div className="so-panel">
           <div className="so-panel-header">
             <h2 className="so-panel-title">Stock Health Distribution</h2>
+            <p className="so-panel-subtitle" style={{ visibility: 'hidden' }}>Spacer</p>
           </div>
           <div className="so-panel-content" style={{ justifyContent: 'center' }}>
             {pieData.length > 0 ? (
@@ -163,7 +164,7 @@ export default function StockOverviewTab() {
                         cx="50%"
                         cy="50%"
                         innerRadius={80}
-                        outerRadius={120}
+                        outerRadius={140}
                         paddingAngle={5}
                         dataKey="value"
                         stroke="none"
@@ -172,11 +173,11 @@ export default function StockOverviewTab() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <RechartsTooltip content={<CustomDonutTooltip />} cursor={{fill: 'transparent'}} />
+                      <RechartsTooltip content={<CustomDonutTooltip />} cursor={{ fill: 'transparent' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 <div className="so-donut-legend">
                   {pieData.map(entry => (
                     <div key={entry.name} className="so-legend-item">
@@ -213,7 +214,7 @@ export default function StockOverviewTab() {
                       <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--card-border)" />
                       <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
                       <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} width={100} />
-                      <RechartsTooltip content={<CustomBarTooltip />} cursor={{fill: 'var(--hover-bg)'}} />
+                      <RechartsTooltip content={<CustomBarTooltip />} cursor={{ fill: 'var(--hover-bg)' }} />
                       {/* Note: The screenshot uses overlapping/grouped bars. We will use grouped bars here. */}
                       <Bar dataKey="Purchased" fill={BAR_COLORS.purchased} barSize={6} radius={[0, 4, 4, 0]} />
                       <Bar dataKey="Sold" fill={BAR_COLORS.sold} barSize={6} radius={[0, 4, 4, 0]} />
@@ -221,7 +222,7 @@ export default function StockOverviewTab() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 <div className="so-bar-legend">
                   <div className="so-legend-item">
                     <span className="so-legend-dot" style={{ backgroundColor: BAR_COLORS.purchased }}></span>
@@ -238,9 +239,9 @@ export default function StockOverviewTab() {
                 </div>
               </>
             ) : (
-               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
-                 No product data available
-               </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+                No product data available
+              </div>
             )}
           </div>
         </div>
@@ -252,7 +253,7 @@ export default function StockOverviewTab() {
         <div className="so-panel-header">
           <h2 className="so-panel-title">Products Detail</h2>
         </div>
-        
+
         <div className="so-table-wrapper">
           <table className="so-table">
             <thead>
@@ -273,8 +274,8 @@ export default function StockOverviewTab() {
                 </tr>
               ) : (
                 products.map((prod, idx) => {
-                  const soldPercent = prod.total_bags_purchased > 0 
-                    ? Math.round((prod.total_bags_sold / prod.total_bags_purchased) * 100) 
+                  const soldPercent = prod.total_bags_purchased > 0
+                    ? Math.round((prod.total_bags_sold / prod.total_bags_purchased) * 100)
                     : 0;
 
                   return (
