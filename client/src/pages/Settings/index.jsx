@@ -41,7 +41,12 @@ export default function Settings() {
   // Initialize form data when query completes
   useEffect(() => {
     if (initialSettings) {
-      setFormData(initialSettings);
+      setFormData({
+        ...initialSettings,
+        business_name: initialSettings.business_name || '',
+        business_phone: initialSettings.business_phone || '',
+        business_address: initialSettings.business_address || '',
+      });
     }
   }, [initialSettings]);
 
@@ -137,14 +142,33 @@ export default function Settings() {
 
     const toastId = showToast.loading('Updating password...');
 
-    updatePasswordMutation.mutate(passwordData, {
+    const payload = {
+      old_password: passwordData.current_password,
+      new_password: passwordData.new_password,
+      confirm_password: passwordData.confirm_password
+    };
+
+    updatePasswordMutation.mutate(payload, {
       onSuccess: () => {
         showToast.success('Success', 'Password changed successfully!');
         setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
         showToast.dismiss(toastId);
       },
-      onError: () => {
-        showToast.error('Error', 'Failed to change password. Please try again.');
+      onError: (err) => {
+        // Extract the main message or specific field errors from the backend response
+        let errorMsg = 'Failed to change password. Please try again.';
+        
+        if (err && err.message) {
+          errorMsg = err.message;
+        }
+        
+        if (err && err.errors && Object.keys(err.errors).length > 0) {
+          // If there's a specific field error, like old_password, use that to be more descriptive
+          const firstErrorKey = Object.keys(err.errors)[0];
+          errorMsg = `${firstErrorKey.replace('_', ' ')}: ${err.errors[firstErrorKey]}`;
+        }
+
+        showToast.error('Error', errorMsg);
         showToast.dismiss(toastId);
       }
     });

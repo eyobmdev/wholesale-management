@@ -4,17 +4,23 @@ import api from './api.js';
 export const settingsService = {
   async getSettings() {
     const response = await api.get('/settings/');
-    return response.data;
+    // If the backend returns an array (e.g., list of settings), grab the first one
+    if (Array.isArray(response)) {
+      return response[0];
+    }
+    // If it's paginated
+    if (response && response.results && Array.isArray(response.results)) {
+      return response.results[0];
+    }
+    return response;
   },
   
   async updateSettings(id, data) {
-    const response = await api.put(`/settings/${id}/`, data);
-    return response.data;
+    return await api.put(`/settings/${id}/`, data);
   },
 
   async patchSettings(id, data) {
-    const response = await api.patch(`/settings/${id}/`, data);
-    return response.data;
+    return await api.patch(`/settings/${id}/`, data);
   }
 };
 
