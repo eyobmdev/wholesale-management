@@ -3,7 +3,42 @@ import { useProfitTrend } from '../../../../services/dashboardService.js';
 import { ComposedChart, AreaChart, Area, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
+import Skeleton from 'react-loading-skeleton';
 import './ProfitTrendTab.css';
+
+export function ProfitTrendSkeleton() {
+  return (
+    <>
+      <div className="profit-trend-cards">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="pt-card">
+            <Skeleton height={14} width={100} style={{ marginBottom: 16 }} />
+            <Skeleton height={36} width={150} />
+          </div>
+        ))}
+      </div>
+      <div className="pt-section">
+        <Skeleton height={24} width={300} style={{ marginBottom: 8 }} />
+        <Skeleton height={16} width={200} style={{ marginBottom: 24 }} />
+        <Skeleton height={400} borderRadius={16} />
+      </div>
+      <div className="pt-section">
+        <Skeleton height={24} width={250} style={{ marginBottom: 8 }} />
+        <Skeleton height={16} width={150} style={{ marginBottom: 24 }} />
+        <Skeleton height={300} borderRadius={16} />
+      </div>
+      <div className="pt-section">
+        <Skeleton height={24} width={200} style={{ marginBottom: 24 }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          {[1, 2, 3, 4, 5].map(i => (
+            <Skeleton key={i} height={20} width={80} />
+          ))}
+        </div>
+        <Skeleton count={5} height={40} style={{ marginBottom: 12 }} />
+      </div>
+    </>
+  );
+}
 
 export default function ProfitTrendTab() {
   const [period, setPeriod] = useState('monthly');
@@ -49,7 +84,7 @@ export default function ProfitTrendTab() {
 
   // Map Data
   const rawData = trendData?.data || [];
-  
+
   const chartData = rawData.map(d => ({
     name: formatXAxisLabel(d.date),
     originalDate: d.date,
@@ -73,7 +108,7 @@ export default function ProfitTrendTab() {
         <div>
           <h1 className="profit-trend-title">Profit Trend</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-            <DashboardDateSelector 
+            <DashboardDateSelector
               period={period}
               startDate={customRange.start}
               endDate={customRange.end}
@@ -90,9 +125,7 @@ export default function ProfitTrendTab() {
       </div>
 
       {showLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <ProfitTrendSkeleton />
       ) : isError ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px', color: '#ef4444' }}>
           <p>Failed to load profit trend data.</p>
@@ -119,33 +152,33 @@ export default function ProfitTrendTab() {
           <div className="pt-section">
             <h2 className="pt-section-title">Gross Profit vs Expenses vs Net Profit</h2>
             <p className="pt-section-subtitle">ETB in thousands</p>
-            
+
             <div style={{ height: '400px', width: '100%' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--card-border)" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} dy={10} />
-                  
+
                   {/* Left Y-Axis for Currency */}
-                  <YAxis 
-                    yAxisId="left" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fontSize: 12, fill: 'var(--text-muted)' }} 
-                    tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} 
-                  />
-                  
-                  {/* Right Y-Axis for Percentage */}
-                  <YAxis 
-                    yAxisId="right" 
-                    orientation="right" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fontSize: 12, fill: 'var(--text-muted)' }} 
-                    tickFormatter={(v) => `${v.toFixed(0)}%`} 
+                  <YAxis
+                    yAxisId="left"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: 'var(--text-muted)' }}
+                    tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
                   />
 
-                  <Tooltip 
+                  {/* Right Y-Axis for Percentage */}
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: 'var(--text-muted)' }}
+                    tickFormatter={(v) => `${v.toFixed(0)}%`}
+                  />
+
+                  <Tooltip
                     cursor={{ fill: 'var(--hover-bg)' }}
                     contentStyle={{ borderRadius: "10px", border: "1px solid var(--card-border)", fontSize: 12, backgroundColor: 'var(--card-bg)' }}
                     formatter={(val, name) => {
@@ -154,11 +187,11 @@ export default function ProfitTrendTab() {
                     }}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: 12, paddingTop: '20px' }} />
-                  
+
                   {/* Bars plotted to left axis */}
                   <Bar yAxisId="left" dataKey="GrossProfit" name="Gross Profit" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} />
                   <Bar yAxisId="left" dataKey="Expenses" name="Expenses" fill="#fb7185" radius={[4, 4, 0, 0]} barSize={40} />
-                  
+
                   {/* Lines plotted to left and right axes respectively */}
                   <Line yAxisId="left" type="monotone" dataKey="NetProfit" name="Net Profit" stroke="#6366f1" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 7 }} />
                   <Line yAxisId="right" type="monotone" dataKey="Margin" name="Margin %" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" dot={false} />
@@ -171,20 +204,20 @@ export default function ProfitTrendTab() {
           <div className="pt-section">
             <h2 className="pt-section-title">Net Profit Margin %</h2>
             <p className="pt-section-subtitle">Percentage of revenue</p>
-            
+
             <div style={{ height: '300px', width: '100%' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorMargin" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--card-border)" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} dy={10} />
                   <YAxis tick={{ fontSize: 12, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v.toFixed(0)}%`} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: "10px", border: "1px solid var(--card-border)", fontSize: 12, backgroundColor: 'var(--card-bg)' }}
                     formatter={(val) => [`${val.toFixed(1)}%`, "Margin"]}
                   />
@@ -215,7 +248,7 @@ export default function ProfitTrendTab() {
                     let badgeClass = 'pt-badge-green';
                     if (row.Margin < 20) badgeClass = 'pt-badge-yellow';
                     if (row.Margin < 10) badgeClass = 'pt-badge-red';
-                    
+
                     return (
                       <tr key={i}>
                         <td style={{ color: 'var(--text-color)' }}>{row.name}</td>
