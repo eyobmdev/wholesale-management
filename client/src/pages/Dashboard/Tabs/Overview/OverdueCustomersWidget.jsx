@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { formatCurrency } from '../../../../utils/formatters.js';
 
 const getTailwindBucketColor = (label) => {
@@ -23,7 +24,7 @@ export function OverdueCustomersList({ data = [] }) {
         <i className="ri-error-warning-line" style={{ color: '#ef4444', fontSize: '1rem' }}></i>
         <h2 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-color)' }}>Overdue Customers</h2>
       </div>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {data.length === 0 ? (
           <div style={{ padding: '16px', textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>
@@ -75,10 +76,8 @@ export function OverdueCustomersSkeleton() {
       flexDirection: 'column',
       gap: '12px'
     }}>
-      <div className="skeleton" style={{ width: '40%', height: '24px', borderRadius: '4px' }}></div>
-      <div className="skeleton" style={{ width: '100%', height: '20px', borderRadius: '4px' }}></div>
-      <div className="skeleton" style={{ width: '100%', height: '20px', borderRadius: '4px' }}></div>
-      <div className="skeleton" style={{ width: '100%', height: '20px', borderRadius: '4px' }}></div>
+      <Skeleton width="40%" height={24} style={{ marginBottom: 8 }} />
+      <Skeleton count={3} height={20} style={{ marginBottom: 4 }} />
     </div>
   );
 }

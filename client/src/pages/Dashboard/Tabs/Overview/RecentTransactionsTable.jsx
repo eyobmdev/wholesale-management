@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { formatCurrency, formatDate, getTransactionTypeLabel } from '../../../../utils/formatters.js';
 
 const getTailwindColor = (type) => {
@@ -103,18 +104,18 @@ export function RecentTransactionsSkeleton() {
       height: '100%'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <div className="skeleton" style={{ height: '20px', width: '150px' }}></div>
-        <div className="skeleton" style={{ height: '16px', width: '16px', borderRadius: '50%' }}></div>
+        <Skeleton height={20} width={150} />
+        <Skeleton height={16} width={16} circle={true} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {[1, 2, 3, 4, 5].map(i => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f8fafc', paddingBottom: '8px' }}>
-            <div className="skeleton" style={{ height: '20px', width: '80px', borderRadius: '6px' }}></div>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--card-border)', paddingBottom: '8px' }}>
+            <Skeleton height={20} width={80} borderRadius={6} />
             <div style={{ flex: 1 }}>
-              <div className="skeleton" style={{ height: '14px', width: '60%', marginBottom: '4px' }}></div>
-              <div className="skeleton" style={{ height: '12px', width: '40%' }}></div>
+              <Skeleton height={14} width="60%" style={{ marginBottom: '4px' }} />
+              <Skeleton height={12} width="40%" />
             </div>
-            <div className="skeleton" style={{ height: '20px', width: '70px' }}></div>
+            <Skeleton height={20} width={70} />
           </div>
         ))}
       </div>

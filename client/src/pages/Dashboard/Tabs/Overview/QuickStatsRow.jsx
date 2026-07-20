@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 export function QuickStatsRow({ data }) {
   if (!data || !data.monthly_comparison) return null;
@@ -65,10 +66,37 @@ export function QuickStatsRow({ data }) {
 
 export function QuickStatsRowSkeleton() {
   return (
-    <div className="quick-stats-grid">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="skeleton" style={{ height: '90px', borderRadius: '12px' }}></div>
-      ))}
-    </div>
+    <>
+      <style>{`
+        .quick-stats-grid-skeleton {
+          display: grid;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+        @media (min-width: 640px) {
+          .quick-stats-grid-skeleton {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (min-width: 768px) {
+          .quick-stats-grid-skeleton {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+        }
+        @media (min-width: 1024px) {
+          .quick-stats-grid-skeleton {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+          }
+        }
+      `}</style>
+      <div className="quick-stats-grid-skeleton">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} style={{ height: '90px' }}>
+            <Skeleton height="100%" borderRadius={12} />
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

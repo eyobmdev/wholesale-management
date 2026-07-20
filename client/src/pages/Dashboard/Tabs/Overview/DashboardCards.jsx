@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { SummaryCard } from '../../../../components/common/index.js';
 
 const cardIcons = [
@@ -69,10 +70,37 @@ export function DashboardCards({ cards = [] }) {
 
 export function DashboardCardsSkeleton() {
   return (
-    <div className="summary-cards-grid">
-      {[1, 2, 3, 4, 5, 6].map(i => (
-        <div key={i} className="skeleton" style={{ height: '140px', borderRadius: '16px' }}></div>
-      ))}
-    </div>
+    <>
+      <style>{`
+        .summary-cards-grid-skeleton {
+          display: grid;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+        @media (min-width: 640px) {
+          .summary-cards-grid-skeleton {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (min-width: 768px) {
+          .summary-cards-grid-skeleton {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+        }
+        @media (min-width: 1024px) {
+          .summary-cards-grid-skeleton {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+          }
+        }
+      `}</style>
+      <div className="summary-cards-grid-skeleton">
+        {[1, 2, 3, 4, 5, 6].map(i => (
+          <div key={i} style={{ height: '140px' }}>
+            <Skeleton height="100%" borderRadius={16} />
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

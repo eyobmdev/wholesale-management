@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import Skeleton from 'react-loading-skeleton';
 import { formatMonthLabel } from '../../../../utils/formatters.js';
 
 export function SalesTrendChart() {
@@ -140,12 +141,12 @@ export function SalesTrendChartSkeleton() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
         <div>
-          <div className="skeleton" style={{ height: '20px', width: '150px', marginBottom: '8px' }}></div>
-          <div className="skeleton" style={{ height: '14px', width: '200px' }}></div>
+          <Skeleton height={20} width={150} style={{ marginBottom: 8 }} />
+          <Skeleton height={14} width={200} />
         </div>
-        <div className="skeleton" style={{ height: '28px', width: '140px', borderRadius: '8px' }}></div>
+        <Skeleton height={28} width={140} borderRadius={8} />
       </div>
-      <div className="skeleton" style={{ height: '220px', width: '100%', borderRadius: '8px' }}></div>
+      <Skeleton height={220} width="100%" borderRadius={8} />
     </div>
   );
 }
