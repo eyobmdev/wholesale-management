@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { useProductPerformance } from '../../../../services/dashboardService.js';
 import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
@@ -20,6 +21,39 @@ const formatCompact = (value) => {
   if (value >= 1000) return (value / 1000).toFixed(1) + 'K ETB';
   return value.toLocaleString() + ' ETB';
 };
+
+export function ProductPerformanceSkeleton() {
+  return (
+    <>
+      <div className="pp-summary-row">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="pp-summary-card">
+            <Skeleton height={14} width={100} style={{ marginBottom: 16 }} />
+            <Skeleton height={36} width={150} style={{ marginBottom: 8 }} />
+            <Skeleton height={12} width={120} />
+          </div>
+        ))}
+      </div>
+      <div className="pp-panel">
+        <Skeleton height={28} width={250} style={{ marginBottom: 8 }} />
+        <Skeleton height={16} width={350} style={{ marginBottom: 24 }} />
+        <Skeleton height={300} borderRadius={16} />
+      </div>
+      <div className="pp-cards-grid">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="pp-product-card">
+            <Skeleton height={20} width={180} style={{ marginBottom: 16 }} />
+            <Skeleton count={4} height={16} style={{ marginBottom: 8 }} />
+          </div>
+        ))}
+      </div>
+      <div className="pp-panel">
+        <Skeleton height={24} width={200} style={{ marginBottom: 24 }} />
+        <Skeleton count={5} height={40} style={{ marginBottom: 12 }} />
+      </div>
+    </>
+  );
+}
 
 const CustomBarTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -64,9 +98,7 @@ export default function ProductPerformanceTab() {
   if (isLoading) {
     return (
       <div className="pp-page">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <ProductPerformanceSkeleton />
       </div>
     );
   }
