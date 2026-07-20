@@ -155,8 +155,6 @@ def _period_expr(field_name: str, period: str):
     raise ValidationError("period must be daily, weekly, or monthly.")
 
 class DashboardViewSet(viewsets.ViewSet):
-    """READ-ONLY Dashboard API — no mutations allowed."""
-
     # MAIN DASHBOARD  GET /api/dashboard/
 
     def list(self, request):
@@ -244,7 +242,6 @@ class DashboardViewSet(viewsets.ViewSet):
         serializer = MainDashboardSerializer(data)
         return Response(serializer.data)
 
-    # ── Private helpers used by list() ───────────────────────────
 
     def _get_period_aggregates(self, start, end, currency: str) -> dict:
         """Sales, gross profit and expenses for a date range."""
@@ -593,7 +590,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(ProfitTrendSerializer(result).data)
 
-    # TOP PRODUCTS  GET /api/dashboard/top-products/
 
     @action(detail=False, methods=["get"], url_path="top-products")
     def top_products(self, request):
@@ -693,7 +689,6 @@ class DashboardViewSet(viewsets.ViewSet):
         result = {"period_label": period_label, "by": by, "products": products}
         return Response(TopProductsSerializer(result).data)
 
-    # TOP CUSTOMERS  GET /api/dashboard/top-customers/
 
     @action(detail=False, methods=["get"], url_path="top-customers")
     def top_customers(self, request):
@@ -813,7 +808,6 @@ class DashboardViewSet(viewsets.ViewSet):
         result = {"period_label": period_label, "by": by, "customers": customer_list}
         return Response(TopCustomersSerializer(result).data)
 
-    # OVERDUE CUSTOMERS  GET /api/dashboard/overdue-customers/
 
     @action(detail=False, methods=["get"], url_path="overdue-customers")
     def overdue_customers(self, request):
@@ -912,7 +906,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(StockOverviewSerializer(result).data)
 
-    # PAYMENT METHODS  GET /api/dashboard/payment-methods/
 
     @action(detail=False, methods=["get"], url_path="payment-methods")
     def payment_methods(self, request):
@@ -959,7 +952,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(PaymentMethodDistributionSerializer(result).data)
 
-    # EXPENSES BREAKDOWN  GET /api/dashboard/expenses-breakdown/
 
     @action(detail=False, methods=["get"], url_path="expenses-breakdown")
     def expenses_breakdown(self, request):
@@ -1029,7 +1021,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(ExpenseBreakdownSerializer(result).data)
 
-    # FACTORY BALANCES  GET /api/dashboard/factory-balances/
 
     @action(detail=False, methods=["get"], url_path="factory-balances")
     def factory_balances(self, request):
@@ -1101,7 +1092,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(FactoryBalancesSerializer(result).data)
 
-    # CUSTOMER BALANCES  GET /api/dashboard/customer-balances/
 
     @action(detail=False, methods=["get"], url_path="customer-balances")
     def customer_balances(self, request):
@@ -1174,7 +1164,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(CustomerBalancesSerializer(result).data)
 
-    # REVENUE VS EXPENSES  GET /api/dashboard/revenue-vs-expenses/
 
     @action(detail=False, methods=["get"], url_path="revenue-vs-expenses")
     def revenue_vs_expenses(self, request):
@@ -1287,7 +1276,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(RevenueVsExpensesSerializer(result).data)
 
-    # INVENTORY AGING  GET /api/dashboard/inventory-aging/
 
     @action(detail=False, methods=["get"], url_path="inventory-aging")
     def inventory_aging(self, request):
@@ -1362,7 +1350,6 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(InventoryAgingSerializer(result).data)
 
-    # PRODUCT PERFORMANCE  GET /api/dashboard/product-performance/
 
     @action(detail=False, methods=["get"], url_path="product-performance")
     def product_performance(self, request):
@@ -1531,6 +1518,7 @@ class DashboardViewSet(viewsets.ViewSet):
             return (today - first_sale.date).days
         return None
 
+
     def _compute_overdue_buckets(self) -> list:
         """
         Group customers with positive balances into overdue time buckets.
@@ -1575,6 +1563,7 @@ class DashboardViewSet(viewsets.ViewSet):
 
         return list(buckets.values())
 
+
     def _compute_overdue_flat(self) -> list:
         today = datetime.date.today()
         customers = Customer.objects.filter(is_active=True).prefetch_related(
@@ -1617,7 +1606,6 @@ class DashboardViewSet(viewsets.ViewSet):
         overdue.sort(key=lambda x: x["days_since_last_payment"] or 0, reverse=True)
         return overdue
 
-    # ── Recent transactions ──────────────────────────────────────
 
     def _compute_recent_transactions(self, limit: int = 10) -> list:
         """
@@ -1696,7 +1684,6 @@ class DashboardViewSet(viewsets.ViewSet):
         transactions.sort(key=lambda x: x["date"], reverse=True)
         return transactions[:limit]
 
-    # ── Stock alerts ─────────────────────────────────────────────
 
     def _compute_stock_alerts(self) -> list:
         """
