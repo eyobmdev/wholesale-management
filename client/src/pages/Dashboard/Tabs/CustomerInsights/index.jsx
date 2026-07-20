@@ -2,7 +2,65 @@ import React from 'react';
 import { useOverdueCustomers } from '../../../../services/dashboardService.js';
 import { formatCurrency, formatDate } from '../../../../utils/formatters.js';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import Skeleton from 'react-loading-skeleton';
 import './CustomerInsights.css';
+
+export function CustomerInsightsSkeleton() {
+  return (
+    <>
+      <div className="ci-summary-row">
+        {[1, 2].map(i => (
+          <div key={i} className="ci-summary-card">
+            <Skeleton height={14} width={100} style={{ marginBottom: 16 }} />
+            <Skeleton height={36} width={150} />
+          </div>
+        ))}
+      </div>
+      <div className="ci-middle-row">
+        <div className="ci-panel" style={{ flex: 1, minWidth: '300px' }}>
+          <div className="ci-panel-header">
+            <Skeleton height={24} width={200} />
+          </div>
+          <div className="ci-panel-content">
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{ marginBottom: 16 }}>
+                <Skeleton height={20} width="100%" style={{ marginBottom: 8 }} />
+                <Skeleton height={14} width="80%" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="ci-panel" style={{ flex: 1, minWidth: '300px' }}>
+          <div className="ci-panel-header">
+            <Skeleton height={24} width={200} />
+          </div>
+          <div className="ci-panel-content">
+            <Skeleton height={250} borderRadius={16} />
+          </div>
+        </div>
+      </div>
+      <div className="ci-panel">
+        <div className="ci-panel-header">
+          <Skeleton height={24} width={250} />
+        </div>
+        <div className="ci-panel-content">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--card-border)' }}>
+              <div style={{ flex: 1 }}>
+                <Skeleton height={20} width={200} style={{ marginBottom: 8 }} />
+                <Skeleton height={16} width={300} />
+              </div>
+              <div style={{ width: 150, textAlign: 'right' }}>
+                <Skeleton height={24} width="100%" style={{ marginBottom: 8 }} />
+                <Skeleton height={16} width="80%" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
 
 // Colors for the donut chart and badges (using our B&W consistent theme colors)
 const getBucketColors = (label) => {
@@ -42,9 +100,7 @@ export default function CustomerInsightsTab() {
   if (isLoading) {
     return (
       <div className="ci-page">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <CustomerInsightsSkeleton />
       </div>
     );
   }
@@ -84,7 +140,7 @@ export default function CustomerInsightsTab() {
 
       {/* 2. Middle Row (Buckets vs Donut) */}
       <div className="ci-middle-row">
-        
+
         {/* Left: Overdue Buckets List */}
         <div className="ci-panel">
           <div className="ci-panel-header">
@@ -102,7 +158,7 @@ export default function CustomerInsightsTab() {
                       <p className="ci-bucket-total-count">{bucket.count} customers</p>
                     </div>
                   </div>
-                  
+
                   {bucket.customers && bucket.customers.length > 0 && (
                     <div className="ci-bucket-customers">
                       {bucket.customers.slice(0, 2).map(c => (
@@ -148,11 +204,11 @@ export default function CustomerInsightsTab() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip content={<CustomDonutTooltip />} cursor={{fill: 'transparent'}} />
+                      <Tooltip content={<CustomDonutTooltip />} cursor={{ fill: 'transparent' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 {/* Legend */}
                 <div className="ci-donut-legend">
                   {pieData.map(entry => (
@@ -179,15 +235,15 @@ export default function CustomerInsightsTab() {
           <i className="ri-error-warning-line stat-text-danger"></i>
           <h2 className="ci-panel-title">All Overdue Customers (Most Overdue First)</h2>
         </div>
-        
+
         <div className="ci-customer-list">
           {all_overdue.length === 0 ? (
-             <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>No customers are currently overdue.</div>
+            <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>No customers are currently overdue.</div>
           ) : (
             // Clone array before sorting to avoid mutating the prop directly if we were in strict mode
             [...all_overdue].sort((a, b) => b.days_since_last_payment - a.days_since_last_payment).map(cust => {
               const { badgeClass } = getBucketColors(cust.bucket);
-              
+
               return (
                 <div key={cust.id} className="ci-customer-row">
                   <div className="ci-customer-left">
@@ -211,7 +267,7 @@ export default function CustomerInsightsTab() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="ci-customer-right">
                     <h3 className="ci-customer-balance">{formatCurrency(cust.current_balance)}</h3>
                     <p className="ci-customer-days">{cust.days_since_last_payment} days overdue</p>
