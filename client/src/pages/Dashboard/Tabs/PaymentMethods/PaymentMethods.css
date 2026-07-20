@@ -7,9 +7,8 @@
 
 .pm-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
 }
 

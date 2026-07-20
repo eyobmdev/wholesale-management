@@ -187,18 +187,19 @@ export default function PaymentMethodsTab() {
           <h1 className="pm-title">Payment Method Distribution</h1>
           <p className="pm-subtitle">How payments are made across all transaction types</p>
         </div>
-        
-        <DashboardDateSelector 
-          period={period}
-          startDate={customRange.start}
-          endDate={customRange.end}
-          displayDuration={getHumanReadableDuration(displayStartDate, displayEndDate)}
-          onChange={(val) => {
-            setPeriod(val.period);
-            setCustomRange({ start: val.start, end: val.end });
-          }}
-          options={['daily', 'monthly']}
-        />
+        <div style={{ marginTop: '4px' }}>
+          <DashboardDateSelector 
+            period={period}
+            startDate={customRange.start}
+            endDate={customRange.end}
+            displayDuration={getHumanReadableDuration(displayStartDate, displayEndDate)}
+            onChange={(val) => {
+              setPeriod(val.period);
+              setCustomRange({ start: val.start, end: val.end });
+            }}
+            options={['daily', 'monthly']}
+          />
+        </div>
       </div>
 
       {/* Top Section: Aggregated Bar Chart */}
