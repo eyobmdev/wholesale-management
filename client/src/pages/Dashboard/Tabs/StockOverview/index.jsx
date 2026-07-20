@@ -2,7 +2,51 @@ import React from 'react';
 import { useStockOverview } from '../../../../services/dashboardService.js';
 import { formatCurrency } from '../../../../utils/formatters.js';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import Skeleton from 'react-loading-skeleton';
 import './StockOverview.css';
+
+export function StockOverviewSkeleton() {
+  return (
+    <>
+      <div className="so-summary-row">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="so-summary-card">
+            <Skeleton height={14} width={100} style={{ marginBottom: 16 }} />
+            <Skeleton height={36} width={150} />
+          </div>
+        ))}
+      </div>
+      <div className="so-middle-row">
+        <div className="so-panel" style={{ flex: 1, minWidth: '300px' }}>
+          <div className="so-panel-header">
+            <Skeleton height={24} width={200} style={{ marginBottom: 8 }} />
+            <Skeleton height={14} width={100} />
+          </div>
+          <div className="so-panel-content">
+            <Skeleton height={300} borderRadius={16} />
+          </div>
+        </div>
+        <div className="so-panel" style={{ flex: 1, minWidth: '300px' }}>
+          <div className="so-panel-header">
+            <Skeleton height={24} width={250} style={{ marginBottom: 8 }} />
+            <Skeleton height={14} width={150} />
+          </div>
+          <div className="so-panel-content">
+            <Skeleton height={300} borderRadius={16} />
+          </div>
+        </div>
+      </div>
+      <div className="so-panel">
+        <div className="so-panel-header">
+          <Skeleton height={24} width={200} />
+        </div>
+        <div className="so-panel-content">
+          <Skeleton count={5} height={40} style={{ marginBottom: 12 }} />
+        </div>
+      </div>
+    </>
+  );
+}
 
 // Colors mapped to status
 const STATUS_COLORS = {
@@ -67,9 +111,7 @@ export default function StockOverviewTab() {
   if (isLoading) {
     return (
       <div className="so-page">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <StockOverviewSkeleton />
       </div>
     );
   }
