@@ -3,7 +3,37 @@ import { usePaymentMethods } from '../../../../services/dashboardService.js';
 import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie } from 'recharts';
+import Skeleton from 'react-loading-skeleton';
 import './PaymentMethods.css';
+
+export function PaymentMethodsSkeleton() {
+  return (
+    <>
+      <div className="pm-panel pm-top-section">
+        <div className="pm-panel-header">
+          <Skeleton height={28} width={300} style={{ marginBottom: 8 }} />
+          <Skeleton height={14} width={200} />
+        </div>
+        <div className="pm-panel-content">
+          <Skeleton height={300} borderRadius={16} />
+        </div>
+      </div>
+      <div className="pm-bottom-section">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="pm-panel" style={{ flex: 1, minWidth: '300px' }}>
+            <div className="pm-panel-header">
+              <Skeleton height={24} width={200} />
+            </div>
+            <div className="pm-panel-content">
+              <Skeleton height={220} borderRadius={16} style={{ marginBottom: 16 }} />
+              <Skeleton height={40} borderRadius={8} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
 
 // Pre-defined modern colors for payment methods
 const METHOD_COLORS = {
@@ -121,9 +151,7 @@ export default function PaymentMethodsTab() {
   if (isLoading) {
     return (
       <div className="pm-page">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <PaymentMethodsSkeleton />
       </div>
     );
   }
@@ -146,7 +174,7 @@ export default function PaymentMethodsTab() {
 
   // 1. Compute Aggregated Total Volume for Top Bar Chart
   const combinedVolume = {};
-  
+
   const processArray = (arr) => {
     if (!arr) return;
     arr.forEach(item => {
@@ -188,7 +216,7 @@ export default function PaymentMethodsTab() {
           <p className="pm-subtitle">How payments are made across all transaction types</p>
         </div>
         <div style={{ marginTop: '4px' }}>
-          <DashboardDateSelector 
+          <DashboardDateSelector
             period={period}
             startDate={customRange.start}
             endDate={customRange.end}
@@ -215,11 +243,11 @@ export default function PaymentMethodsTab() {
                 <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--card-border)" />
                   <XAxis dataKey="formattedName" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)' }} />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: 'var(--text-muted)' }} 
-                    tickFormatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(0)}K` : val} 
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'var(--text-muted)' }}
+                    tickFormatter={(val) => val >= 1000 ? `${(val / 1000).toFixed(0)}K` : val}
                   />
                   <Tooltip content={<CustomBarTooltip />} cursor={{ fill: 'transparent' }} />
                   <Bar dataKey="volume" radius={[4, 4, 0, 0]}>
@@ -240,7 +268,7 @@ export default function PaymentMethodsTab() {
 
       {/* Bottom Section: Three Donut Charts */}
       <div className="pm-bottom-section">
-        
+
         {/* 1. Customer Income */}
         <div className="pm-panel">
           <div className="pm-panel-header">
@@ -273,9 +301,9 @@ export default function PaymentMethodsTab() {
                 <DonutLegend data={incomeData} />
               </>
             ) : (
-               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
-                 No income data
-               </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
+                No income data
+              </div>
             )}
           </div>
         </div>
@@ -312,9 +340,9 @@ export default function PaymentMethodsTab() {
                 <DonutLegend data={factoryData} />
               </>
             ) : (
-               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
-                 No factory payments data
-               </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
+                No factory payments data
+              </div>
             )}
           </div>
         </div>
@@ -351,9 +379,9 @@ export default function PaymentMethodsTab() {
                 <DonutLegend data={expensesData} />
               </>
             ) : (
-               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
-                 No expenses data
-               </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', minHeight: '220px' }}>
+                No expenses data
+              </div>
             )}
           </div>
         </div>
