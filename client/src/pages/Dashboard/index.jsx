@@ -29,30 +29,13 @@ export default function Dashboard() {
             As of {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} &middot; Currency: ETB
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <span style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '6px', 
-            fontSize: '0.75rem', 
-            backgroundColor: '#ecfdf5', 
-            color: '#047857', 
-            border: '1px solid #a7f3d0', 
-            padding: '6px 12px', 
-            borderRadius: '9999px', 
-            fontWeight: 500 
-          }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
-            Live
-          </span>
-        </div>
       </div>
 
-      <div style={{ 
-        display: 'flex', 
-        gap: '8px', 
-        marginBottom: '24px', 
-        borderBottom: '1px solid var(--card-border)', 
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '24px',
+        borderBottom: '1px solid var(--card-border)',
         paddingBottom: '12px',
         overflowX: 'auto'
       }}>
@@ -84,12 +67,12 @@ export default function Dashboard() {
 
       <div>
         {activeTab === 'overview' && <OverviewTab />}
-        { activeTab === 'sales-trend' && <SalesTrendTab /> }
-        { activeTab === 'profit-trend' && <ProfitTrendTab /> }
-        { activeTab === 'customers' && <CustomerInsightsTab /> }
-        { activeTab === 'stock-overview' && <StockOverviewTab /> }
-        { activeTab === 'product-performance' && <ProductPerformanceTab /> }
-        { activeTab === 'payment-methods' && <PaymentMethodsTab /> }
+        {activeTab === 'sales-trend' && <SalesTrendTab />}
+        {activeTab === 'profit-trend' && <ProfitTrendTab />}
+        {activeTab === 'customers' && <CustomerInsightsTab />}
+        {activeTab === 'stock-overview' && <StockOverviewTab />}
+        {activeTab === 'product-performance' && <ProductPerformanceTab />}
+        {activeTab === 'payment-methods' && <PaymentMethodsTab />}
       </div>
     </div>
   );
