@@ -3,7 +3,42 @@ import { useSalesTrend } from '../../../../services/dashboardService.js';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { formatCurrency, getHumanReadableDuration } from '../../../../utils/formatters.js';
 import { DashboardDateSelector } from '../../components/DashboardDateSelector.jsx';
+import Skeleton from 'react-loading-skeleton';
 import './SalesTrendTab.css';
+
+export function SalesTrendSkeleton() {
+  return (
+    <>
+      <div className="sales-trend-cards">
+        {[1, 2, 3, 4, 5].map(i => (
+          <div key={i} className="st-card">
+            <Skeleton height={14} width={100} style={{ marginBottom: 16 }} />
+            <Skeleton height={36} width={100} />
+          </div>
+        ))}
+      </div>
+      <div className="st-section">
+        <Skeleton height={24} width={300} style={{ marginBottom: 8 }} />
+        <Skeleton height={16} width={150} style={{ marginBottom: 24 }} />
+        <Skeleton height={400} borderRadius={16} />
+      </div>
+      <div className="st-section">
+        <Skeleton height={24} width={250} style={{ marginBottom: 8 }} />
+        <Skeleton height={16} width={200} style={{ marginBottom: 24 }} />
+        <Skeleton height={300} borderRadius={16} />
+      </div>
+      <div className="st-section">
+        <Skeleton height={24} width={200} style={{ marginBottom: 24 }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          {[1, 2, 3, 4, 5].map(i => (
+            <Skeleton key={i} height={20} width={80} />
+          ))}
+        </div>
+        <Skeleton count={5} height={40} style={{ marginBottom: 12 }} />
+      </div>
+    </>
+  );
+}
 
 export default function SalesTrendTab() {
   const [period, setPeriod] = useState('daily');
@@ -80,7 +115,7 @@ export default function SalesTrendTab() {
         <div>
           <h1 className="sales-trend-title">Sales Trend</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-            <DashboardDateSelector 
+            <DashboardDateSelector
               period={period}
               startDate={customRange.start}
               endDate={customRange.end}
@@ -97,9 +132,7 @@ export default function SalesTrendTab() {
       </div>
 
       {showLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-          <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '16px' }}></div>
-        </div>
+        <SalesTrendSkeleton />
       ) : isError ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px', color: '#ef4444' }}>
           <p>Failed to load sales trend data.</p>
