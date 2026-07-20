@@ -1,4 +1,5 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export function MonthlyComparison({ data }) {
@@ -54,9 +55,9 @@ export function MonthlyComparisonSkeleton() {
       padding: '20px',
       height: '100%'
     }}>
-      <div className="skeleton" style={{ height: '20px', width: '150px', marginBottom: '8px' }}></div>
-      <div className="skeleton" style={{ height: '14px', width: '200px', marginBottom: '24px' }}></div>
-      <div className="skeleton" style={{ height: '200px', width: '100%', borderRadius: '8px' }}></div>
+      <Skeleton height={20} width={150} style={{ marginBottom: 8 }} />
+      <Skeleton height={14} width={200} style={{ marginBottom: 24 }} />
+      <Skeleton height={200} width="100%" borderRadius={8} />
     </div>
   );
 }
