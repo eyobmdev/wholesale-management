@@ -30,7 +30,7 @@ def generate_purchase_invoice(purchase) -> bytes:
         )
 
         factory_name = safe(getattr(purchase.factory, "name", "N/A"))
-        payment_status = getattr(purchase, "payment_status", "N/A")
+        payment_status = "-" # getattr(purchase, "payment_status", "N/A")
         currency = getattr(purchase, "currency", "ETB")
         shipping_code = safe(getattr(purchase, "shipping_code", "N/A"))
 
@@ -90,14 +90,16 @@ def generate_purchase_invoice(purchase) -> bytes:
                  Paragraph("BALANCE DUE", STYLES["section_label"])],
                 [
                     Paragraph(f"<b>{fmt_money(total_amt, currency)}</b>", STYLES["summary_total"]),
-                    Paragraph(f"<b>{fmt_money(paid_amt, currency)}</b>", STYLES["summary_paid"]),
-                    Paragraph(
-                        f"<b>{fmt_money(unpaid_amt, currency)}</b>",
-                        ParagraphStyle(
-                            "unpaid_dyn", parent=STYLES["normal"], fontSize=13,
-                            textColor=DANGER if float(unpaid_amt or 0) > 0 else SUCCESS,
-                        ),
-                    ),
+                    "-",
+                    "-"
+                    # Paragraph(f"<b>{fmt_money(paid_amt, currency)}</b>", STYLES["summary_paid"]),
+                    # Paragraph(
+                    #     f"<b>{fmt_money(unpaid_amt, currency)}</b>",
+                    #     ParagraphStyle(
+                    #         "unpaid_dyn", parent=STYLES["normal"], fontSize=13,
+                    #         textColor=DANGER if float(unpaid_amt or 0) > 0 else SUCCESS,
+                    #     ),
+                    # ),
                 ],
             ],
             colWidths=[163, 163, 164],

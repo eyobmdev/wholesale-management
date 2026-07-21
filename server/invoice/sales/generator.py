@@ -32,12 +32,12 @@ def generate_sale_invoice(sale) -> bytes:
         customer_name = safe(getattr(sale.customer, "name", "N/A"))
         currency = getattr(sale, "currency", "ETB")
         invoice_number = safe(getattr(sale, "invoice_number", "N/A"))
-        payment_status = getattr(sale, "payment_status", None) or _fallback_status(sale)
+        payment_status = "-" # getattr(sale, "payment_status", None) or _fallback_status(sale)
 
         elements = []
 
         title_block = Table(
-            [[Paragraph("Your Company Name", STYLES["company"]),
+            [[Paragraph("Amin Complex", STYLES["company"]),
               Paragraph("INVOICE", STYLES["title"])]],
             colWidths=[280, 210],
         )
@@ -90,14 +90,16 @@ def generate_sale_invoice(sale) -> bytes:
                  Paragraph("CREDIT (DUE)", STYLES["section_label"])],
                 [
                     Paragraph(f"<b>{fmt_money(total_amt, currency)}</b>", STYLES["summary_total"]),
-                    Paragraph(f"<b>{fmt_money(paid_amt, currency)}</b>", STYLES["summary_paid"]),
-                    Paragraph(
-                        f"<b>{fmt_money(credit_amt, currency)}</b>",
-                        ParagraphStyle(
-                            "credit_dyn", parent=STYLES["normal"], fontSize=13,
-                            textColor=DANGER if float(credit_amt or 0) > 0 else SUCCESS,
-                        ),
-                    ),
+                    "-",
+                    "-"
+                    # Paragraph(f"<b>{fmt_money(paid_amt, currency)}</b>", STYLES["summary_paid"]),
+                    # Paragraph(
+                    #     f"<b>{fmt_money(credit_amt, currency)}</b>",
+                    #     ParagraphStyle(
+                    #         "credit_dyn", parent=STYLES["normal"], fontSize=13,
+                    #         textColor=DANGER if float(credit_amt or 0) > 0 else SUCCESS,
+                    #     ),
+                    # ),
                 ],
             ],
             colWidths=[163, 163, 164],
