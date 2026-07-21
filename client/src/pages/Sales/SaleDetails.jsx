@@ -364,10 +364,10 @@ export default function SaleDetails() {
               keyField="id"
               emptyMessage="No items found for this sale."
               isLoading={itemsLoading}
-              
+
               toolbarActions={
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   leftIcon="ri-add-line"
                   onClick={() => setIsAddItemModalOpen(true)}
                 >
@@ -442,8 +442,8 @@ export default function SaleDetails() {
                     <span className="info-label">Price Type</span>
                     <span className="info-value">
                       {selectedItem.sell_price_type === 'per_piece' ? <Badge variant="info">Per Piece</Badge> :
-                       selectedItem.sell_price_type === 'per_bag' ? <Badge variant="primary">Per Bag</Badge> :
-                       <Badge variant="default">{selectedItem.sell_price_type}</Badge>}
+                        selectedItem.sell_price_type === 'per_bag' ? <Badge variant="primary">Per Bag</Badge> :
+                          <Badge variant="default">{selectedItem.sell_price_type}</Badge>}
                     </span>
                   </div>
                   <div className="info-item">

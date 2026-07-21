@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { FormField, Input, Select, Button, TextArea } from './index.js';
-import { usePaymentMethods, useCreateIncome } from '../../services/paymentService.js';
+import { usePaymentMethods, useCreateIncome, useCreateFactoryPayment } from '../../services/paymentService.js';
 import { showToast } from '../../utils/toast.js';
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
 
 export const PaymentForm = ({ entityIdKey, entityId, onSuccess, onCancel }) => {
   const { data: paymentMethodsResponse, isLoading: isLoadingMethods, error: methodsError } = usePaymentMethods();
-  const createMutation = useCreateIncome();
+  const createIncomeMutation = useCreateIncome();
+  const createFactoryPaymentMutation = useCreateFactoryPayment();
+  const createMutation = entityIdKey === 'factory' ? createFactoryPaymentMutation : createIncomeMutation;
   const isSubmitting = createMutation.isLoading;
 
   const [showAdditional, setShowAdditional] = useState(false);
