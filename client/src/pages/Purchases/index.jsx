@@ -4,6 +4,7 @@ import { usePurchases, useDeletePurchase, purchaseService } from '../../services
 import { DataTable, Badge, Button, Modal } from '../../components/common/index.js';
 import PurchaseEditForm from './PurchaseEditForm.jsx';
 import { showToast } from '../../utils/toast.js';
+import { formatCurrency } from '../../utils/formatters.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
 
 export default function Purchases() {
@@ -57,7 +58,7 @@ export default function Purchases() {
       key: 'total_purchase_amount',
       title: 'Total Amount',
       sortable: true,
-      render: (val) => `${parseFloat(val || 0).toFixed(2)}`
+      render: (val) => formatCurrency(val)
     },
     {
       key: 'unpaid_amount',
@@ -65,7 +66,7 @@ export default function Purchases() {
       sortable: true,
       render: (val) => {
         const amt = parseFloat(val || 0);
-        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{amt.toFixed(2)}</span> : '0.00';
+        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{formatCurrency(amt)}</span> : formatCurrency(0);
       }
     },
     {
