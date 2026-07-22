@@ -4,6 +4,7 @@ import { useFactory, useDeleteFactory } from '../../services/factoryService.js';
 import { Card, Button, Badge, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
+import { formatCurrency } from '../../utils/formatters.js';
 import FactoryForm from './FactoryForm.jsx';
 import '../Customers/Customers.css'; // Reusing the same grid layout styles
 
@@ -44,8 +45,8 @@ export default function FactoryDetails() {
     const balance = parseFloat(factory.current_balance || 0);
     const currency = factory.initial_balance_currency || 'ETB';
     
-    if (balance > 0) return <Badge variant="danger">You Owe {balance.toFixed(2)} {currency}</Badge>;
-    if (balance < 0) return <Badge variant="success">They Owe {Math.abs(balance).toFixed(2)} {currency}</Badge>;
+    if (balance > 0) return <Badge variant="danger">You Owe {formatCurrency(balance, currency)}</Badge>;
+    if (balance < 0) return <Badge variant="success">They Owe {formatCurrency(Math.abs(balance), currency)}</Badge>;
     return <Badge variant="default">Settled</Badge>;
   };
 
