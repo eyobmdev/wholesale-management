@@ -153,13 +153,13 @@ export default function FactoryDetails() {
               <div className="info-item">
                 <span className="info-label">Current Balance</span>
                 <span className="info-value" style={{ fontWeight: '600' }}>
-                  {parseFloat(factory.current_balance || 0).toFixed(2)} {factory.initial_balance_currency || 'ETB'}
+                  {formatCurrency(factory.current_balance || 0, factory.initial_balance_currency)}
                 </span>
               </div>
               <div className="info-item">
                 <span className="info-label">Initial Balance</span>
                 <span className="info-value">
-                  {parseFloat(factory.initial_balance || 0).toFixed(2)} {factory.initial_balance_currency || 'ETB'}
+                  {formatCurrency(factory.initial_balance || 0, factory.initial_balance_currency)}
                 </span>
               </div>
               <div className="info-item">
