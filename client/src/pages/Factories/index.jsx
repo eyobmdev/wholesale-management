@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFactories } from '../../services/factoryService.js';
 import { DataTable, Badge, Button, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { formatCurrency } from '../../utils/formatters.js';
 import FactoryForm from './FactoryForm.jsx';
 
 export default function Factories() {
@@ -46,8 +47,8 @@ export default function Factories() {
         const currency = row.initial_balance_currency || 'ETB';
         
         // Positive means we owe them (Danger). Negative means they owe us (Success).
-        if (balance > 0) return <Badge variant="danger">You Owe {balance.toFixed(2)} {currency}</Badge>;
-        if (balance < 0) return <Badge variant="success">They Owe {Math.abs(balance).toFixed(2)} {currency}</Badge>;
+        if (balance > 0) return <Badge variant="danger">You Owe {formatCurrency(balance, currency)}</Badge>;
+        if (balance < 0) return <Badge variant="success">They Owe {formatCurrency(Math.abs(balance), currency)}</Badge>;
         return <Badge variant="default">Settled</Badge>;
       }
     },
