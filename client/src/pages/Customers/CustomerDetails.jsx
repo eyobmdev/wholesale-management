@@ -155,13 +155,13 @@ export default function CustomerDetails() {
               <div className="info-item">
                 <span className="info-label">Current Balance</span>
                 <span className="info-value" style={{ fontWeight: '600' }}>
-                  {parseFloat(customer.current_balance || 0).toFixed(2)} {customer.initial_credit_currency || 'ETB'}
+                  {formatCurrency(customer.current_balance || 0, customer.initial_credit_currency)}
                 </span>
               </div>
               <div className="info-item">
                 <span className="info-label">Initial Credit</span>
                 <span className="info-value">
-                  {parseFloat(customer.initial_credit || 0).toFixed(2)} {customer.initial_credit_currency || 'ETB'}
+                  {formatCurrency(customer.initial_credit || 0, customer.initial_credit_currency)}
                 </span>
               </div>
               <div className="info-item">
