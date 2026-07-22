@@ -4,6 +4,7 @@ import { useSales, useDeleteSale } from '../../hooks/useSales.js';
 import { saleService } from '../../services/saleService.js';
 import { DataTable, Badge, Button, Card, Modal } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
+import { formatCurrency } from '../../utils/formatters.js';
 import SaleEditForm from './SaleEditForm.jsx';
 
 export default function Sales() {
@@ -56,7 +57,7 @@ export default function Sales() {
       key: 'total_sale_amount',
       title: 'Total Amount',
       sortable: true,
-      render: (val) => `${parseFloat(val || 0).toFixed(2)}`
+      render: (val) => formatCurrency(val)
     },
     {
       key: 'credit_amount',
@@ -64,7 +65,7 @@ export default function Sales() {
       sortable: true,
       render: (val) => {
         const amt = parseFloat(val || 0);
-        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{amt.toFixed(2)}</span> : '0.00';
+        return amt > 0 ? <span style={{ color: '#ef4444', fontWeight: 500 }}>{formatCurrency(amt)}</span> : formatCurrency(0);
       }
     },
     {
