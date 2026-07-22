@@ -4,6 +4,7 @@ import { useCustomer, useDeleteCustomer } from '../../services/customerService.j
 import { Card, Button, Badge, Modal, PaymentForm } from '../../components/common/index.js';
 import { showToast } from '../../utils/toast.js';
 import { handleBackendErrors } from '../../utils/errorHandler.js';
+import { formatCurrency } from '../../utils/formatters.js';
 import CustomerForm from './CustomerForm.jsx';
 import './Customers.css';
 
@@ -44,8 +45,8 @@ export default function CustomerDetails() {
     const balance = parseFloat(customer.current_balance || 0);
     const currency = customer.initial_credit_currency || 'ETB';
     
-    if (balance > 0) return <Badge variant="danger">Owes {balance.toFixed(2)} {currency}</Badge>;
-    if (balance < 0) return <Badge variant="success">You Owe {Math.abs(balance).toFixed(2)} {currency}</Badge>;
+    if (balance > 0) return <Badge variant="danger">Owes {formatCurrency(balance, currency)}</Badge>;
+    if (balance < 0) return <Badge variant="success">You Owe {formatCurrency(Math.abs(balance), currency)}</Badge>;
     return <Badge variant="default">Settled</Badge>;
   };
 
