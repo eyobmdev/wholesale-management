@@ -178,7 +178,6 @@ EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-# your existing SMTP config should already be here
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # CORS_ALLOWED_ORIGINS = [*]
