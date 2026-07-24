@@ -4,7 +4,7 @@
     A full-stack business management platform built for wholesale distributors.<br/>
     Track purchases, inventory, sales, payments, expenses — and see it all on a real-time analytics dashboard.
   </p>
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/Django-6.0-092E20?logo=django&logoColor=white" alt="Django" />
